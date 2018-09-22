@@ -7,7 +7,7 @@ function prototype = createPrototype(sys, fcn)
 %       fcn             Simulink Function block path name.
 %
 %   Outputs:
-%       prototype       Prototye for calling simFcns from sys.
+%       prototype       Prototype for calling Simulink Functions from sys.
 
     p = getPrototype(fcn);
     vis = getFcnScope(fcn);

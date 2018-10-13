@@ -22,7 +22,7 @@ function moveAll(address, xshift, yshift)
     end
 
     % Move blocks
-    blocks = find_system(address, 'SearchDepth', '1');
+    blocks = find_system(address, 'SearchDepth', '1', 'IncludeCommented', 'on');
     for i = 2:length(blocks) % Start at 2 because the root is entry 1
         bPos = get_param(blocks{i}, 'Position');
         bPos(1) = bPos(1) + xshift;

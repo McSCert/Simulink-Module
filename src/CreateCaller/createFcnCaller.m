@@ -1,7 +1,7 @@
 function caller = createFcnCaller(sys, blockPath, varargin)
-% CREATECALLER Create a function caller block for a Simulink function,
-%   anywhere in the model or parent hierarchy, with the prototype and the input/output argument
-%   specifications populated.
+% CREATECALLER Create a function caller block for a Simulink function, 
+%   anywhere in the model or parent hierarchy, with the prototype and the input/output  
+%   argument specifications populated.
 %
 %   Inputs:
 %       sys         Subsystem in which to place the new caller.
@@ -9,11 +9,11 @@ function caller = createFcnCaller(sys, blockPath, varargin)
 %       varargin{1} Simulink Function prototype. [Optional]
 %
 %   Outputs:
-%       caller     Handle of Function Caller block.
+%       caller      Handle of Function Caller block.
 %
 %   Example:
 %       createFcnCaller(gcs, 'model1/Simulink Function')
-
+        
     callerNum = 1;
     loadedSys = false;
 
@@ -26,10 +26,10 @@ function caller = createFcnCaller(sys, blockPath, varargin)
             load_system(blockSys);
             loadedSys = true;
     end
-
+    
     % Determine Simulink Function block parameters
     % 1) Prototype
-    if nargin < 2
+    if nargin < 3
         prototype = createPrototype(sys, blockPath);
     else
         prototype = varargin{1};
@@ -59,7 +59,7 @@ function caller = createFcnCaller(sys, blockPath, varargin)
             argsOutSpec = [argsOutSpec ', ' type '(' dim ')'];
         end
     end
-
+    
     % Create caller block (with a unique name)
     blockCreated = false;
     while ~blockCreated
@@ -72,14 +72,14 @@ function caller = createFcnCaller(sys, blockPath, varargin)
             callerNum = callerNum + 1;
             blockCreated = true;
         catch ME
-            if contains2(ME.message, 'identifier') % Identifier is not valid
+            if contains(ME.message, 'identifier') % Identifier is not valid
                 rethrow(ME);
             else % Block with that name exists already
                 callerNum = callerNum + 1;
             end
         end
     end
-
+    
     %  Resize block width
     pos = get_param(caller, 'Position');
     [~, newWidth] = blockStringDims(caller, prototype);
@@ -89,7 +89,7 @@ function caller = createFcnCaller(sys, blockPath, varargin)
         pos(3) = newPos;
     end
     set_param(caller, 'Position', pos);
-
+    
     % Close system
     if loadedSys
         close_system(blockSys);

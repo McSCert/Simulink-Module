@@ -1,5 +1,5 @@
 function callers = createFcnCallerLocal(blocks)
-% CREATECALLERLOCAL Create a function caller block for a Simulink function, in
+% CREATECALLERLOCAL Create a function caller block for a Simulink function, in 
 %   the same subystem, with the prototype and the input/output argument specifications populated.
 %
 %   Inputs:
@@ -13,14 +13,14 @@ function callers = createFcnCallerLocal(blocks)
 
     % Handle input
     blocks = inputToCell(blocks);
-
+    
     % Allocate array for new block handles
     callers = zeros(1, length(blocks));
-
+    
     callerNum = 1;
     for i = 1:length(blocks)
         if isSimulinkFcn(blocks{i})
-
+            
             % Determine caller block parameters
             % 1) Prototype
             % Caller is in the same system, so don't worry about qualification
@@ -28,7 +28,7 @@ function callers = createFcnCallerLocal(blocks)
                 'BlockType', 'TriggerPort', ...
                 'TriggerType', 'function-call');
             prototype = get_param(triggerPort, 'FunctionPrototype');
-
+            
             % 2) InputArgumentSpecifications, OutputArgumentSpecifications
             argsIn = find_system(blocks{i}, 'SearchDepth', 1, 'BlockType', 'ArgIn');
             argsOut = find_system(blocks{i}, 'SearchDepth', 1, 'BlockType', 'ArgOut');
@@ -52,7 +52,7 @@ function callers = createFcnCallerLocal(blocks)
                     argsOutSpec = [argsOutSpec ', ' type '(' dim ')'];
                 end
             end
-
+            
             % 3) Position
             position = get_param(blocks{i}, 'Position');
             fcnBlockH = position(4) - position(2);
@@ -63,9 +63,9 @@ function callers = createFcnCallerLocal(blocks)
                 position(4) = position(4) + fcnBlockH + fcnNameH + bufferH;
             else
                 position(2) = position(4) +  bufferH;
-                position(4) = position(4) + fcnBlockH + bufferH;
+                position(4) = position(4) + fcnBlockH + bufferH;               
             end
-
+            
             % Create caller block (with a unique name)
             blockCreated = false;
             while ~blockCreated
@@ -83,5 +83,5 @@ function callers = createFcnCallerLocal(blocks)
                 end
             end
         end
-    end
+    end 
 end

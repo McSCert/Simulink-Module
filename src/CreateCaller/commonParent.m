@@ -1,12 +1,14 @@
 function path1 = commonParent(sys1, sys2)
-% COMMONPARENT Find the first (top-most) common parent between two subsystems or blocks.
+% COMMONPARENT Find the first (top-most) common parent between two blocks.
 %
 %   Inputs:
-%       sys1    Subsystem path name or handle.
-%       sys2    Subsystem path name or handle.
+%       sys1    Block path name or handle.
+%       sys2    Block path name or handle.
 %
 %   Outputs:
 %       path    Path to common parent.
+%
+%   See COMMONPARENTS for finding a common parent for multiple blocks.
 
     % If handles, change to paths for later string operations
     if isnumeric(sys1)
@@ -19,16 +21,11 @@ function path1 = commonParent(sys1, sys2)
     % Compare each element in the path, starting at the root
     path1 = strsplit(sys1, '/');
     path2 = strsplit(sys2, '/');
-    commonPath = '';
-    for i = 1:min(length(path1), length(path2))
-        if isempty(commonPath)
-            newCommonPath = path1{i};
-        else
-            newCommonPath = [commonPath '/' path1{i}];
-        end
-        
-        if  strcmp(path1{i}, path2{i})
-            commonPath =  newCommonPath;
+    
+    commonPath = path1{1};
+    for i = 2:min(length(path1), length(path2))
+        if strcmp(path1{i}, path2{i})
+            commonPath =  [commonPath '/' path1{i}];
         else
             break;
         end

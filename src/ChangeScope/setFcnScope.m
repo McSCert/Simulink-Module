@@ -13,20 +13,20 @@ function setFcnScope(blocks, scope, subsystem)
 
     % Handle input: Convert to cell array of path names
     blocks = inputToCell(blocks);
-
+        
     % 1) Set Function Visibility parameter
     for j = 1:length(blocks)
-        triggerPort = find_system(blocks{j}, 'SearchDepth', 1, 'FollowLinks', 'on', ...
+        triggerPort = find_system(blocks{j}, 'SearchDepth', 1, 'FollowLinks', 'on', ... 
             'BlockType', 'TriggerPort', ...
             'TriggerType', 'function-call');
-
+        
         if (scope == Scope.Global)
             set_param(triggerPort{1}, 'FunctionVisibility', 'global'); % Should only be one
         else
             set_param(triggerPort{1}, 'FunctionVisibility', 'scoped');
         end
     end
-
+    
     % 2) Move to proper location in the model
     if (nargin < 3) && ~exist('subsystem', 'var')
        moveToAdjustScope(blocks, scope, '');
@@ -37,7 +37,7 @@ end
 function moveToAdjustScope(blocks, visibility, subsystem)
 % MOVETOADJUSTSCOPE Move to proper location according to exporting rules.
 %   1) Global functoins can be placed anywhere in a model.
-%   2) Scoped functions are placed at the top level so that they are exported.
+%   2) Scoped functions are placed at the top level so that they are exported. 
 %   3) Local functiosn are placed in a subsystem so that they are not exported.
 % This function moves blocks in cases 2) and 3).
 %
@@ -62,7 +62,7 @@ function moveToAdjustScope(blocks, visibility, subsystem)
             end
         end
     end
-
+    
     % Case 2: scoped function
     if (visibility == Scope.Scoped)
         % Move to root system
@@ -85,10 +85,10 @@ function moveToAdjustScope(blocks, visibility, subsystem)
              else
                  for m = 1:length(blocksToMove)
                     move_block(blocksToMove(m), subsystem);
-                 end
+                 end 
              end
          else
             Simulink.BlockDiagram.createSubsystem(blocksToMove);
          end
-    end
+    end    
 end

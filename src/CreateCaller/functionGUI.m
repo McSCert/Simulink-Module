@@ -60,18 +60,6 @@ position(1) = (screenSize(3) - position(3))/2;
 position(2) = (screenSize(4) - position(4))/2;
 set(handles.figure1, 'Position', position);
 
-% % Populate the listbox with Subsystem names
-% try
-%     [fcns, ~] = getCallableFunctions(varargin{1});
-%     % Remove any newlines
-%     for i = 1:length(fcns)
-%         fcns{i} = strrep(fcns{i}, char(10), '');
-%     end
-% catch
-%     fcns = '';
-% end
-% set(handles.listbox1, 'String', fcns);
-
 % Populate the listbox with Subsystem names
 set(handles.listbox1, 'String', varargin{2});
 
@@ -136,7 +124,7 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-handles.output = get(hObject,'String');
+handles.output = get(hObject, 'String');
 
 % Update handles structure
 guidata(hObject, handles);
@@ -155,7 +143,6 @@ function figure1_CloseRequestFcn(hObject, eventdata, handles)
 if isequal(get(hObject, 'waitstatus'), 'waiting')
     uiresume(hObject);
 else
-    % Close the figure
     delete(hObject);
 end
 

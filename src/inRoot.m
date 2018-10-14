@@ -11,5 +11,5 @@ function b = inRoot(block)
         b = true;
     else
         b = false;
-    end
+    end    
 end

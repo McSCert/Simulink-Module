@@ -15,7 +15,7 @@ classdef Interface
         DataStoreWrite  InterfaceItem
         Function        InterfaceItem
     end
-    properties (Constant, Access = private)
+    properties (Constant, Access = private)        
         InputLabel          = 'Input';
         OutputLabel         = 'Output';
         
@@ -44,10 +44,67 @@ classdef Interface
                 obj = autoAdd(obj);
             end
         end
+        function n = numel(obj)
+        % NUMEL Number of elements in the interface.
+        %
+        %   Inputs:
+        %       obj     Interface object.
+        %
+        %   Outputs:
+        %       n       Number of elements.
+        
+            n = numel(obj.Inport) + ...
+                numel(obj.FromFile) + ...
+                numel(obj.FromWorkspace) + ...
+                numel(obj.FromSpreadsheet) + ...
+                numel(obj.DataStoreRead) + ...
+                numel(obj.Outport) + ...
+                numel(obj.ToFile) + ...
+                numel(obj.ToWorkspace) + ...
+                numel(obj.DataStoreWrite) + ...
+                numel(obj.Function);                 
+        end
+        function l = length(obj)
+        % LENGTH Length of the interface, i.e., the number of elements on the
+        % interface.
+        %
+        %   Inputs:
+        %       obj     Interface object.
+        %
+        %   Outputs:
+        %       l       Length.
+        
+            l = numel(obj);
+        end
+        
+        function s = size(obj)
+        % SIZE Size of the interface, where number of rows corresponds to number
+        %   of properties, and number of columns to number of elements of that
+        %   property.
+        %
+        %   Inputs:
+        %       obj     Interface object.
+        %
+        %   Outputs:
+        %       s       Size.
+        
+            n = max([numel(obj.Inport), ...
+                numel(obj.FromFile), ...
+                numel(obj.FromWorkspace), ...
+                numel(obj.FromSpreadsheet), ...
+                numel(obj.DataStoreRead),+ ...
+                numel(obj.Outport), ...
+                numel(obj.ToFile), ...
+                numel(obj.ToWorkspace), ...
+                numel(obj.DataStoreWrite), ...
+                numel(obj.Function)]);
+            s = [10, n];
+        end
         function print(obj, varargin)
         % PRINT Print the interface in the Command Window.
         %
         %   Inputs:
+        %       obj         Interface object.
         %       verbose     Whether to show empty items (1, default) or not (0).
         %
         %   Outputs:
@@ -154,6 +211,137 @@ classdef Interface
                 end
             end
         end
+        function el = get(obj, loc)
+        % GET Retrieve an element from the interface.
+        %
+        %   Inputs:
+        %       obj     Interface object.
+        %       locs    Location.
+        %
+        %   Outputs:
+        %       el      Element.
+        
+            % Linearize and short-circuit the evaluation
+            all = cell(numel(obj),1);
+            curr = 0;
+            
+            for i = 1:numel(obj.Inport)
+                all{i} = obj.Inport(i);
+            end
+            if ~isempty(i)
+                curr = i;
+            end
+            
+            if curr < loc
+                for j = 1:numel(obj.FromFile)
+                    all{curr+j} = obj.FromFile(j);
+                end
+                if ~isempty(j)
+                    curr = curr + j;
+                end
+            else
+                el = all{loc};
+                return
+            end
+
+            if curr < loc
+                for k = 1:numel(obj.FromWorkspace)
+                    all{curr+k} = obj.FromWorkspace(k);
+                end
+                if ~isempty(k)
+                    curr = curr + k;
+                end
+            else
+                el = all{loc};
+                return
+            end
+            
+            if curr < loc
+                for l = 1:numel(obj.FromSpreadsheet)
+                    all{curr+l} = obj.FromSpreadsheet(l);
+                end
+                if ~isempty(l)
+                    curr = curr + l;
+                end
+            else
+                el = all{loc};
+                return
+            end
+            
+            if curr < loc
+                for m = 1:numel(obj.DataStoreRead)
+                    all{curr+m} = obj.DataStoreRead(m);
+                end
+                if ~isempty(m)
+                    curr = curr + m;
+                end
+            else
+                el = all{loc};
+                return
+            end
+ 
+            if curr < loc
+                for n = 1:numel(obj.Outport)
+                    all{curr+n} = obj.Outport(n);
+                end
+                if ~isempty(n)
+                    curr = curr + n;
+                end
+            else
+                el = all{loc};
+                return
+            end
+            
+            if curr < loc
+                for o = 1:numel(obj.ToFile)
+                    all{curr+o} = obj.ToFile(o);
+                end
+                if ~isempty(o)
+                    curr = curr + o;
+                end
+            else
+                el = all{loc};
+                return
+            end
+            
+            if curr < loc
+                for p = 1:numel(obj.ToWorkspace)
+                    all{curr+p} = obj.ToWorkspace(p);
+                end
+                if ~isempty(p)
+                    curr = curr + p;
+                end
+            else
+                el = all{loc};
+                return
+            end
+            
+            if curr < loc
+                for q = 1:numel(obj.DataStoreWrite)
+                    all{curr+q} = obj.DataStoreWrite(q);
+                end
+                if ~isempty(q)
+                    curr = curr + q;
+                end
+            else
+                el = all{loc};
+                return
+            end
+            
+            if curr < loc
+                for r = 1:numel(obj.Function)
+                    all{curr+r} = obj.Function(r);
+                end
+                %if ~isempty(r)
+                %    curr = curr + r;
+                %end
+            else
+                el = all{loc};
+                return
+            end
+            
+            el = all{loc};
+        end
         function obj = add(obj, names)
         % ADD Add item to interface.
         %
@@ -227,7 +415,7 @@ classdef Interface
                error('Interface has no model.');
            end
             
-           varargin = horzcat(varargin, 'ShowName' ,'on', 'HideAutomaticName', 'off');
+           varargin = horzcat(varargin, 'ShowName' ,'on', 'HideAutomaticName', 'off', 'Commented', 'on');
            % TODO: use a for loop and space everything   
            interfaceWidth = 300; % Should be computed dynamically
            moveAll(obj.ModelName, interfaceWidth, 0);
@@ -361,6 +549,7 @@ classdef Interface
             
             % Resize blocks
             
+            
             % Move blocks left and right
             
             % Connect to terminators/grounds
@@ -370,7 +559,10 @@ classdef Interface
   
             
             set_param(bdroot, 'Zoomfactor', 'FitSystem');
-        end      
+        end
+        function iter = createIterator(obj)
+            iter = InterfaceIterator(obj);
+        end
     end
     methods (Access = private)
         function obj = autoAdd(obj, varargin)
@@ -450,6 +642,10 @@ classdef Interface
                 end
                 obj = add(obj, unique([fcns_scoped, fcns_global]));
             end
+        end
+        function resizeAll()
+        % RESIZEALL Resize all blocks in the interface.
+        %   adjustWidth();
         end
     end
 end

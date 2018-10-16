@@ -235,24 +235,21 @@ function interface(callbackInfo)
     % Check if interface object already exists for this model
     sys = bdroot(gcs);
     objName = [sys '_InterfaceObject'];
-    eval(['global ' objName ';']);
-    eval(['notempty_obj = ~isempty(' objName ');']);
+%     eval(['global ' objName ';']);
+%     eval(['notempty_obj = ~isempty(' objName ');']);
+%     
+%     if notempty_obj
+%         eval(['this_sys = strcmp(get_param(sys, ''name''), ' objName '.ModelName);'])
+%         if this_sys
+%             % don't recreate it because it already exists
+%         else
+%             eval([objName ' = Interface(sys);']);
+%         end
+%     else
+%         eval([objName ' = Interface(sys);']);
+%     end
+%     
+    eval([objName ' = Interface(sys);']);
+    eval([objName ' = ' objName '.model;']);   
     
-    if notempty_obj
-        %eval(['valid_obj = isvalid(' objName ');']);
-        %if valid_obj
-            eval(['this_sys = strcmp(get_param(sys, ''name''), ' objName '.ModelName);'])
-            if this_sys
-                % don't recreate it because it already exists
-            else
-                eval([objName ' = Interface(sys);']);
-            end
-        %else
-        %    eval([objName ' = Interface(sys);']);
-        %end
-    else
-        eval([objName ' = Interface(sys);']);
-    end
-    
-    eval([objName ' = ' objName '.model;']);
 end

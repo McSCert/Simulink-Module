@@ -1,6 +1,7 @@
 classdef Interface
 	properties
         ModelName
+        
         % INPUTS
         Inport          InterfaceItem
         FromFile        InterfaceItem 
@@ -66,7 +67,7 @@ classdef Interface
         end
         function l = length(obj)
         % LENGTH Length of the interface, i.e., the number of elements on the
-        % interface.
+        %   interface.
         %
         %   Inputs:
         %       obj     Interface object.
@@ -75,8 +76,7 @@ classdef Interface
         %       l       Length.
         
             l = numel(obj);
-        end
-        
+        end       
         function s = size(obj)
         % SIZE Size of the interface, where number of rows corresponds to number
         %   of properties, and number of columns to number of elements of that
@@ -123,7 +123,7 @@ classdef Interface
             elseif ~isempty(obj.Inport) 
                 fprintf('%s:\n', obj.InportLabel);
                 for i = 1:length(obj.Inport)
-                    fprintf('\t%s, %s\n', obj.Inport(i).Fullpath, obj.Inport(i).Type);
+                    fprintf('\t%s, %s\n', obj.Inport(i).Fullpath, obj.Inport(i).DataType);
                 end
             end
             
@@ -132,7 +132,7 @@ classdef Interface
             elseif ~isempty(obj.FromFile)
                 fprintf('%s:\n', obj.FromFileLabel);
                 for i = 1:length(obj.FromFile)
-                    fprintf('\t%s, %s\n', obj.FromFile(i).Fullpath, obj.FromFile(i).Type);
+                    fprintf('\t%s, %s\n', obj.FromFile(i).Fullpath, obj.FromFile(i).DataType);
                 end
             end
             
@@ -141,7 +141,7 @@ classdef Interface
             elseif ~isempty(obj.FromWorkspace)
                 fprintf('%s:\n', obj.FromWorkspaceLabel);
                 for i = 1:length(obj.FromWorkspace)
-                    fprintf('\t%s, %s\n', obj.FromWorkspace(i).Fullpath, obj.FromWorkspace(i).Type);
+                    fprintf('\t%s, %s\n', obj.FromWorkspace(i).Fullpath, obj.FromWorkspace(i).DataType);
                 end
             end
             
@@ -150,7 +150,7 @@ classdef Interface
             elseif ~isempty(obj.FromSpreadsheet)
                 fprintf('%s:\n', obj.FromSpreadsheetLabel);
                 for i = 1:length(obj.FromSpreadsheet)
-                    fprintf('\t%s, %s\n', obj.FromSpreadsheet(i).Fullpath, obj.FromSpreadsheet(i).Type);
+                    fprintf('\t%s, %s\n', obj.FromSpreadsheet(i).Fullpath, obj.FromSpreadsheet(i).DataType);
                 end
             end
 
@@ -159,7 +159,7 @@ classdef Interface
             elseif ~isempty(obj.DataStoreRead)
                 fprintf('%s:\n', obj.DataStoreReadLabel);
                 for i = 1:length(obj.DataStoreRead)
-                    fprintf('\t%s, %s\n', obj.DataStoreRead(i).Fullpath, obj.DataStoreRead(i).Type);
+                    fprintf('\t%s, %s\n', obj.DataStoreRead(i).Fullpath, obj.DataStoreRead(i).DataType);
                 end
             end
             
@@ -171,7 +171,7 @@ classdef Interface
             elseif ~isempty(obj.Outport)
                 fprintf('%s:\n', obj.OutportLabel);
                 for i = 1:length(obj.Outport)
-                    fprintf('\t%s, %s\n', obj.Outport(i).Fullpath, obj.Outport(i).Type);
+                    fprintf('\t%s, %s\n', obj.Outport(i).Fullpath, obj.Outport(i).DataType);
                 end
             end
             
@@ -180,7 +180,7 @@ classdef Interface
             elseif ~isempty(obj.ToFile)
                 fprintf('%s:\n', obj.ToFileLabel);
                 for i = 1:length(obj.ToFile)
-                    fprintf('\t%s, %s\n', obj.ToFile(i).Fullpath, obj.ToFile(i).Type);
+                    fprintf('\t%s, %s\n', obj.ToFile(i).Fullpath, obj.ToFile(i).DataType);
                 end
             end
             
@@ -189,7 +189,7 @@ classdef Interface
             elseif ~isempty(obj.ToWorkspace)
                 fprintf('%s:\n', obj.ToWorkspaceLabel);
                 for i = 1:length(obj.ToWorkspace)
-                    fprintf('\t%s, %s\n', obj.ToWorkspace(i).Fullpath, obj.ToWorkspace(i).Type);
+                    fprintf('\t%s, %s\n', obj.ToWorkspace(i).Fullpath, obj.ToWorkspace(i).DataType);
                 end
             end
                         
@@ -198,7 +198,7 @@ classdef Interface
             elseif ~isempty(obj.DataStoreWrite)
                 fprintf('%s:\n', obj.DataStoreWriteLabel);
                 for i = 1:length(obj.DataStoreWrite)
-                    fprintf('\t%s, %s\n', obj.DataStoreWrite(i).Fullpath, obj.DataStoreWrite(i).Type);
+                    fprintf('\t%s, %s\n', obj.DataStoreWrite(i).Fullpath, obj.DataStoreWrite(i).DataType);
                 end
             end
             
@@ -207,7 +207,7 @@ classdef Interface
             elseif ~isempty(obj.Function)
                 fprintf('%s:\n', obj.FunctionLabel);
                 for i = 1:length(obj.Function)
-                    fprintf('\t%s, %s\n', obj.Function(i).Fullpath, obj.Function(i).Type);
+                    fprintf('\t%s, %s\n', obj.Function(i).Fullpath, obj.Function(i).DataType);
                 end
             end
         end
@@ -222,8 +222,8 @@ classdef Interface
         %       el      Element.
         
             % Linearize and short-circuit the evaluation
-            all = cell(numel(obj),1);
-            curr = 0;
+            all = cell(numel(obj), 1);
+            curr = 0;  % Index where element is placed in linearized cell array
             
             for i = 1:numel(obj.Inport)
                 all{i} = obj.Inport(i);
@@ -548,11 +548,28 @@ classdef Interface
             end
             
             % Resize blocks
-            
+            resizeAll(obj);
             
             % Move blocks left and right
+%             iter = createIterator(obj);
+%             while iter.hasNext()
+%                 el = iter.next();
+%                 if strcmp(el.InterfaceType, 'In')
+%                     
+%                 end
+%             end
             
             % Connect to terminators/grounds
+            iter = createIterator(obj);
+            while iter.hasNext()
+                el = iter.next();
+                allPorts = get_param(el.InterfaceHandle, 'PortHandles');
+                if ~isempty(allPorts)
+                    el.GroundHandle = fulfillPorts(allPorts.Inport);
+                    el.TerminatorHandle = fulfillPorts(allPorts.Outport);
+                end
+            end
+
 
             % Add annotations
             %            obj.ExportDataHeader = Simulink.Annotation([bdroot '/' obj.ExportDataHeaderText], 'FontSize', 14, 'Position', [10,100]);
@@ -561,6 +578,15 @@ classdef Interface
             set_param(bdroot, 'Zoomfactor', 'FitSystem');
         end
         function iter = createIterator(obj)
+        % CREATEITERATOR Create the iterator object for iterating over an
+        %   interface.
+        %
+        %   Inputs:
+        %       obj     Interface object.
+        %
+        %   Outputs:
+        %       iter    Iterator object.
+        
             iter = InterfaceIterator(obj);
         end
     end
@@ -643,9 +669,24 @@ classdef Interface
                 obj = add(obj, unique([fcns_scoped, fcns_global]));
             end
         end
-        function resizeAll()
+        function resizeAll(obj)
         % RESIZEALL Resize all blocks in the interface.
-        %   adjustWidth();
+        %
+        %   Inputs:
+        %       obj     Interface object.
+        
+            iter = createIterator(obj);
+            while iter.hasNext()
+                el = iter.next();
+                if ~isempty(el.InterfaceHandle)
+                    try
+                        adjustWidth(get_param(el.InterfaceHandle, 'Path'));
+                    catch
+                        % FromFile blocks don't have a path parameter
+                        adjustWidth([get_param(el.InterfaceHandle, 'Parent'), '/', get_param(el.InterfaceHandle, 'Name')]);
+                    end
+                end
+            end
         end
     end
 end

@@ -19,26 +19,51 @@ classdef InterfaceItem
         
     end
     methods (Access = public)
-         function obj = InterfaceItem(handle)
-             if nargin == 1
-                 % Perform checks before creating an InterfaceItem
+        function obj = InterfaceItem(handle)
+            if nargin == 1
+                % Perform checks before creating an InterfaceItem
                 [valid, ~] = itemTypeCheck(handle);
                 if ~valid
                     error(['Block ''' get_param(obj.Handle, 'Name') ''' is not a valid InterfaceItem.']);
                 end
-                
+
                 obj.Handle = inputToNumeric(handle);
                 obj = autoGetData(obj);    
-             elseif nargin > 1
-                 error('Too many inputs provided.');
+            elseif nargin > 1
+                error('Too many inputs provided.');
+            else
+                error('Not enough inputs provided.');
+            end
+        end
+        function b = eq(obj1, obj2)
+        % EQ Check if two InterfaceItems are equal.
+        %
+        %   Inputs:
+        %       obj1    InterfaceItem.
+        %       obj2    InterfaceItem.
+        %
+        %   Outputs:
+        %
+        %       b      Whether or not inputs are equal (1), or not (0).
+        
+             if obj1.Handle == obj2.Handle
+                 b = true;
              else
-                 error('Not enough inputs provided.');
+                 b = false;
              end
          end
     end
     methods (Access = private)
         function obj = autoGetData(obj)
-            
+        % AUTOGETDATA Automatically populate the item's fields based on the model.
+        %
+        %   Inputs:
+        %       obj     InterfaceItem.
+        %
+        %   Outputs:
+        %
+        %       obj     InterfaceItem.
+        
             % BLOCKTYPE
             obj.BlockType = get_param(obj.Handle, 'BlockType');
             
@@ -57,7 +82,7 @@ classdef InterfaceItem
             % DIMENSIONS
             obj.Dimensions = char(getDimensions(obj.Handle));
             
-            % INTERFACEBLOCK
+            % INTERFACEHANDLE
             % Added when the interface is modeled only.
         end
     end
@@ -65,9 +90,16 @@ end
 function [valid, type] = itemTypeCheck(handle)
 % ITEMTYPECHECK Check if the item is one of the supported BlockTypes. Return the
 %   InterfaceType.
+%
+%   Inputs:
+%       handle  Handle to a block.
+%
+%   Outputs:
+%       valid   Whether or not it is a supported InterfaceItem block.
+%       type    Whether it is an input InterfaceItem ('In'), or an output ('out').
 
-    bt = get_param(handle, 'BlockType');
-    in = {'Inport', 'FromFile', 'FromWorkspace', 'FromSpreadsheet', 'DataStoreRead'};
+    bt  = get_param(handle, 'BlockType');
+    in  = {'Inport', 'FromFile', 'FromWorkspace', 'FromSpreadsheet', 'DataStoreRead'};
     out = {'Outport', 'ToFile', 'ToWorkspace', 'DataStoreWrite', 'SubSystem'};
     
     if isempty(bt)
@@ -86,7 +118,4 @@ function [valid, type] = itemTypeCheck(handle)
         type = '';
         valid = false;
     end    
-end
-function s = replaceNewline(string)
-    s =  regexprep(string, '[\n\r]+', ' ');
 end

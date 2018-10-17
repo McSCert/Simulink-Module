@@ -417,7 +417,7 @@ classdef Interface
             
            varargin = horzcat(varargin, 'ShowName' ,'on', 'HideAutomaticName', 'off', 'Commented', 'on');
            % TODO: use a for loop and space everything   
-           interfaceWidth = 300; % Should be computed dynamically
+           interfaceWidth = 100; % Should be computed dynamically
            moveAll(obj.ModelName, interfaceWidth, 0);
            
            nblock = 1;
@@ -435,6 +435,13 @@ classdef Interface
                     end
                     name = get_param(obj.FromFile(j).Handle, 'FileName');
                     set_param(obj.FromFile(j).InterfaceHandle, 'FileName', name); 
+                    
+                    % Connect to terminators/grounds
+                    allPorts = get_param(obj.FromFile(j).InterfaceHandle, 'PortHandles');
+                    if ~isempty(allPorts)
+                        obj.FromFile(j).GroundHandle = fulfillPorts(allPorts.Inport);
+                        obj.FromFile(j).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                    end
                 end 
            end
            
@@ -452,6 +459,13 @@ classdef Interface
                     end
                     name = get_param(obj.FromSpreadsheet(k).Handle, 'FileName');
                     set_param(obj.FromSpreadsheet(k).InterfaceHandle, 'FileName', name); 
+                    
+                    % Connect to terminators/grounds
+                    allPorts = get_param(obj.FromSpreadsheet(k).InterfaceHandle, 'PortHandles');
+                    if ~isempty(allPorts)
+                        obj.FromSpreadsheet(k).GroundHandle = fulfillPorts(allPorts.Inport);
+                        obj.FromSpreadsheet(k).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                    end
                 end 
             end
            
@@ -469,6 +483,13 @@ classdef Interface
                     end
                     name = get_param(obj.FromWorkspace(l).Handle, 'VariableName');
                     set_param(obj.FromWorkspace(l).InterfaceHandle, 'VariableName', name);
+                    
+                    % Connect to terminators/grounds
+                    allPorts = get_param(obj.FromWorkspace(l).InterfaceHandle, 'PortHandles');
+                    if ~isempty(allPorts)
+                        obj.FromWorkspace(l).GroundHandle = fulfillPorts(allPorts.Inport);
+                        obj.FromWorkspace(l).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                    end
                 end 
             end
             
@@ -486,6 +507,13 @@ classdef Interface
                     end    
                     name = get_param(obj.DataStoreRead(m).Handle, 'DataStoreName');
                     set_param(obj.DataStoreRead(m).InterfaceHandle, 'DataStoreName', name);
+                    
+                    % Connect to terminators/grounds
+                    allPorts = get_param(obj.DataStoreRead(m).InterfaceHandle, 'PortHandles');
+                    if ~isempty(allPorts)
+                        obj.DataStoreRead(m).GroundHandle = fulfillPorts(allPorts.Inport);
+                        obj.DataStoreRead(m).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                    end
                 end 
             end
             
@@ -502,7 +530,14 @@ classdef Interface
                         end
                     end   
                     name = get_param(obj.ToFile(n).Handle, 'FileName');
-                    set_param(obj.ToFile(n).InterfaceHandle, 'FileName', name); 
+                    set_param(obj.ToFile(n).InterfaceHandle, 'FileName', name);
+                    
+                    % Connect to terminators/grounds
+                    allPorts = get_param(obj.ToFile(n).InterfaceHandle, 'PortHandles');
+                    if ~isempty(allPorts)
+                        obj.ToFile(n).GroundHandle = fulfillPorts(allPorts.Inport);
+                        obj.ToFile(n).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                    end
                 end 
             end
             
@@ -520,6 +555,13 @@ classdef Interface
                     end
                     name = get_param(obj.ToWorkspace(o).Handle, 'VariableName');
                     set_param(obj.ToWorkspace(o).InterfaceHandle, 'VariableName', name);
+                    
+                    % Connect to terminators/grounds
+                    allPorts = get_param(obj.ToWorkspace(o).InterfaceHandle, 'PortHandles');
+                    if ~isempty(allPorts)
+                        obj.ToWorkspace(o).GroundHandle = fulfillPorts(allPorts.Inport);
+                        obj.ToWorkspace(o).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                    end
                 end 
             end
 
@@ -537,6 +579,13 @@ classdef Interface
                     end
                     name = get_param(obj.DataStoreWrite(p).Handle, 'DataStoreName');
                     set_param(obj.DataStoreWrite(p).InterfaceHandle, 'DataStoreName', name);
+                    
+                    % Connect to terminators/grounds
+                    allPorts = get_param(obj.DataStoreWrite(p).InterfaceHandle, 'PortHandles');
+                    if ~isempty(allPorts)
+                        obj.DataStoreWrite(p).GroundHandle = fulfillPorts(allPorts.Inport);
+                        obj.DataStoreWrite(p).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                    end
                 end 
             end
             
@@ -545,11 +594,18 @@ classdef Interface
                     obj.Function(q).InterfaceHandle = createFcnCaller(obj.ModelName, obj.Function(q).Fullpath);    
                     set_param(obj.Function(q).InterfaceHandle, varargin{:})
                 end 
+                
+                % Connect to terminators/grounds
+                allPorts = get_param(obj.Function(q).InterfaceHandle, 'PortHandles');
+                if ~isempty(allPorts)
+                    obj.Function(q).GroundHandle = fulfillPorts(allPorts.Inport);
+                    obj.Function(q).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                end
             end
             
             % Resize blocks
             resizeAll(obj);
-            
+                        
             % Move blocks left and right
 %             iter = createIterator(obj);
 %             while iter.hasNext()
@@ -558,24 +614,52 @@ classdef Interface
 %                     
 %                 end
 %             end
-            
+           
+
+            iter = createIterator(obj);
+            h = [];
+            while iter.hasNext()
+                el = iter.next();
+                h = [h el.InterfaceHandle];
+                
+            end
+            alignBlocksInColumn(num2cell(h), 'center');
+
             % Connect to terminators/grounds
+            % Note: Functions can have multiples
             iter = createIterator(obj);
             while iter.hasNext()
                 el = iter.next();
-                allPorts = get_param(el.InterfaceHandle, 'PortHandles');
-                if ~isempty(allPorts)
-                    el.GroundHandle = fulfillPorts(allPorts.Inport);
-                    el.TerminatorHandle = fulfillPorts(allPorts.Outport);
+                if length(el.GroundHandle) > 1
+                    for i = 1:length(el.GroundHandle)
+                        moveToConnectedPort(el.GroundHandle(i), 30);
+                    end
+                else
+                    moveToConnectedPort(el.GroundHandle, 30);
+                end
+                
+                if length(el.TerminatorHandle) > 1
+                    for i = 1:length(el.TerminatorHandle)
+                        moveToConnectedPort(el.TerminatorHandle(i), 30);
+                    end
+                else
+                    moveToConnectedPort(el.TerminatorHandle, 30);
                 end
             end
 
-
             % Add annotations
-            %            obj.ExportDataHeader = Simulink.Annotation([bdroot '/' obj.ExportDataHeaderText], 'FontSize', 14, 'Position', [10,100]);
+            % obj.ExportDataHeader = Simulink.Annotation([bdroot '/' obj.ExportDataHeaderText], 'FontSize', 14, 'Position', [10,100]);
   
             
             set_param(bdroot, 'Zoomfactor', 'FitSystem');
+        end
+        function obj = setTerminator(obj, item, handle)
+            for i = 1:length(obj)
+                el = obj.get(i);
+                if el == item
+                    obj.get(i).TerminatorHandle = handle;
+                end
+            end            
         end
         function iter = createIterator(obj)
         % CREATEITERATOR Create the iterator object for iterating over an

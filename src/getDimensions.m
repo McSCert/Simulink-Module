@@ -27,7 +27,7 @@ function dims = getDimensions(blocks)
 
         elseif isSimulinkFcn(blocks(i))
             [indim, outdim] = getFcnArgsDim(blocks(i));
-            dims{i} = ['In: ' strjoin(indim{:}, ', '), '; Out: ' strjoin(outdim{:}, ', ')];
+            dims{i} = ['In: ' strjoin(indim, ', '), '; Out: ' strjoin(outdim, ', ')];
 
         elseif strcmp(blockTypes{i},  'DataStoreRead') || strcmp(blockTypes{i},  'DataStoreWrite')
             % Find Simulink.Signal object, then get its DataType

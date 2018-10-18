@@ -1,5 +1,5 @@
 function moveToConnectedPort(block, varargin)
-% MOVETOPORT Move a block to the right/left of the block it is connnected to,
+% MOVETOPORT Move a block to the right/left of the block it is connected to,
 %   and align it with the port it is connected to. If it is connected to more
 %   than one block, use the first port. If it is connected to both a source and
 %   destination block, move to the source.

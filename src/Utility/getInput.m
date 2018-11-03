@@ -14,7 +14,7 @@ function value = getInput(name, args)
  %				SubSystem
 
     if iscellcell(args)
-    	idx = find(strcmp([args{:}], name));
+    	idx = find(strcmp(args, name));
     	exists = ~isempty(idx);
     else
     	[exists, idx] = ismember(name, args);

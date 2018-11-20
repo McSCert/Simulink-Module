@@ -33,6 +33,10 @@ function [fcns, prototype] = getFcns(sys)
     
     fcnsAll = find_system(bdroot(sys), 'BlockType', 'SubSystem', 'IsSimulinkFunction', 'on');
     prototypeAll = getPrototype(fcnsAll); 
+    if ~iscell(prototypeAll)
+        prototypeAll = {prototypeAll};
+    end
+    
     vis = getFcnScope(fcnsAll);
     
     for j = 1:length(fcnsAll)

@@ -22,17 +22,18 @@ function types = getDataType(blocks)
     end
 
     for i = 1:length(blocks)
-        if strcmp(blockTypes{i}, 'Outport') ...
-            || strcmp(blockTypes{i}, 'Inport') ...
-            || strcmp(blockTypes{i}, 'FromFile') ...
-            || strcmp(blockTypes{i}, 'FromSpreadsheet') ...
-            || strcmp(blockTypes{i}, 'FromWorkspace')
-            types{i} = get_param(blocks(i), 'OutDataTypeStr');
+        b = blocks(i);
+        
+        if any(find(strcmp(blockTypes{i}, {'Outport', 'Inport', 'FromFile', 'FromSpreadsheet', 'FromWorkspace'})))
+            types{i} = get_param(b, 'OutDataTypeStr');
+            
         elseif strcmp(blockTypes{i}, 'ToFile')
-            types{i} = get_param(blocks(i), 'SaveFormat');
+            types{i} = get_param(b, 'SaveFormat');
+            
         elseif strcmp(blockTypes{i}, 'ToWorkspace')
-            types{i} = get_param(blocks(i), 'SaveFormat');
-        elseif strcmp(blockTypes{i}, 'DataStoreRead') || strcmp(blockTypes{i},  'DataStoreWrite')
+            types{i} = get_param(b, 'SaveFormat');
+            
+        elseif any(find(strcmp(blockTypes{i}, {'DataStoreRead', 'DataStoreWrite'})))
             % Find Simulink.Signal object, then get its DataType
     
             % Assume Data Stores are in the base workspace/data dictionary
@@ -42,14 +43,22 @@ function types = getDataType(blocks)
 %             datastores = workspaceData(idx);
 %             match = strcmp({datastores.name}, get_param(blocks(i), 'DataStoreName'));
             types{i} = 'Unknown';
-        elseif isSimulinkFcn(blocks(i))
-            [intype, outtype] = getFcnArgsType(blocks(i));
+            
+        elseif isSimulinkFcn(b)
+            [intype, outtype] = getFcnArgsType(b);
             types{i} = ['In: ' strjoin(intype, ', '), '; Out: ' strjoin(outtype, ', ')];
+            
+        elseif isLibraryLink(b)
+            types{i} = 'N/A';
+            
+        elseif strcmp(blockTypes{i}, 'ModelReference')
+            types{i} = 'N/A';
+            
         else
             try
-                types{i} = get_param(blocks(i), 'OutDataTypeStr');
+                types{i} = get_param(b, 'OutDataTypeStr');
             catch
-               % warning(['No data type was identified for block ' get_param(blocks(i), 'Name') '.']);
+               % warning(['No data type was identified for block ' get_param(b, 'Name') '.']);
                 types{i} = 'N/A';
             end
         end

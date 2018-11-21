@@ -11,8 +11,8 @@ function [in, out] = getFcnArgsType(fcn)
 
     fcn = inputToCell(fcn);
     
-    argsIn = find_system(fcn, 'SearchDepth', 1, 'BlockType', 'ArgIn');
-    argsOut = find_system(fcn, 'SearchDepth', 1, 'BlockType', 'ArgOut');
+    argsIn  = find_system(fcn, 'FollowLinks', 'on', 'SearchDepth', 1, 'BlockType', 'ArgIn');
+    argsOut = find_system(fcn, 'FollowLinks', 'on', 'SearchDepth', 1, 'BlockType', 'ArgOut');
 
     in = cell(size(argsIn));
     out = cell(size(argsOut));

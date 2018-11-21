@@ -1,7 +1,7 @@
 classdef InterfaceItem
     properties
         BlockType           % BlockType.
-        InterfaceType       % Input or output.
+        InterfaceType       % Input, Import, Output, or Export.
         Handle              % Handle of the item that is on the interface.
         Name                % Name.
         Fullpath            % Fullpath.
@@ -44,7 +44,7 @@ classdef InterfaceItem
         %
         %   Outputs:
         %
-        %       b      Whether or not inputs are equal (1), or not (0).
+        %       b       Whether or not inputs are equal (1), or not (0).
         
              if obj1.Handle == obj2.Handle
                  b = true;
@@ -96,26 +96,36 @@ function [valid, type] = itemTypeCheck(handle)
 %
 %   Outputs:
 %       valid   Whether or not it is a supported InterfaceItem block.
-%       type    Whether it is an input InterfaceItem ('In'), or an output ('out').
+%       type    'Input', 'Import', 'Output', 'Export'
 
-    bt  = get_param(handle, 'BlockType');
+    blocktype  = get_param(handle, 'BlockType');
     in  = {'Inport', 'FromFile', 'FromWorkspace', 'FromSpreadsheet', 'DataStoreRead'};
-    out = {'Outport', 'ToFile', 'ToWorkspace', 'DataStoreWrite', 'SubSystem'};
+    im  = {'ModelReference'};
+    out = {'Outport', 'ToFile', 'ToWorkspace', 'DataStoreWrite'};
+
+    % Note: Both library links and Simulink functions are of BlockType
+    % SubSystem, so extra check will need to be done
     
-    if isempty(bt)
+    if isempty(blocktype)
         type = '';
         valid = false;
         return
     end
     
-    if any2(find(strcmp(in, bt)))
-        type = 'In';
+    if any2(find(strcmp(in, blocktype)))
+        type = 'Input';
         valid = true;
-    elseif any2(find(strcmp(out, bt)))
-        type = 'Out';
+    elseif any2(find(strcmp(out, blocktype)))
+        type = 'Outout';
+        valid = true;
+    elseif any2(find(strcmp(im, blocktype))) || isLibraryLink(handle)
+        type = 'Import';
+        valid = true;
+    elseif isSimulinkFcn(handle)
+        type = 'Export';
         valid = true;
     else
         type = '';
         valid = false;
-    end    
+    end   
 end

@@ -22,33 +22,41 @@ function dims = getDimensions(blocks)
     end
 
     for i = 1:length(blocks)
-        if strcmp(blockTypes{i},  'Outport') || strcmp(blockTypes{i},  'Inport')
-            dims{i} = get_param(blocks(i), 'PortDimensions');
+        b = blocks(i);
+        if any(find(strcmp(blockTypes{i}, {'Inport', 'Outport'})))
+            dims{i} = get_param(b, 'PortDimensions');
 
-        elseif isSimulinkFcn(blocks(i))
-            [indim, outdim] = getFcnArgsDim(blocks(i));
+        elseif isSimulinkFcn(b) && ~isLibraryLink(b)
+            [indim, outdim] = getFcnArgsDim(b);
             dims{i} = ['In: ' strjoin(indim, ', '), '; Out: ' strjoin(outdim, ', ')];
 
-        elseif strcmp(blockTypes{i},  'DataStoreRead') || strcmp(blockTypes{i},  'DataStoreWrite')
+        elseif any(find(strcmp(blockTypes{i}, {'DataStoreRead', 'DataStoreWrite'})))
             % Find Simulink.Signal object, then get its DataType
             dims{i} = 'Unknown';
-        elseif strcmp(blockTypes{i},  'ToFile') || strcmp(blockTypes{i},  'FromFile')
+            
+        elseif any(find(strcmp(blockTypes{i}, {'ToFile', 'FromFile'})))
             dims{i} = 'N/A';
-        elseif strcmp(blockTypes{i},  'FromWorkspace')            
+            
+        elseif strcmp(blockTypes{i}, 'FromWorkspace')            
             dims{i} = 'N/A';
 
-        elseif strcmp(blockTypes{i},  'FromSpreadsheet')
+        elseif strcmp(blockTypes{i}, 'FromSpreadsheet')
             % Only one dimensional signals are supported
-            oneDims = num2str(ones(1, length(get_param(blocks(i), 'PortConnectivity'))));
+            oneDims = num2str(ones(1, length(get_param(b, 'PortConnectivity'))));
             oneDims = regexprep(oneDims, ' +', ', ');
             dims{i} = oneDims;
-        elseif strcmp(blockTypes{i},  'ToWorkspace')
-            dims{i} = get_param(blocks(i), 'SaveFormat'); % VariableName? SaveFormat?
+            
+        elseif strcmp(blockTypes{i}, 'ToWorkspace')
+            dims{i} = get_param(b, 'SaveFormat'); % VariableName? SaveFormat?
+            
+        elseif strcmp(blockTypes{i}, 'ModelReference')
+             dims{i} = 'N/A';
+
         else
             try
-                dims{i} = get_param(blocks(i), 'PortDimensions');
+                dims{i} = get_param(b, 'PortDimensions');
             catch
-               % warning(['No dimension was identified for block ' get_param(blocks(i), 'Name') '.']);
+               % warning(['No dimension was identified for block ' get_param(b, 'Name') '.']);
                 dims{i} = 'N/A';
             end
         end

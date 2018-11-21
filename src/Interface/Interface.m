@@ -9,11 +9,17 @@ classdef Interface
         FromSpreadsheet InterfaceItem
         DataStoreRead   InterfaceItem
         
+        % IMPORTS
+        ModelReference  InterfaceItem
+        LibraryLink     InterfaceItem   
+        
         % OUTPUTS
         Outport         InterfaceItem
         ToFile          InterfaceItem
         ToWorkspace     InterfaceItem
         DataStoreWrite  InterfaceItem
+        
+        % EXPORTS
         Function        InterfaceItem
     end
     properties (Constant, Access = private)
@@ -26,10 +32,14 @@ classdef Interface
         FromSpreadsheetLabel = 'From Spreadsheet';
         DataStoreReadLabel  = 'Data Store Read';
         
+        ModelReferenceLabel = 'Model Reference';
+        LibraryLinkLabel    = 'Library Link';
+        
         OutportLabel        = 'Outport';
         ToFileLabel         = 'To File';
         ToWorkspaceLabel    = 'To Workspace';
         DataStoreWriteLabel = 'Data Store Write';
+        
         FunctionLabel       = 'Simulink Function';
     end
     properties (Access = private)
@@ -59,6 +69,8 @@ classdef Interface
                 numel(obj.FromWorkspace) + ...
                 numel(obj.FromSpreadsheet) + ...
                 numel(obj.DataStoreRead) + ...
+                numel(obj.ModelReference) + ...
+                numel(obj.LibraryLink) + ...
                 numel(obj.Outport) + ...
                 numel(obj.ToFile) + ...
                 numel(obj.ToWorkspace) + ...
@@ -92,7 +104,9 @@ classdef Interface
                 numel(obj.FromFile), ...
                 numel(obj.FromWorkspace), ...
                 numel(obj.FromSpreadsheet), ...
-                numel(obj.DataStoreRead),+ ...
+                numel(obj.DataStoreRead), ...
+                numel(obj.ModelReference), ...
+                numel(obj.LibraryLink), ...
                 numel(obj.Outport), ...
                 numel(obj.ToFile), ...
                 numel(obj.ToWorkspace), ...
@@ -162,6 +176,26 @@ classdef Interface
                     fprintf('\t%s, %s\n', obj.DataStoreRead(i).Fullpath, obj.DataStoreRead(i).DataType);
                 end
             end
+
+            fprintf('\nIMPORTS\n');
+            fprintf('------\n');
+            if isempty(obj.ModelReference) && verbose
+                fprintf('%s:\n\tN/A\n', obj.ModelReferenceLabel);
+            elseif ~isempty(obj.ModelReference)
+                fprintf('%s:\n', obj.ModelReferenceLabel);
+                for i = 1:length(obj.ModelReference)
+                    fprintf('\t%s, %s\n', obj.ModelReference(i).Fullpath, obj.ModelReference(i).DataType);
+                end
+            end            
+
+            if isempty(obj.LibraryLink) && verbose
+                fprintf('%s:\n\tN/A\n', obj.LibraryLinkLabel);
+            elseif ~isempty(obj.LibraryLink)
+                fprintf('%s:\n', obj.LibraryLinkLabel);
+                for i = 1:length(obj.LibraryLink)
+                    fprintf('\t%s, %s\n', obj.LibraryLink(i).Fullpath, obj.LibraryLink(i).DataType);
+                end
+            end   
             
             fprintf('\nOUTPUTS\n');
             fprintf('-------\n');
@@ -201,6 +235,9 @@ classdef Interface
                     fprintf('\t%s, %s\n', obj.DataStoreWrite(i).Fullpath, obj.DataStoreWrite(i).DataType);
                 end
             end
+
+            fprintf('\nEXPORTS\n');
+            fprintf('-------\n');
             
             if isempty(obj.Function) && verbose
                 fprintf('%s:\n\tN/A\n', obj.FunctionLabel);
@@ -271,6 +308,30 @@ classdef Interface
             if curr < loc
                 for m = 1:numel(obj.DataStoreRead)
                     all{curr+m} = obj.DataStoreRead(m);
+                end
+                if ~isempty(m)
+                    curr = curr + m;
+                end
+            else
+                el = all{loc};
+                return
+            end
+            
+            if curr < loc
+                for m = 1:numel(obj.ModelReference)
+                    all{curr+m} = obj.ModelReference(m);
+                end
+                if ~isempty(m)
+                    curr = curr + m;
+                end
+            else
+                el = all{loc};
+                return
+            end
+
+            if curr < loc
+                for m = 1:numel(obj.LibraryLink)
+                    all{curr+m} = obj.LibraryLink(m);
                 end
                 if ~isempty(m)
                     curr = curr + m;
@@ -356,37 +417,46 @@ classdef Interface
             blockTypes = get_param(names, 'BlockType');
             
             for i = 1:length(names)
-                t = blockTypes(i);
-                if strcmp(t, 'Inport')
-                    j = length(obj.Inport)+1;
-                    obj.Inport(j) = InterfaceItem(names(i));
-                elseif strcmp(t, 'FromFile')
-                    j = length(obj.FromFile)+1;
-                    obj.FromFile(j) = InterfaceItem(names(i));
-                elseif strcmp(t, 'FromWorkspace')
-                    j = length(obj.FromWorkspace)+1;
-                    obj.FromWorkspace(j) = InterfaceItem(names(i));
-                elseif strcmp(t, 'FromSpreadsheet')
-                    j = length(obj.FromSpreadsheet)+1;
-                    obj.FromSpreadsheet(j) = InterfaceItem(names(i));
-                elseif strcmp(t, 'DataStoreRead')
-                    j = length(obj.DataStoreRead)+1;
-                    obj.DataStoreRead(j) = InterfaceItem(names(i));
-                elseif strcmp(t, 'Outport')
-                    j = length(obj.Outport)+1;
-                    obj.Outport(j) = InterfaceItem(names(i));
-                elseif strcmp(t, 'ToFile')
-                    j = length(obj.ToFile)+1;
-                    obj.ToFile(j) = InterfaceItem(names(i));
-                elseif strcmp(t, 'ToWorkspace')
-                    j = length(obj.ToWorkspace)+1;
-                    obj.ToWorkspace(j) = InterfaceItem(names(i));
-                elseif strcmp(t, 'DataStoreWrite')
-                    j = length(obj.DataStoreWrite)+1;
-                    obj.DataStoreWrite(j) = InterfaceItem(names(i));
-                elseif isSimulinkFcn(names(i))
-                    j = length(obj.Function)+1;
-                    obj.Function(j) = InterfaceItem(names(i));
+                t = blockTypes{i};
+                switch t
+                    case 'Inport'
+                        j = length(obj.Inport)+1;
+                        obj.Inport(j) = InterfaceItem(names(i));
+                    case 'FromFile'
+                        j = length(obj.FromFile)+1;
+                        obj.FromFile(j) = InterfaceItem(names(i));
+                    case 'FromWorkspace'
+                        j = length(obj.FromWorkspace)+1;
+                        obj.FromWorkspace(j) = InterfaceItem(names(i));
+                    case 'FromSpreadsheet'
+                        j = length(obj.FromSpreadsheet)+1;
+                        obj.FromSpreadsheet(j) = InterfaceItem(names(i));
+                    case 'DataStoreRead'
+                        j = length(obj.DataStoreRead)+1;
+                        obj.DataStoreRead(j) = InterfaceItem(names(i));
+                    case 'ModelReference'
+                         j = length(obj.ModelReference)+1;
+                        obj.ModelReference(j) = InterfaceItem(names(i));
+                    case 'Outport'
+                        j = length(obj.Outport)+1;
+                        obj.Outport(j) = InterfaceItem(names(i));
+                    case 'ToFile'
+                        j = length(obj.ToFile)+1;
+                        obj.ToFile(j) = InterfaceItem(names(i));
+                    case 'ToWorkspace'
+                        j = length(obj.ToWorkspace)+1;
+                        obj.ToWorkspace(j) = InterfaceItem(names(i));
+                    case 'DataStoreWrite'
+                        j = length(obj.DataStoreWrite)+1;
+                        obj.DataStoreWrite(j) = InterfaceItem(names(i));
+                    otherwise
+                        if isSimulinkFcn(names(i)) && ~isLibraryLink(names(i))
+                            j = length(obj.Function)+1;
+                            obj.Function(j) = InterfaceItem(names(i));
+                        elseif isLibraryLink(names(i))
+                            j = length(obj.LibraryLink)+1;
+                            obj.LibraryLink(j) = InterfaceItem(names(i));
+                        end
                 end
             end
         end
@@ -746,7 +816,11 @@ classdef Interface
             %   to the interface.
             
             if isempty(varargin)
-                varargin = {'inport', 'fromfile', 'fromspreadsheet', 'fromworkspace', 'datastoreread', 'outport', 'tofile', 'toworkspace', 'datastorewrite', 'function'};
+                varargin = {...
+                    'inport', 'fromfile', 'fromspreadsheet', 'fromworkspace', 'datastoreread', ...
+                    'modelreference', 'librarylink', ...
+                    'outport', 'tofile', 'toworkspace', 'datastorewrite', ...
+                    'function'};
             end
             
             if contains2(varargin, 'inport')
@@ -787,10 +861,10 @@ classdef Interface
                 % Only add data stores that are stored in the data dictionary or
                 % base workspace because if they are in the model worskpace,
                 % they are not shared outside the model
-                blocks = find_system(obj.ModelName, 'BlockType', 'DataStoreRead', 'Commented', 'off');
-                dsname = get_param(blocks, 'DataStoreName');
+                blocks = find_system(obj.ModelName, 'BlockType', 'DataStoreRead', 'Commented', 'off');  
                 
-                % Remove non-unique
+                % Remove non-unique based on DataStoreName
+                dsname = get_param(blocks, 'DataStoreName');
                 [dsname, idx] = unique(dsname);
                 blocks = blocks(idx);
                 
@@ -802,6 +876,28 @@ classdef Interface
                     end
                 end
             end
+            
+            if contains2(varargin, 'modelreference')
+                blocks = find_system(obj.ModelName, 'BlockType', 'ModelReference', 'Commented', 'off');
+                
+                % Remove non-unique based on ModelFile
+                modelname = get_param(blocks, 'ModelFile');
+                [modelname, idx] = unique(modelname);
+                blocks = blocks(idx);
+                
+                obj = add(obj, blocks);
+            end
+            if contains2(varargin, 'librarylink')
+                blocks = find_system(obj.ModelName, 'LinkStatus', 'resolved', 'Commented', 'off');
+                
+                % Remove non-unique based on ReferenceBlock
+                libraryname = get_param(blocks, 'ReferenceBlock');
+                [libraryname, idx] = unique(libraryname);
+                blocks = blocks(idx);
+                
+                obj = add(obj, blocks);
+            end           
+            
             if contains2(varargin, 'outport')
                 ports = find_system(obj.ModelName, 'SearchDepth', 1, 'BlockType', 'Outport', 'Commented', 'off');
                 obj = add(obj, ports);

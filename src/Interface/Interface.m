@@ -485,13 +485,16 @@ classdef Interface
                 error('Interface has no model.');
             end
             
+            % Add default parameters for complying with MAAB
             varargin = horzcat(varargin, 'ShowName' ,'on', 'HideAutomaticName', 'off', 'Commented', 'on');
             
-            % Get before we start adding blocks
+            % Get orignal model bounds before we start adding blocks
             modelBlocks = find_system(obj.ModelName, 'SearchDepth', '1', 'FindAll', 'on');
             modelBounds = bounds_of_sim_objects(modelBlocks);
             
-            spaceBetweenModelAndInterface = 100;
+            % Spacing constants
+            spaceBetween_ModelAndInterface = 100;
+            spaceBetween_InterfaceElements = 40;
             
             if ~isempty(obj.Inport)
                 for i = 1:length(obj.Inport)
@@ -500,10 +503,8 @@ classdef Interface
                     % Convert line(s) to goto/from connection
                     lines = get_param(obj.Inport(i).Handle, 'LineHandles');
                     lines = lines.Outport;
-                    
                     tag = ['Goto' obj.Inport(i).Name];
                     tag = strrep(tag, ':', '');
-                    
                     line2Goto(obj.ModelName, lines, tag);
                     
                     fromName = char(getDsts(obj.Inport(i).Handle, 'IncludeImplicit', 'off'));
@@ -622,11 +623,9 @@ classdef Interface
                     
                     % Convert line(s) to goto/from connection
                     lines = get_param(obj.Outport(n).Handle, 'LineHandles');
-                    lines = lines.Inport;
-                    
+                    lines = lines.Inport;      
                     tag = ['Goto' obj.Outport(n).Name];
-                    tag = strrep(tag, ':', '');
-                    
+                    tag = strrep(tag, ':', '');   
                     line2Goto(obj.ModelName, lines, tag);
                     
                     fromName = char(getSrcs(obj.Outport(n).Handle, 'IncludeImplicit', 'off'));
@@ -737,7 +736,6 @@ classdef Interface
                     set_param(obj.Inport(i).InterfaceHandle, 'Orientation', 'right');
                 end
             end
-            
             if ~isempty(obj.Outport)
                 for i = 1:length(obj.Outport)
                     set_param(obj.Outport(i).InterfaceHandle, 'Orientation', 'right');
@@ -747,11 +745,26 @@ classdef Interface
             % Resize main interface blocks (not grounds/terminators)
             resizeAll(obj);
             
+            % Don't show terminator/ground names. Block symbols are
+            % self-explanatory
+            set_param([hGrnd, hTerm], 'ShowName' ,'off');
+            
             % Center main interface blocks
             alignBlocksInColumn(num2cell(hMain), 'center');
             leftModelBound = modelBounds(1);
             
-            % Connect the terminators/grounds
+            % Vertically distribute interface blocks
+            topModelBound = modelBounds(2);
+            pNext = topModelBound;
+            for i = 1:length(hMain)
+                pCurrent = get_param(hMain(i), 'Position');
+                height = pCurrent(4) - pCurrent(2);
+                pAdjusted = [pCurrent(1), pNext, pCurrent(3), pNext + height];
+                set_param(hMain(i), 'Position', pAdjusted);
+                pNext = pNext + height + spaceBetween_InterfaceElements;
+            end
+            
+            % Move the terminators/grounds
             % Note: Functions can have multiples
             iter = createIterator(obj);
             while iter.hasNext()
@@ -777,9 +790,9 @@ classdef Interface
             interfaceBounds = bounds_of_sim_objects(interfaceBlocks);
             rightInterfaceBound = interfaceBounds(3);
             if rightInterfaceBound < interfaceBounds
-                shift = rightInterfaceBound - leftModelBound - spaceBetweenModelAndInterface;
+                shift = rightInterfaceBound - leftModelBound - spaceBetween_ModelAndInterface;
             else %rightInterfaceBound >= interfaceBounds
-                shift = leftModelBound - rightInterfaceBound - spaceBetweenModelAndInterface;
+                shift = leftModelBound - rightInterfaceBound - spaceBetween_ModelAndInterface;
             end
             shiftBlocks(interfaceBlocks, [shift 0 shift 0]);
             
@@ -976,7 +989,8 @@ classdef Interface
         end
         function [main, grnd, term] = getInterfaceBlocks(obj)
             % GETINTERFACEBLOCKS Return the blocks associated with the interface
-            %   after it has been modelled.
+            %   after it has been modelled. They are returned in the order that
+            %   they appear on the interface.
             iter = createIterator(obj);
             main = [];  % Inport, ToFile, Function Caller, etc.
             term = [];  % Terminators

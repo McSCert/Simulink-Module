@@ -23,24 +23,26 @@ classdef Interface
         Function        InterfaceItem
     end
     properties (Constant, Access = private)
-        InputLabel          = 'Input';
-        OutputLabel         = 'Output';
+        InputLabel           = 'Inputs';
+        ImportLabel          = 'Imports';
+        OutputLabel          = 'Outputs';
+        ExportLabel          = 'Exports';
         
-        InportLabel         = 'Inport';
-        FromFileLabel       = 'From File';
-        FromWorkspaceLabel  = 'From Workspace';
-        FromSpreadsheetLabel = 'From Spreadsheet';
-        DataStoreReadLabel  = 'Data Store Read';
+        InportLabel          = 'Inports';
+        FromFileLabel        = 'From Files';
+        FromWorkspaceLabel   = 'From Workspaces';
+        FromSpreadsheetLabel = 'From Spreadsheets';
+        DataStoreReadLabel   = 'Data Store Reads';
         
-        ModelReferenceLabel = 'Model Reference';
-        LibraryLinkLabel    = 'Library Link';
+        ModelReferenceLabel  = 'Model References';
+        LibraryLinkLabel     = 'Library Links';
         
-        OutportLabel        = 'Outport';
-        ToFileLabel         = 'To File';
-        ToWorkspaceLabel    = 'To Workspace';
-        DataStoreWriteLabel = 'Data Store Write';
+        OutportLabel         = 'Outports';
+        ToFileLabel          = 'To Files';
+        ToWorkspaceLabel     = 'To Workspaces';
+        DataStoreWriteLabel  = 'Data Store Writes';
         
-        FunctionLabel       = 'Simulink Function';
+        FunctionLabel        = 'Simulink Functions';
     end
     properties (Access = private)
         ExportDataHeader
@@ -494,9 +496,16 @@ classdef Interface
             
             % Spacing constants
             spaceBetween_ModelAndInterface = 100;
-            spaceBetween_InterfaceElements = 40;
+            spaceAfter_Block = 40;
+            spaceAfter_Header = 10;
             
+            % ADD BLOCKS/ANNOTATIONS
+            hAnn = [];
+            if ~isempty(obj.Inport) || ~isempty(obj.FromFile) || ~isempty(obj.FromWorkspace) || ~isempty(obj.FromSpreadsheet) || ~isempty(obj.DatStoreRead)
+                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.InputLabel], 'FontSize', 18).Handle;
+            end
             if ~isempty(obj.Inport)
+                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.InportLabel], 'FontSize', 14).Handle;
                 for i = 1:length(obj.Inport)
                     obj.Inport(i).InterfaceHandle = get_param(obj.Inport(i).Fullpath, 'Handle');
                     
@@ -514,6 +523,7 @@ classdef Interface
             
             nblock = 1;
             if ~isempty(obj.FromFile)
+                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.FromFileLabel], 'FontSize', 14).Handle;
                 for j = 1:length(obj.FromFile)
                     blockCreated = false;
                     while ~blockCreated
@@ -541,6 +551,7 @@ classdef Interface
             
             nblock = 1;
             if ~isempty(obj.FromSpreadsheet)
+                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.FromSpreadsheetLabel], 'FontSize', 14).Handle;
                 for k = 1:length(obj.FromSpreadsheet)
                     blockCreated = false;
                     while ~blockCreated
@@ -567,6 +578,7 @@ classdef Interface
             
             nblock = 1;
             if ~isempty(obj.FromWorkspace)
+                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.FromWorkspaceLabel], 'FontSize', 14).Handle;
                 for l = 1:length(obj.FromWorkspace)
                     blockCreated = false;
                     while ~blockCreated
@@ -593,6 +605,7 @@ classdef Interface
             
             nblock = 1;
             if ~isempty(obj.DataStoreRead)
+                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.DataStoreReadLabel], 'FontSize', 14).Handle;
                 for m = 1:length(obj.DataStoreRead)
                     blockCreated = false;
                     while ~blockCreated
@@ -617,7 +630,11 @@ classdef Interface
                 end
             end
             
+            if ~isempty(obj.Outport) || ~isempty(obj.ToFile) || ~isempty(obj.ToWorkspace) || ~isempty(obj.DataStoreWrite)
+                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.OutputLabel], 'FontSize', 18).Handle;
+            end
             if ~isempty(obj.Outport)
+                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.OutportLabel], 'FontSize', 14).Handle;
                 for n = 1:length(obj.Outport)
                     obj.Outport(n).InterfaceHandle = get_param(obj.Outport(n).Fullpath, 'Handle');
                     
@@ -635,6 +652,7 @@ classdef Interface
             
             nblock = 1;
             if ~isempty(obj.ToFile)
+                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.ToFileLabel], 'FontSize', 14).Handle;
                 for o = 1:length(obj.ToFile)
                     blockCreated = false;
                     while ~blockCreated
@@ -661,6 +679,7 @@ classdef Interface
             
             nblock = 1;
             if ~isempty(obj.ToWorkspace)
+                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.ToWorkspaceLabel], 'FontSize', 14).Handle;
                 for p = 1:length(obj.ToWorkspace)
                     blockCreated = false;
                     while ~blockCreated
@@ -687,6 +706,7 @@ classdef Interface
             
             nblock = 1;
             if ~isempty(obj.DataStoreWrite)
+                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.DataStoreWriteLabel], 'FontSize', 14).Handle;
                 for q = 1:length(obj.DataStoreWrite)
                     blockCreated = false;
                     while ~blockCreated
@@ -712,6 +732,8 @@ classdef Interface
             end
             
             if ~isempty(obj.Function)
+                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.ExportLabel], 'FontSize', 18).Handle;
+                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.FunctionLabel], 'FontSize', 14).Handle;
                 for r = 1:length(obj.Function)
                     obj.Function(r).InterfaceHandle = createFcnCaller(obj.ModelName, obj.Function(r).Fullpath);
                     set_param(obj.Function(r).InterfaceHandle, varargin{:})
@@ -730,7 +752,7 @@ classdef Interface
             interfaceBlocks = [hMain, hGrnd, hTerm];
             
             % Correct block orientation of inport and outports, because they are
-            % put there by the user
+            % put there by the user and can be flipped
             if ~isempty(obj.Inport)
                 for i = 1:length(obj.Inport)
                     set_param(obj.Inport(i).InterfaceHandle, 'Orientation', 'right');
@@ -747,28 +769,37 @@ classdef Interface
             
             % Don't show terminator/ground names. Block symbols are
             % self-explanatory
-            set_param([hGrnd, hTerm], 'ShowName' ,'off');
-            
-            % Center main interface blocks
-            alignBlocksInColumn(num2cell(hMain), 'center');
-            leftModelBound = modelBounds(1);
-            
-            % Vertically distribute interface blocks
-            topModelBound = modelBounds(2);
-            pNext = topModelBound;
-            for i = 1:length(hMain)
-                pCurrent = get_param(hMain(i), 'Position');
-                height = pCurrent(4) - pCurrent(2);
-                pAdjusted = [pCurrent(1), pNext, pCurrent(3), pNext + height];
-                set_param(hMain(i), 'Position', pAdjusted);
-                pNext = pNext + height + spaceBetween_InterfaceElements;
+            sinks = [hGrnd, hTerm];
+            for i = 1:length(sinks)
+                set_param(sinks(i), 'ShowName', 'off');
             end
             
+            % Center main interface blocks and annotations
+            alignBlocksInColumn(num2cell(hMain), 'center');
+            alignBlocksInColumn(num2cell(hAnn), 'center')            
+            
+            % Vertically distribute interface blocks/annotations
+            topModelBound = modelBounds(2);
+            pNext = topModelBound;
+            blocksOrAnnotations = sort([hMain, hAnn]); 
+            for i = 1:length(blocksOrAnnotations)
+                pCurrent = get_param(blocksOrAnnotations(i), 'Position');
+                height = pCurrent(4) - pCurrent(2);
+                set_param(blocksOrAnnotations(i), 'Position', [pCurrent(1), pNext, pCurrent(3), pNext + height]);
+                
+                if strcmp(get_param(blocksOrAnnotations(i), 'Type'), 'annotation')
+                    pNext = pNext + height + spaceAfter_Header;
+                else  
+                    pNext = pNext + height + spaceAfter_Block;
+                end
+            end
+
             % Move the terminators/grounds
             % Note: Functions can have multiples
             iter = createIterator(obj);
             while iter.hasNext()
                 el = iter.next();
+                % Ground
                 if length(el.GroundHandle) > 1
                     for i = 1:length(el.GroundHandle)
                         moveToConnectedPort(el.GroundHandle(i), 30);
@@ -776,7 +807,7 @@ classdef Interface
                 else
                     moveToConnectedPort(el.GroundHandle, 30);
                 end
-                
+                % Terminators
                 if length(el.TerminatorHandle) > 1
                     for i = 1:length(el.TerminatorHandle)
                         moveToConnectedPort(el.TerminatorHandle(i), 30);
@@ -787,6 +818,7 @@ classdef Interface
             end
             
             % Move the whole interface left/right
+            leftModelBound = modelBounds(1);
             interfaceBounds = bounds_of_sim_objects(interfaceBlocks);
             rightInterfaceBound = interfaceBounds(3);
             if rightInterfaceBound < interfaceBounds
@@ -795,11 +827,7 @@ classdef Interface
                 shift = leftModelBound - rightInterfaceBound - spaceBetween_ModelAndInterface;
             end
             shiftBlocks(interfaceBlocks, [shift 0 shift 0]);
-            
-            % Add annotations
-            % obj.ExportDataHeader = Simulink.Annotation([bdroot '/' obj.ExportDataHeaderText], 'FontSize', 14, 'Position', [10,100]);
-            
-            
+
             set_param(bdroot, 'Zoomfactor', 'FitSystem');
         end
         function obj = setTerminator(obj, item, handle)
@@ -984,6 +1012,12 @@ classdef Interface
                         % FromFile blocks don't have a path parameter
                         adjustWidth([get_param(el.InterfaceHandle, 'Parent'), '/', get_param(el.InterfaceHandle, 'Name')]);
                     end
+%                     try
+%                         adjustHeight(get_param(el.InterfaceHandle, 'Path'));
+%                     catch
+%                         % FromFile blocks don't have a path parameter
+%                         adjustHeight([get_param(el.InterfaceHandle, 'Parent'), '/', get_param(el.InterfaceHandle, 'Name')]);
+%                     end
                 end
             end
         end

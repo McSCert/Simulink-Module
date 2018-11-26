@@ -113,7 +113,38 @@ classdef Interface
                 numel(obj.ToWorkspace), ...
                 numel(obj.DataStoreWrite), ...
                 numel(obj.Function)]);
-            s = [10, n];
+            s = [12, n];
+        end
+        function b = isempty(obj, varargin)
+            if nargin > 1
+                group = varargin{1};
+                switch group
+                    case 'Input'
+                        b = isempty(obj.Inport) ...
+                            || isempty(obj.FromFile) ...
+                            || isempty(obj.FromWorkspace) ...
+                            || isempty(obj.FromSpreadsheet) ...
+                            || isempty(obj.DataStoreRead);
+                    case 'Import'
+                        b = isempty(obj.ModelReference) ...
+                            || isempty(obj.LibraryLink);
+                    case 'Output'
+                        b = isempty(obj.Outport) ...
+                            || isempty(obj.ToFile) ...
+                            || isempty(obj.ToWorkspace) ...
+                            || isempty(obj.DataStoreWrite);
+                    case 'Export'
+                        b = isempty(obj.Function);
+                    otherwise
+                        error('Invalid input argument.');
+                end
+            else
+                if numel(obj) == 0
+                    b = true;
+                else
+                    b = false;
+                end
+            end
         end
         function print(obj, varargin)
             % PRINT Print the interface in the Command Window.
@@ -500,6 +531,9 @@ classdef Interface
             
             if isempty(obj.ModelName)
                 error('Interface has no model.');
+            elseif isempty(obj)
+                warning('No elements on the interface.');
+                return % No items on the interface
             end
             
             % Add default parameters for complying with MAAB
@@ -518,7 +552,7 @@ classdef Interface
             smallFontSize  = 14;
             
             % ADD BLOCKS/ANNOTATIONS
-            if ~isempty(obj.Inport) || ~isempty(obj.FromFile) || ~isempty(obj.FromWorkspace) || ~isempty(obj.FromSpreadsheet) || ~isempty(obj.DatStoreRead)
+            if ~isempty(obj, 'Input')
                 obj.InputHeader.Handle = Simulink.Annotation([bdroot '/' obj.InputHeader.Label], 'FontSize', largeFontSize).Handle;
             end
             if ~isempty(obj.Inport)
@@ -647,7 +681,7 @@ classdef Interface
                 end
             end
             
-            if ~isempty(obj.Outport) || ~isempty(obj.ToFile) || ~isempty(obj.ToWorkspace) || ~isempty(obj.DataStoreWrite)
+            if ~isempty(obj, 'Output')
                 obj.OutputHeader.Handle = Simulink.Annotation([bdroot '/' obj.OutputHeader.Label], 'FontSize', largeFontSize).Handle;
             end
             if ~isempty(obj.Outport)
@@ -748,8 +782,10 @@ classdef Interface
                 end
             end
             
+            if ~isempty(obj, 'Export')
+                obj.ExportHeader.Handle = Simulink.Annotation([bdroot '/' obj.ExportHeader.Label], 'FontSize', largeFontSize).Handle; 
+            end
             if ~isempty(obj.Function)
-                obj.ExportHeader.Handle = Simulink.Annotation([bdroot '/' obj.ExportHeader.Label], 'FontSize', largeFontSize).Handle;
                 obj.FunctionHeader.Handle = Simulink.Annotation([bdroot '/' obj.FunctionHeader.Label], 'FontSize', smallFontSize).Handle;
                 for r = 1:length(obj.Function)
                     obj.Function(r).InterfaceHandle = createFcnCaller(obj.ModelName, obj.Function(r).Fullpath);
@@ -763,7 +799,7 @@ classdef Interface
                     obj.Function(r).TerminatorHandle = fulfillPorts(allPorts.Outport);
                 end
             end
-            
+
             % Get all interface blocks
             hAll = getInterfaceSorted(obj);
             [~, hGrnd, hTerm] = getInterfaceBlocks(obj);
@@ -856,14 +892,14 @@ classdef Interface
 
             set_param(bdroot, 'Zoomfactor', 'FitSystem');
         end
-        function obj = setTerminator(obj, item, handle)
-            for i = 1:length(obj)
-                el = obj.get(i);
-                if el == item
-                    obj.get(i).TerminatorHandle = handle;
-                end
-            end
-        end
+%         function obj = setTerminator(obj, item, handle)
+%             for i = 1:length(obj)
+%                 el = obj.get(i);
+%                 if el == item
+%                     obj.get(i).TerminatorHandle = handle;
+%                 end
+%             end
+%         end
         function iter = createIterator(obj)
             % CREATEITERATOR Create the iterator object for iterating over an
             %   interface.

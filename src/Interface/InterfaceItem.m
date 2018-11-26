@@ -12,11 +12,8 @@ classdef InterfaceItem
         InterfaceHandle     % If the block is represented on the interface by another 
                             % block, this is the handle to that block (not
                             % applicable for Inports and Outports).
-        TerminatorHandle    % Handle(s) of Terminators blocks.
-        GroundHandle        % Handle(s) of Ground blocks.
-    end
-    properties (Access = private)
-        
+        GroundHandle        % Handle(s) of Ground blocks (or Goto for ports).
+        TerminatorHandle    % Handle(s) of Terminators blocks (or From for ports).
     end
     methods (Access = public)
         function obj = InterfaceItem(handle)

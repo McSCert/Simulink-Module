@@ -231,10 +231,10 @@ function schema = InterfaceSchema(callbackInfo)
 end
 
 function interface(callbackInfo)
-    
-    % Check if interface object already exists for this model
     sys = bdroot(gcs);
     objName = [sys '_InterfaceObject'];
+    
+    % Check if interface object already exists for this model
 %     eval(['global ' objName ';']);
 %     eval(['notempty_obj = ~isempty(' objName ');']);
 %     
@@ -251,5 +251,4 @@ function interface(callbackInfo)
 %     
     eval([objName ' = Interface(sys);']);
     eval([objName ' = ' objName '.model;']);   
-    
 end

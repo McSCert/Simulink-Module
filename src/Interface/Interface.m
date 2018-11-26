@@ -133,119 +133,135 @@ classdef Interface
             fprintf('%s\n', obj.InputHeader.Label);
             fprintf('------\n');
             
-            if isempty(obj.Inport) && verbose
-                fprintf('%s:\n\tN/A\n', obj.InportHeader.Label);
-            elseif ~isempty(obj.Inport)
-                fprintf('%s:\n', obj.InportHeader.Label);
-                for i = 1:length(obj.Inport)
-                    fprintf('\t%s, %s\n', obj.Inport(i).Fullpath, obj.Inport(i).DataType);
+            if isempty(obj.Inport) && isempty(obj.FromFile) && isempty(obj.FromWorkspace) && isempty(obj.FromSpreadsheet) && isempty(obj.DataStoreRead)
+                fprintf('N/A\n');
+            else
+                if isempty(obj.Inport) && verbose
+                    fprintf('%s:\n\tN/A\n', obj.InportHeader.Label);
+                elseif ~isempty(obj.Inport)
+                    fprintf('%s:\n', obj.InportHeader.Label);
+                    for i = 1:length(obj.Inport)
+                        fprintf('\t%s, %s\n', obj.Inport(i).Fullpath, obj.Inport(i).DataType);
+                    end
                 end
-            end
-            
-            if isempty(obj.FromFile) && verbose
-                fprintf('%s:\n\tN/A\n', obj.FromFileHeader.Label);
-            elseif ~isempty(obj.FromFile)
-                fprintf('%s:\n', obj.FromFileHeader.Label);
-                for i = 1:length(obj.FromFile)
-                    fprintf('\t%s, %s\n', obj.FromFile(i).Fullpath, obj.FromFile(i).DataType);
+
+                if isempty(obj.FromFile) && verbose
+                    fprintf('%s:\n\tN/A\n', obj.FromFileHeader.Label);
+                elseif ~isempty(obj.FromFile)
+                    fprintf('%s:\n', obj.FromFileHeader.Label);
+                    for i = 1:length(obj.FromFile)
+                        fprintf('\t%s, %s\n', obj.FromFile(i).Fullpath, obj.FromFile(i).DataType);
+                    end
                 end
-            end
-            
-            if isempty(obj.FromWorkspace) && verbose
-                fprintf('%s:\n\tN/A\n', obj.FromWorkspaceHeader.Label);
-            elseif ~isempty(obj.FromWorkspace)
-                fprintf('%s:\n', obj.FromWorkspaceHeader.Label);
-                for i = 1:length(obj.FromWorkspace)
-                    fprintf('\t%s, %s\n', obj.FromWorkspace(i).Fullpath, obj.FromWorkspace(i).DataType);
+
+                if isempty(obj.FromWorkspace) && verbose
+                    fprintf('%s:\n\tN/A\n', obj.FromWorkspaceHeader.Label);
+                elseif ~isempty(obj.FromWorkspace)
+                    fprintf('%s:\n', obj.FromWorkspaceHeader.Label);
+                    for i = 1:length(obj.FromWorkspace)
+                        fprintf('\t%s, %s\n', obj.FromWorkspace(i).Fullpath, obj.FromWorkspace(i).DataType);
+                    end
                 end
-            end
-            
-            if isempty(obj.FromSpreadsheet) && verbose
-                fprintf('%s:\n\tN/A\n', obj.FromSpreadsheetHeader.Label);
-            elseif ~isempty(obj.FromSpreadsheet)
-                fprintf('%s:\n', obj.FromSpreadsheetHeader.Label);
-                for i = 1:length(obj.FromSpreadsheet)
-                    fprintf('\t%s, %s\n', obj.FromSpreadsheet(i).Fullpath, obj.FromSpreadsheet(i).DataType);
+
+                if isempty(obj.FromSpreadsheet) && verbose
+                    fprintf('%s:\n\tN/A\n', obj.FromSpreadsheetHeader.Label);
+                elseif ~isempty(obj.FromSpreadsheet)
+                    fprintf('%s:\n', obj.FromSpreadsheetHeader.Label);
+                    for i = 1:length(obj.FromSpreadsheet)
+                        fprintf('\t%s, %s\n', obj.FromSpreadsheet(i).Fullpath, obj.FromSpreadsheet(i).DataType);
+                    end
                 end
-            end
-            
-            if isempty(obj.DataStoreRead) && verbose
-                fprintf('%s:\n\tN/A\n', obj.DataStoreReadHeader.Label);
-            elseif ~isempty(obj.DataStoreRead)
-                fprintf('%s:\n', obj.DataStoreReadHeader.Label);
-                for i = 1:length(obj.DataStoreRead)
-                    fprintf('\t%s, %s\n', obj.DataStoreRead(i).Fullpath, obj.DataStoreRead(i).DataType);
+
+                if isempty(obj.DataStoreRead) && verbose
+                    fprintf('%s:\n\tN/A\n', obj.DataStoreReadHeader.Label);
+                elseif ~isempty(obj.DataStoreRead)
+                    fprintf('%s:\n', obj.DataStoreReadHeader.Label);
+                    for i = 1:length(obj.DataStoreRead)
+                        fprintf('\t%s, %s\n', obj.DataStoreRead(i).Fullpath, obj.DataStoreRead(i).DataType);
+                    end
                 end
             end
 
             fprintf('\n%s\n', obj.ImportHeader.Label);
             fprintf('------\n');
-            if isempty(obj.ModelReference) && verbose
-                fprintf('%s:\n\tN/A\n', obj.ModelReferenceHeader.Label);
-            elseif ~isempty(obj.ModelReference)
-                fprintf('%s:\n', obj.ModelReferenceHeader.Label);
-                for i = 1:length(obj.ModelReference)
-                    fprintf('\t%s, %s\n', obj.ModelReference(i).Fullpath, obj.ModelReference(i).DataType);
-                end
-            end            
+            if isempty(obj.ModelReference) && isempty(obj.LibraryLink)
+                fprintf('N/A\n');
+            else
+                if isempty(obj.ModelReference) && verbose
+                    fprintf('%s:\n\tN/A\n', obj.ModelReferenceHeader.Label);
+                elseif ~isempty(obj.ModelReference)
+                    fprintf('%s:\n', obj.ModelReferenceHeader.Label);
+                    for i = 1:length(obj.ModelReference)
+                        fprintf('\t%s, %s\n', obj.ModelReference(i).Fullpath, obj.ModelReference(i).DataType);
+                    end
+                end            
 
-            if isempty(obj.LibraryLink) && verbose
-                fprintf('%s:\n\tN/A\n', obj.LibraryLinkHeader.Label);
-            elseif ~isempty(obj.LibraryLink)
-                fprintf('%s:\n', obj.LibraryLinkHeader.Label);
-                for i = 1:length(obj.LibraryLink)
-                    fprintf('\t%s, %s\n', obj.LibraryLink(i).Fullpath, obj.LibraryLink(i).DataType);
+                if isempty(obj.LibraryLink) && verbose
+                    fprintf('%s:\n\tN/A\n', obj.LibraryLinkHeader.Label);
+                elseif ~isempty(obj.LibraryLink)
+                    fprintf('%s:\n', obj.LibraryLinkHeader.Label);
+                    for i = 1:length(obj.LibraryLink)
+                        fprintf('\t%s, %s\n', obj.LibraryLink(i).Fullpath, obj.LibraryLink(i).DataType);
+                    end
                 end
-            end   
+            end
             
             fprintf('\n%s\n', obj.OutputHeader.Label);
             fprintf('-------\n');
             
-            if isempty(obj.Outport) && verbose
-                fprintf('%s:\n\tN/A\n', obj.OutportHeader.Label);
-            elseif ~isempty(obj.Outport)
-                fprintf('%s:\n', obj.OutportHeader.Label);
-                for i = 1:length(obj.Outport)
-                    fprintf('\t%s, %s\n', obj.Outport(i).Fullpath, obj.Outport(i).DataType);
+            if isempty(obj.Outport) && isempty(obj.ToFile) && isempty(obj.ToWorkspace) && isempty(obj.DataStoreWrite)
+                fprintf('N/A\n');
+            else
+                if isempty(obj.Outport) && verbose
+                    fprintf('%s:\n\tN/A\n', obj.OutportHeader.Label);
+                elseif ~isempty(obj.Outport)
+                    fprintf('%s:\n', obj.OutportHeader.Label);
+                    for i = 1:length(obj.Outport)
+                        fprintf('\t%s, %s\n', obj.Outport(i).Fullpath, obj.Outport(i).DataType);
+                    end
                 end
-            end
-            
-            if isempty(obj.ToFile) && verbose
-                fprintf('%s:\n\tN/A\n', obj.ToFileHeader.Label);
-            elseif ~isempty(obj.ToFile)
-                fprintf('%s:\n', obj.ToFileHeader.Label);
-                for i = 1:length(obj.ToFile)
-                    fprintf('\t%s, %s\n', obj.ToFile(i).Fullpath, obj.ToFile(i).DataType);
+
+                if isempty(obj.ToFile) && verbose
+                    fprintf('%s:\n\tN/A\n', obj.ToFileHeader.Label);
+                elseif ~isempty(obj.ToFile)
+                    fprintf('%s:\n', obj.ToFileHeader.Label);
+                    for i = 1:length(obj.ToFile)
+                        fprintf('\t%s, %s\n', obj.ToFile(i).Fullpath, obj.ToFile(i).DataType);
+                    end
                 end
-            end
-            
-            if isempty(obj.ToWorkspace) && verbose
-                fprintf('%s:\n\tN/A\n', obj.ToWorkspaceHeader.Label);
-            elseif ~isempty(obj.ToWorkspace)
-                fprintf('%s:\n', obj.ToWorkspaceHeader.Label);
-                for i = 1:length(obj.ToWorkspace)
-                    fprintf('\t%s, %s\n', obj.ToWorkspace(i).Fullpath, obj.ToWorkspace(i).DataType);
+
+                if isempty(obj.ToWorkspace) && verbose
+                    fprintf('%s:\n\tN/A\n', obj.ToWorkspaceHeader.Label);
+                elseif ~isempty(obj.ToWorkspace)
+                    fprintf('%s:\n', obj.ToWorkspaceHeader.Label);
+                    for i = 1:length(obj.ToWorkspace)
+                        fprintf('\t%s, %s\n', obj.ToWorkspace(i).Fullpath, obj.ToWorkspace(i).DataType);
+                    end
                 end
-            end
-            
-            if isempty(obj.DataStoreWrite) && verbose
-                fprintf('%s:\n\tN/A\n', obj.DataStoreWriteHeader.Label);
-            elseif ~isempty(obj.DataStoreWrite)
-                fprintf('%s:\n', obj.DataStoreWriteHeader.Label);
-                for i = 1:length(obj.DataStoreWrite)
-                    fprintf('\t%s, %s\n', obj.DataStoreWrite(i).Fullpath, obj.DataStoreWrite(i).DataType);
+
+                if isempty(obj.DataStoreWrite) && verbose
+                    fprintf('%s:\n\tN/A\n', obj.DataStoreWriteHeader.Label);
+                elseif ~isempty(obj.DataStoreWrite)
+                    fprintf('%s:\n', obj.DataStoreWriteHeader.Label);
+                    for i = 1:length(obj.DataStoreWrite)
+                        fprintf('\t%s, %s\n', obj.DataStoreWrite(i).Fullpath, obj.DataStoreWrite(i).DataType);
+                    end
                 end
             end
 
             fprintf('\n%s\n', obj.ExportHeader.Label);
             fprintf('-------\n');
             
-            if isempty(obj.Function) && verbose
-                fprintf('%s:\n\tN/A\n', obj.FunctionHeader.Label);
-            elseif ~isempty(obj.Function)
-                fprintf('%s:\n', obj.FunctionHeader.Label);
-                for i = 1:length(obj.Function)
-                    fprintf('\t%s, %s\n', obj.Function(i).Fullpath, obj.Function(i).DataType);
+            if isempty(obj.Function)
+                fprintf('N/A\n');
+            else
+                if isempty(obj.Function) && verbose
+                    fprintf('%s:\n\tN/A\n', obj.FunctionHeader.Label);
+                elseif ~isempty(obj.Function)
+                    fprintf('%s:\n', obj.FunctionHeader.Label);
+                    for i = 1:length(obj.Function)
+                        fprintf('\t%s, %s\n', obj.Function(i).Fullpath, obj.Function(i).DataType);
+                    end
                 end
             end
         end
@@ -495,8 +511,9 @@ classdef Interface
             
             % Spacing constants
             spaceBetween_ModelAndInterface = 100;
-            spaceAfter_Block = 40;
+            spaceAfter_Block = 30;
             spaceAfter_Header = 10;
+            spaceAfter_MainHeader = 4;
             largeFontSize = 18;
             smallFontSize  = 14;
             
@@ -646,7 +663,7 @@ classdef Interface
                     line2Goto(obj.ModelName, lines, tag);
                     
                     fromName = char(getSrcs(obj.Outport(n).Handle, 'IncludeImplicit', 'off'));
-                    obj.Outport(n).TerminatorHandle = get_param(fromName, 'Handle');
+                    obj.Outport(n).GroundHandle = get_param(fromName, 'Handle');
                 end
             end
             
@@ -753,7 +770,7 @@ classdef Interface
             interfaceBlocks = [hAll, hGrnd, hTerm];
             
             % Correct block orientation of inport and outports, because they are
-            % put there by the user and can be flipped
+            % created by the user and can be flipped
             if ~isempty(obj.Inport)
                 for i = 1:length(obj.Inport)
                     set_param(obj.Inport(i).InterfaceHandle, 'Orientation', 'right');
@@ -765,7 +782,7 @@ classdef Interface
                 end
             end
             
-            % Resize main interface blocks (not grounds/terminators)
+            % Resize main interface blocks
             resizeAll(obj);
             
             % Don't show terminator/ground names. Block symbols are
@@ -774,11 +791,7 @@ classdef Interface
             for i = 1:length(sinks)
                 set_param(sinks(i), 'ShowName', 'off');
             end
-            
-            % Center main interface blocks and annotations
-            alignBlocksInColumn(num2cell(hAll), 'center');
-            %alignBlocksInColumn(num2cell(hHeaders), 'center')            
-            
+ 
             % Vertically distribute interface blocks/annotations
             topModelBound = modelBounds(2);
             pNext = topModelBound;
@@ -788,14 +801,21 @@ classdef Interface
                 set_param(hAll(i), 'Position', [pCurrent(1), pNext, pCurrent(3), pNext + height]);
                 
                 if strcmp(get_param(hAll(i), 'Type'), 'annotation')
-                    pNext = pNext + height + spaceAfter_Header;
+                    % Next one is annotation too, use a smaller space
+                    if (i+1 <= length(hAll)) && strcmp(get_param(hAll(i+1), 'Type'), 'annotation') 
+                        pNext = pNext + height + spaceAfter_MainHeader;
+                    else
+                         pNext = pNext + height + spaceAfter_Header;
+                    end
                 else  
                     pNext = pNext + height + spaceAfter_Block;
                 end
             end
+            
+            % Center main interface blocks and annotations
+            alignBlocksInColumn(num2cell(hAll), 'center');
 
-            % Move the terminators/grounds
-            % Note: Functions can have multiples
+            % Move the terminators/grounds to their corresponding ports
             iter = createIterator(obj);
             while iter.hasNext()
                 el = iter.next();
@@ -816,6 +836,12 @@ classdef Interface
                     moveToConnectedPort(el.TerminatorHandle, 30);
                 end
             end
+            
+            % Left justify grounds
+            alignBlocksInColumn(num2cell(hGrnd), 'left');
+            
+            % Right justify terminators
+            alignBlocksInColumn(num2cell(hTerm), 'right');
             
             % Move the whole interface left/right
             leftModelBound = modelBounds(1);

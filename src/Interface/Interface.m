@@ -116,8 +116,18 @@ classdef Interface
             s = [12, n];
         end
         function b = isempty(obj, varargin)
+            % ISEMPTY Return 1 if the interface is empty and 0 otherwise.
+            %
+            %   Inputs:
+            %       obj      Interface object.
+            %       varargin Part of the interface: 
+            %                ['Input' | 'Import' | 'Output' | 'Export']
+            %
+            %   Outputs:
+            %       b        Whether the interface is empty (1) or not (0).
+            
             if nargin > 1
-                group = varargin{1};
+                group = varargin{1}; 
                 switch group
                     case 'Input'
                         b = isempty(obj.Inport) ...
@@ -164,7 +174,7 @@ classdef Interface
             fprintf('%s\n', obj.InputHeader.Label);
             fprintf('------\n');
             
-            if isempty(obj.Inport) && isempty(obj.FromFile) && isempty(obj.FromWorkspace) && isempty(obj.FromSpreadsheet) && isempty(obj.DataStoreRead)
+            if isempty(obj, 'Input')
                 fprintf('N/A\n');
             else
                 if isempty(obj.Inport) && verbose
@@ -215,7 +225,7 @@ classdef Interface
 
             fprintf('\n%s\n', obj.ImportHeader.Label);
             fprintf('------\n');
-            if isempty(obj.ModelReference) && isempty(obj.LibraryLink)
+            if isempty(obj, 'Import')
                 fprintf('N/A\n');
             else
                 if isempty(obj.ModelReference) && verbose
@@ -240,7 +250,7 @@ classdef Interface
             fprintf('\n%s\n', obj.OutputHeader.Label);
             fprintf('-------\n');
             
-            if isempty(obj.Outport) && isempty(obj.ToFile) && isempty(obj.ToWorkspace) && isempty(obj.DataStoreWrite)
+            if isempty(obj, 'Output')
                 fprintf('N/A\n');
             else
                 if isempty(obj.Outport) && verbose
@@ -283,7 +293,7 @@ classdef Interface
             fprintf('\n%s\n', obj.ExportHeader.Label);
             fprintf('-------\n');
             
-            if isempty(obj.Function)
+            if isempty(obj, 'Export')
                 fprintf('N/A\n');
             else
                 if isempty(obj.Function) && verbose

@@ -22,31 +22,30 @@ classdef Interface
         % EXPORTS
         Function        InterfaceItem
     end
-    properties (Constant, Access = private)
-        InputLabel           = 'Inputs';
-        ImportLabel          = 'Imports';
-        OutputLabel          = 'Outputs';
-        ExportLabel          = 'Exports';
-        
-        InportLabel          = 'Inports';
-        FromFileLabel        = 'From Files';
-        FromWorkspaceLabel   = 'From Workspaces';
-        FromSpreadsheetLabel = 'From Spreadsheets';
-        DataStoreReadLabel   = 'Data Store Reads';
-        
-        ModelReferenceLabel  = 'Model References';
-        LibraryLinkLabel     = 'Library Links';
-        
-        OutportLabel         = 'Outports';
-        ToFileLabel          = 'To Files';
-        ToWorkspaceLabel     = 'To Workspaces';
-        DataStoreWriteLabel  = 'Data Store Writes';
-        
-        FunctionLabel        = 'Simulink Functions';
-    end
     properties (Access = private)
-        ExportDataHeader
-        FcnsHeader
+        % INPUTS
+        InputHeader           = InterfaceHeader('Inputs');
+        InportHeader          = InterfaceHeader('Inports');
+        FromFileHeader        = InterfaceHeader('From Files');
+        FromWorkspaceHeader   = InterfaceHeader('From Workspaces');
+        FromSpreadsheetHeader = InterfaceHeader('From Spreadsheets');
+        DataStoreReadHeader   = InterfaceHeader('Data Store Reads');
+
+        % IMPORTS
+        ImportHeader          = InterfaceHeader('Imports');
+        ModelReferenceHeader  = InterfaceHeader('Model References');
+        LibraryLinkHeader     = InterfaceHeader('Library Links');
+                
+        % OUTPUTS
+        OutputHeader          = InterfaceHeader('Outputs');
+        OutportHeader         = InterfaceHeader('Outports');
+        ToFileHeader          = InterfaceHeader('To Files');
+        ToWorkspaceHeader     = InterfaceHeader('To Workspaces');
+        DataStoreWriteHeader  = InterfaceHeader('Data Store Writes');
+        
+        % EXPORTS
+        ExportHeader          = InterfaceHeader('Exports');
+        FunctionHeader        = InterfaceHeader('Simulink Functions');
     end
     methods (Access = public)
         function obj = Interface(m)
@@ -131,120 +130,120 @@ classdef Interface
             else
                 verbose = false;
             end
-            fprintf('INPUTS\n');
+            fprintf('%s\n', obj.InputHeader.Label);
             fprintf('------\n');
             
             if isempty(obj.Inport) && verbose
-                fprintf('%s:\n\tN/A\n', obj.InportLabel);
+                fprintf('%s:\n\tN/A\n', obj.InportHeader.Label);
             elseif ~isempty(obj.Inport)
-                fprintf('%s:\n', obj.InportLabel);
+                fprintf('%s:\n', obj.InportHeader.Label);
                 for i = 1:length(obj.Inport)
                     fprintf('\t%s, %s\n', obj.Inport(i).Fullpath, obj.Inport(i).DataType);
                 end
             end
             
             if isempty(obj.FromFile) && verbose
-                fprintf('%s:\n\tN/A\n', obj.FromFileLabel);
+                fprintf('%s:\n\tN/A\n', obj.FromFileHeader.Label);
             elseif ~isempty(obj.FromFile)
-                fprintf('%s:\n', obj.FromFileLabel);
+                fprintf('%s:\n', obj.FromFileHeader.Label);
                 for i = 1:length(obj.FromFile)
                     fprintf('\t%s, %s\n', obj.FromFile(i).Fullpath, obj.FromFile(i).DataType);
                 end
             end
             
             if isempty(obj.FromWorkspace) && verbose
-                fprintf('%s:\n\tN/A\n', obj.FromWorkspaceLabel);
+                fprintf('%s:\n\tN/A\n', obj.FromWorkspaceHeader.Label);
             elseif ~isempty(obj.FromWorkspace)
-                fprintf('%s:\n', obj.FromWorkspaceLabel);
+                fprintf('%s:\n', obj.FromWorkspaceHeader.Label);
                 for i = 1:length(obj.FromWorkspace)
                     fprintf('\t%s, %s\n', obj.FromWorkspace(i).Fullpath, obj.FromWorkspace(i).DataType);
                 end
             end
             
             if isempty(obj.FromSpreadsheet) && verbose
-                fprintf('%s:\n\tN/A\n', obj.FromSpreadsheetLabel);
+                fprintf('%s:\n\tN/A\n', obj.FromSpreadsheetHeader.Label);
             elseif ~isempty(obj.FromSpreadsheet)
-                fprintf('%s:\n', obj.FromSpreadsheetLabel);
+                fprintf('%s:\n', obj.FromSpreadsheetHeader.Label);
                 for i = 1:length(obj.FromSpreadsheet)
                     fprintf('\t%s, %s\n', obj.FromSpreadsheet(i).Fullpath, obj.FromSpreadsheet(i).DataType);
                 end
             end
             
             if isempty(obj.DataStoreRead) && verbose
-                fprintf('%s:\n\tN/A\n', obj.DataStoreReadLabel);
+                fprintf('%s:\n\tN/A\n', obj.DataStoreReadHeader.Label);
             elseif ~isempty(obj.DataStoreRead)
-                fprintf('%s:\n', obj.DataStoreReadLabel);
+                fprintf('%s:\n', obj.DataStoreReadHeader.Label);
                 for i = 1:length(obj.DataStoreRead)
                     fprintf('\t%s, %s\n', obj.DataStoreRead(i).Fullpath, obj.DataStoreRead(i).DataType);
                 end
             end
 
-            fprintf('\nIMPORTS\n');
+            fprintf('\n%s\n', obj.ImportHeader.Label);
             fprintf('------\n');
             if isempty(obj.ModelReference) && verbose
-                fprintf('%s:\n\tN/A\n', obj.ModelReferenceLabel);
+                fprintf('%s:\n\tN/A\n', obj.ModelReferenceHeader.Label);
             elseif ~isempty(obj.ModelReference)
-                fprintf('%s:\n', obj.ModelReferenceLabel);
+                fprintf('%s:\n', obj.ModelReferenceHeader.Label);
                 for i = 1:length(obj.ModelReference)
                     fprintf('\t%s, %s\n', obj.ModelReference(i).Fullpath, obj.ModelReference(i).DataType);
                 end
             end            
 
             if isempty(obj.LibraryLink) && verbose
-                fprintf('%s:\n\tN/A\n', obj.LibraryLinkLabel);
+                fprintf('%s:\n\tN/A\n', obj.LibraryLinkHeader.Label);
             elseif ~isempty(obj.LibraryLink)
-                fprintf('%s:\n', obj.LibraryLinkLabel);
+                fprintf('%s:\n', obj.LibraryLinkHeader.Label);
                 for i = 1:length(obj.LibraryLink)
                     fprintf('\t%s, %s\n', obj.LibraryLink(i).Fullpath, obj.LibraryLink(i).DataType);
                 end
             end   
             
-            fprintf('\nOUTPUTS\n');
+            fprintf('\n%s\n', obj.OutputHeader.Label);
             fprintf('-------\n');
             
             if isempty(obj.Outport) && verbose
-                fprintf('%s:\n\tN/A\n', obj.OutportLabel);
+                fprintf('%s:\n\tN/A\n', obj.OutportHeader.Label);
             elseif ~isempty(obj.Outport)
-                fprintf('%s:\n', obj.OutportLabel);
+                fprintf('%s:\n', obj.OutportHeader.Label);
                 for i = 1:length(obj.Outport)
                     fprintf('\t%s, %s\n', obj.Outport(i).Fullpath, obj.Outport(i).DataType);
                 end
             end
             
             if isempty(obj.ToFile) && verbose
-                fprintf('%s:\n\tN/A\n', obj.ToFileLabel);
+                fprintf('%s:\n\tN/A\n', obj.ToFileHeader.Label);
             elseif ~isempty(obj.ToFile)
-                fprintf('%s:\n', obj.ToFileLabel);
+                fprintf('%s:\n', obj.ToFileHeader.Label);
                 for i = 1:length(obj.ToFile)
                     fprintf('\t%s, %s\n', obj.ToFile(i).Fullpath, obj.ToFile(i).DataType);
                 end
             end
             
             if isempty(obj.ToWorkspace) && verbose
-                fprintf('%s:\n\tN/A\n', obj.ToWorkspaceLabel);
+                fprintf('%s:\n\tN/A\n', obj.ToWorkspaceHeader.Label);
             elseif ~isempty(obj.ToWorkspace)
-                fprintf('%s:\n', obj.ToWorkspaceLabel);
+                fprintf('%s:\n', obj.ToWorkspaceHeader.Label);
                 for i = 1:length(obj.ToWorkspace)
                     fprintf('\t%s, %s\n', obj.ToWorkspace(i).Fullpath, obj.ToWorkspace(i).DataType);
                 end
             end
             
             if isempty(obj.DataStoreWrite) && verbose
-                fprintf('%s:\n\tN/A\n', obj.DataStoreWriteLabel);
+                fprintf('%s:\n\tN/A\n', obj.DataStoreWriteHeader.Label);
             elseif ~isempty(obj.DataStoreWrite)
-                fprintf('%s:\n', obj.DataStoreWriteLabel);
+                fprintf('%s:\n', obj.DataStoreWriteHeader.Label);
                 for i = 1:length(obj.DataStoreWrite)
                     fprintf('\t%s, %s\n', obj.DataStoreWrite(i).Fullpath, obj.DataStoreWrite(i).DataType);
                 end
             end
 
-            fprintf('\nEXPORTS\n');
+            fprintf('\n%s\n', obj.ExportHeader.Label);
             fprintf('-------\n');
             
             if isempty(obj.Function) && verbose
-                fprintf('%s:\n\tN/A\n', obj.FunctionLabel);
+                fprintf('%s:\n\tN/A\n', obj.FunctionHeader.Label);
             elseif ~isempty(obj.Function)
-                fprintf('%s:\n', obj.FunctionLabel);
+                fprintf('%s:\n', obj.FunctionHeader.Label);
                 for i = 1:length(obj.Function)
                     fprintf('\t%s, %s\n', obj.Function(i).Fullpath, obj.Function(i).DataType);
                 end
@@ -498,14 +497,15 @@ classdef Interface
             spaceBetween_ModelAndInterface = 100;
             spaceAfter_Block = 40;
             spaceAfter_Header = 10;
+            largeFontSize = 18;
+            smallFontSize  = 14;
             
             % ADD BLOCKS/ANNOTATIONS
-            hAnn = [];
             if ~isempty(obj.Inport) || ~isempty(obj.FromFile) || ~isempty(obj.FromWorkspace) || ~isempty(obj.FromSpreadsheet) || ~isempty(obj.DatStoreRead)
-                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.InputLabel], 'FontSize', 18).Handle;
+                obj.InputHeader.Handle = Simulink.Annotation([bdroot '/' obj.InputHeader.Label], 'FontSize', largeFontSize).Handle;
             end
             if ~isempty(obj.Inport)
-                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.InportLabel], 'FontSize', 14).Handle;
+                obj.InportHeader.Handle = Simulink.Annotation([bdroot '/' obj.InportHeader.Label], 'FontSize', smallFontSize).Handle;
                 for i = 1:length(obj.Inport)
                     obj.Inport(i).InterfaceHandle = get_param(obj.Inport(i).Fullpath, 'Handle');
                     
@@ -523,7 +523,7 @@ classdef Interface
             
             nblock = 1;
             if ~isempty(obj.FromFile)
-                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.FromFileLabel], 'FontSize', 14).Handle;
+                obj.FromFileHeader.Handle = Simulink.Annotation([bdroot '/' obj.FromFileHeader.Label], 'FontSize', smallFontSize).Handle;
                 for j = 1:length(obj.FromFile)
                     blockCreated = false;
                     while ~blockCreated
@@ -551,7 +551,7 @@ classdef Interface
             
             nblock = 1;
             if ~isempty(obj.FromSpreadsheet)
-                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.FromSpreadsheetLabel], 'FontSize', 14).Handle;
+                obj.FromSpreadsheetHeader.Handle = Simulink.Annotation([bdroot '/' obj.FromSpreadsheetHeader.Label], 'FontSize', smallFontSize).Handle;
                 for k = 1:length(obj.FromSpreadsheet)
                     blockCreated = false;
                     while ~blockCreated
@@ -578,7 +578,7 @@ classdef Interface
             
             nblock = 1;
             if ~isempty(obj.FromWorkspace)
-                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.FromWorkspaceLabel], 'FontSize', 14).Handle;
+                obj.FromWorkspaceHeader.Handle = Simulink.Annotation([bdroot '/' obj.FromWorkspaceHeader.Label], 'FontSize', smallFontSize).Handle;
                 for l = 1:length(obj.FromWorkspace)
                     blockCreated = false;
                     while ~blockCreated
@@ -605,7 +605,7 @@ classdef Interface
             
             nblock = 1;
             if ~isempty(obj.DataStoreRead)
-                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.DataStoreReadLabel], 'FontSize', 14).Handle;
+                obj.DataStoreReadHeader.Handle = Simulink.Annotation([bdroot '/' obj.DataStoreReadHeader.Label], 'FontSize', smallFontSize).Handle;
                 for m = 1:length(obj.DataStoreRead)
                     blockCreated = false;
                     while ~blockCreated
@@ -631,10 +631,10 @@ classdef Interface
             end
             
             if ~isempty(obj.Outport) || ~isempty(obj.ToFile) || ~isempty(obj.ToWorkspace) || ~isempty(obj.DataStoreWrite)
-                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.OutputLabel], 'FontSize', 18).Handle;
+                obj.OutputHeader.Handle = Simulink.Annotation([bdroot '/' obj.OutputHeader.Label], 'FontSize', largeFontSize).Handle;
             end
             if ~isempty(obj.Outport)
-                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.OutportLabel], 'FontSize', 14).Handle;
+                obj.OutportHeader.Handle = Simulink.Annotation([bdroot '/' obj.OutportHeader.Label], 'FontSize', smallFontSize).Handle;
                 for n = 1:length(obj.Outport)
                     obj.Outport(n).InterfaceHandle = get_param(obj.Outport(n).Fullpath, 'Handle');
                     
@@ -652,7 +652,7 @@ classdef Interface
             
             nblock = 1;
             if ~isempty(obj.ToFile)
-                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.ToFileLabel], 'FontSize', 14).Handle;
+                obj.ToFileHeader.Handle = Simulink.Annotation([bdroot '/' obj.ToFileHeader.Label], 'FontSize', smallFontSize).Handle;
                 for o = 1:length(obj.ToFile)
                     blockCreated = false;
                     while ~blockCreated
@@ -679,7 +679,7 @@ classdef Interface
             
             nblock = 1;
             if ~isempty(obj.ToWorkspace)
-                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.ToWorkspaceLabel], 'FontSize', 14).Handle;
+                obj.ToWorkspaceHeader.Handle = Simulink.Annotation([bdroot '/' obj.ToWorkspaceHeader.Label], 'FontSize', smallFontSize).Handle;
                 for p = 1:length(obj.ToWorkspace)
                     blockCreated = false;
                     while ~blockCreated
@@ -706,7 +706,7 @@ classdef Interface
             
             nblock = 1;
             if ~isempty(obj.DataStoreWrite)
-                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.DataStoreWriteLabel], 'FontSize', 14).Handle;
+                obj.DataStoreWriteHeader.Handle = Simulink.Annotation([bdroot '/' obj.DataStoreWriteHeader.Label], 'FontSize', smallFontSize).Handle;
                 for q = 1:length(obj.DataStoreWrite)
                     blockCreated = false;
                     while ~blockCreated
@@ -732,8 +732,8 @@ classdef Interface
             end
             
             if ~isempty(obj.Function)
-                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.ExportLabel], 'FontSize', 18).Handle;
-                hAnn(end+1) = Simulink.Annotation([bdroot '/' obj.FunctionLabel], 'FontSize', 14).Handle;
+                obj.ExportHeader.Handle = Simulink.Annotation([bdroot '/' obj.ExportHeader.Label], 'FontSize', largeFontSize).Handle;
+                obj.FunctionHeader.Handle = Simulink.Annotation([bdroot '/' obj.FunctionHeader.Label], 'FontSize', smallFontSize).Handle;
                 for r = 1:length(obj.Function)
                     obj.Function(r).InterfaceHandle = createFcnCaller(obj.ModelName, obj.Function(r).Fullpath);
                     set_param(obj.Function(r).InterfaceHandle, varargin{:})
@@ -748,8 +748,9 @@ classdef Interface
             end
             
             % Get all interface blocks
+            hHeaders = getInterfaceHeaders(obj);
             [hMain, hGrnd, hTerm] = getInterfaceBlocks(obj);
-            interfaceBlocks = [hMain, hGrnd, hTerm];
+            interfaceBlocks = [hMain, hGrnd, hTerm, hHeaders];
             
             % Correct block orientation of inport and outports, because they are
             % put there by the user and can be flipped
@@ -775,13 +776,13 @@ classdef Interface
             end
             
             % Center main interface blocks and annotations
-            alignBlocksInColumn(num2cell(hMain), 'center');
-            alignBlocksInColumn(num2cell(hAnn), 'center')            
+            alignBlocksInColumn(num2cell([hHeaders,hMain]), 'center');
+            %alignBlocksInColumn(num2cell(hHeaders), 'center')            
             
             % Vertically distribute interface blocks/annotations
             topModelBound = modelBounds(2);
             pNext = topModelBound;
-            blocksOrAnnotations = sort([hMain, hAnn]); 
+            blocksOrAnnotations = sort([hMain,hHeaders]); 
             for i = 1:length(blocksOrAnnotations)
                 pCurrent = get_param(blocksOrAnnotations(i), 'Position');
                 height = pCurrent(4) - pCurrent(2);
@@ -997,11 +998,7 @@ classdef Interface
             end
         end
         function resizeAll(obj)
-            % RESIZEALL Resize all blocks in the interface.
-            %
-            %   Inputs:
-            %       obj     Interface object.
-            
+            % RESIZEALL Resize all blocks in the interface.            
             iter = createIterator(obj);
             while iter.hasNext()
                 el = iter.next();
@@ -1035,6 +1032,27 @@ classdef Interface
                 grnd = [grnd el.GroundHandle];
                 term = [term el.TerminatorHandle];
             end
+        end
+        function handles = getInterfaceHeaders(obj)
+            % GETINTERFACEHEADERS Return the annotations of the interface after
+            %   it has been modelled. They are returned in the order that
+            %   they appear on the interface.
+            handles = [obj.InputHeader.Handle, ...
+                obj.InportHeader.Handle, ...
+                obj.FromFileHeader.Handle, ...
+                obj.FromWorkspaceHeader.Handle, ...
+                obj.FromSpreadsheetHeader.Handle, ...
+                obj.DataStoreReadHeader.Handle, ...
+                obj.ImportHeader.Handle, ...
+                obj.ModelReferenceHeader.Handle, ... 
+                obj.LibraryLinkHeader.Handle, ...
+                obj.OutputHeader.Handle, ...
+                obj.OutportHeader.Handle, ...
+                obj.ToFileHeader.Handle, ...
+                obj.ToWorkspaceHeader.Handle, ...
+                obj.DataStoreWriteHeader.Handle, ...
+                obj.ExportHeader.Handle, ...
+                obj.FunctionHeader.Handle];
         end
     end
 end

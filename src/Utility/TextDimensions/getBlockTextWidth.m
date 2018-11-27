@@ -178,19 +178,19 @@ function defaultWidth = getDefaultWidth(block)
     [~, defaultWidth] = blockStringDims(block, string);
 end
 
-function neededWidth = getSubSystemBlockWidth(block, bType)
+function neededWidth = getSubSystemBlockWidth(block, blockType)
+    % Determine the width of a subsystem block, based on the strings that appear
+    % in the block: its inport names, outport names, and any other text.
     
     block = getfullname(block);
+     
+    % TODO: Consider other port types that appear at the top?
+    % enables  = find_system(block, 'SearchDepth', 1, 'LookUnderMasks', 'all', 'BlockType', 'EnablePort');
+    % triggers = find_system(block, 'SearchDepth', 1, 'LookUnderMasks', 'all', 'BlockType', 'TriggerPort');
+    % actions  = find_system(block, 'SearchDepth', 1, 'LookUnderMasks', 'all', 'BlockType', 'ActionPort');
     
+    % Inport names
     inports = find_system(block, 'SearchDepth', 1, 'LookUnderMasks', 'all', 'BlockType', 'Inport');
-    
-    % % May need to consider other port types
-    %             inports = [inports; find_system(block, 'SearchDepth', 1, 'LookUnderMasks', 'all', 'BlockType', 'EnablePort')];
-    %             inports = [inports; find_system(block, 'SearchDepth', 1, 'LookUnderMasks', 'all', 'BlockType', 'TriggerPort')];
-    %             inports = [inports; find_system(block, 'SearchDepth', 1, 'LookUnderMasks', 'all', 'BlockType', 'ActionPort')];
-    
-    outports = find_system(block, 'SearchDepth', 1, 'LookUnderMasks', 'all', 'BlockType', 'Outport');
-    
     leftWidth = 0;
     for i = 1:length(inports)
         string = get_param(inports{i}, 'Name');
@@ -200,6 +200,8 @@ function neededWidth = getSubSystemBlockWidth(block, bType)
         end
     end
     
+    % Outport names
+    outports = find_system(block, 'SearchDepth', 1, 'LookUnderMasks', 'all', 'BlockType', 'Outport');
     rightWidth = 0;
     for i = 1:length(outports)
         string = get_param(outports{i}, 'Name');
@@ -209,24 +211,22 @@ function neededWidth = getSubSystemBlockWidth(block, bType)
         end
     end
     
-    if strcmp(get_param(block, 'Mask'),'on')
+    % Masks
+    if strcmp(get_param(block, 'Mask'), 'on')
         maskType = get_param(block, 'MaskType');
         [~, blockWidth] = blockStringDims(block, get_param(block, 'Name'));
         [~, maskWidth] = blockStringDims(block, maskType);
-        centerWidth = max(blockWidth,maskWidth);
+        centerWidth = max(blockWidth, maskWidth);
+    % Simulink Function prototypes
+    elseif strcmpi(get_param(block, 'IsSimulinkFunction'), 'on')
+        % Simulink functions are a special type of SubSystem. 
+        % Their block displays the function prototype.
+        trigger = find_system(block, 'FollowLinks', 'on', 'SearchDepth', 1, 'Type', 'Block', 'BlockType', 'TriggerPort');
+        prototype = get_param(trigger, 'FunctionPrototype');
+        [~, centerWidth] = blockStringDims(block, prototype{1});
     else
-        %                 maskType = '';
         centerWidth = 0;
     end
     
-    %             if strcmp(get_param(block,'ShowName'),'on')
-    %                 string = block;
-    %                 [~, width] = blockStringDims(block, string);
-    %                 if width > centerWidth
-    %                     centerWidth = width;
-    %                 end
-    %             end
-    
-    width = sum([leftWidth, rightWidth, centerWidth]);
-    neededWidth = width;   %To fit different blocks of text within the block
+    neededWidth = sum([leftWidth, rightWidth, centerWidth]);
 end

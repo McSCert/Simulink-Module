@@ -567,7 +567,7 @@ classdef Interface
             options = {'ShowName' ,'on', 'HideAutomaticName', 'off', 'Commented', 'on'};
             
             % Get orignal model bounds before we start adding blocks
-            modelBlocks = find_system(obj.ModelName, 'SearchDepth', '1', 'FindAll', 'on');
+            modelBlocks = find_system(obj.ModelName, 'SearchDepth', '1', 'FindAll', 'on', 'IncludeCommented', 'on');
             modelBounds = bounds_of_sim_objects(modelBlocks);
             
             % Spacing constants

@@ -131,18 +131,18 @@ classdef Interface
                 switch group
                     case 'Input'
                         b = isempty(obj.Inport) ...
-                            || isempty(obj.FromFile) ...
-                            || isempty(obj.FromWorkspace) ...
-                            || isempty(obj.FromSpreadsheet) ...
-                            || isempty(obj.DataStoreRead);
+                            && isempty(obj.FromFile) ...
+                            && isempty(obj.FromWorkspace) ...
+                            && isempty(obj.FromSpreadsheet) ...
+                            && isempty(obj.DataStoreRead);
                     case 'Import'
                         b = isempty(obj.ModelReference) ...
-                            || isempty(obj.LibraryLink);
+                            && isempty(obj.LibraryLink);
                     case 'Output'
                         b = isempty(obj.Outport) ...
-                            || isempty(obj.ToFile) ...
-                            || isempty(obj.ToWorkspace) ...
-                            || isempty(obj.DataStoreWrite);
+                            && isempty(obj.ToFile) ...
+                            && isempty(obj.ToWorkspace) ...
+                            && isempty(obj.DataStoreWrite);
                     case 'Export'
                         b = isempty(obj.Function);
                     otherwise
@@ -461,6 +461,21 @@ classdef Interface
             
             el = all{loc};
         end
+        function [main, grnd, term] = getInterfaceBlocks(obj)
+            % GETINTERFACEBLOCKS Return the blocks associated with the interface
+            %   after it has been modelled. They are returned in the order that
+            %   they appear on the interface.
+            iter = createIterator(obj);
+            main = [];  % Inport, ToFile, Function Caller, etc.
+            term = [];  % Terminators
+            grnd = [];  % Grounds
+            while iter.hasNext()
+                el = iter.next();
+                main = [main el.InterfaceHandle];
+                grnd = [grnd el.GroundHandle];
+                term = [term el.TerminatorHandle];
+            end
+        end
         function obj = add(obj, names)
             % ADD Add item to interface.
             %
@@ -528,26 +543,28 @@ classdef Interface
             
             obj.ModelName = bdroot(name);
         end
-        function obj = model(obj, varargin)
+        function obj = model(obj)
             % MODEL Create a representation of the interface in the model.
             %   Moves blocks, adds annotations, and adds the blocks representing the
             %   interface.
             %
             %   Inputs:
-            %       obj     Interface object.
+            %       obj      Interface object.
+            %       varargin Any additional parameters that the use wants to
+            %                include for the interface blocks created.
             %
             %   Outputs:
-            %       obj     Interface object.
+            %       obj      Interface object.
             
             if isempty(obj.ModelName)
                 error('Interface has no model.');
             elseif isempty(obj)
                 warning('No elements on the interface.');
-                return % No items on the interface
+                return
             end
             
             % Add default parameters for complying with MAAB
-            varargin = horzcat(varargin, 'ShowName' ,'on', 'HideAutomaticName', 'off', 'Commented', 'on');
+            options = {'ShowName' ,'on', 'HideAutomaticName', 'off', 'Commented', 'on'};
             
             % Get orignal model bounds before we start adding blocks
             modelBlocks = find_system(obj.ModelName, 'SearchDepth', '1', 'FindAll', 'on');
@@ -567,45 +584,46 @@ classdef Interface
             end
             if ~isempty(obj.Inport)
                 obj.InportHeader.Handle = Simulink.Annotation([bdroot '/' obj.InportHeader.Label], 'FontSize', smallFontSize).Handle;
-                for i = 1:length(obj.Inport)
-                    obj.Inport(i).InterfaceHandle = get_param(obj.Inport(i).Fullpath, 'Handle');
+                for a = 1:length(obj.Inport)
+                    obj.Inport(a).InterfaceHandle = get_param(obj.Inport(a).Fullpath, 'Handle');
                     
                     % Convert line(s) to goto/from connection
-                    lines = get_param(obj.Inport(i).Handle, 'LineHandles');
+                    lines = get_param(obj.Inport(a).Handle, 'LineHandles');
                     lines = lines.Outport;
-                    tag = ['Goto' obj.Inport(i).Name];
+                    tag = ['Goto' obj.Inport(a).Name];
                     tag = strrep(tag, ':', '');
                     line2Goto(obj.ModelName, lines, tag);
                     
-                    fromName = char(getDsts(obj.Inport(i).Handle, 'IncludeImplicit', 'off'));
-                    obj.Inport(i).TerminatorHandle = get_param(fromName, 'Handle');
+                    fromName = char(getDsts(obj.Inport(a).Handle, 'IncludeImplicit', 'off'));
+                    obj.Inport(a).TerminatorHandle = get_param(fromName, 'Handle');
                 end
             end
             
             nblock = 1;
             if ~isempty(obj.FromFile)
                 obj.FromFileHeader.Handle = Simulink.Annotation([bdroot '/' obj.FromFileHeader.Label], 'FontSize', smallFontSize).Handle;
-                for j = 1:length(obj.FromFile)
+                for b = 1:length(obj.FromFile)
                     blockCreated = false;
                     while ~blockCreated
                         try
-                            obj.FromFile(j).InterfaceHandle = add_block('simulink/Sources/From File', ...
+                            obj.FromFile(b).InterfaceHandle = add_block('simulink/Sources/From File', ...
                                 [bdroot '/From File' num2str(nblock)], ...
-                                varargin{:});
+                                options{:});
                             
                             blockCreated = true;
                         catch
                             nblock = nblock + 1;
                         end
                     end
-                    tag = get_param(obj.FromFile(j).Handle, 'FileName');
-                    set_param(obj.FromFile(j).InterfaceHandle, 'FileName', tag);
+                    % Set name
+                    name = get_param(obj.FromFile(b).Handle, 'FileName');
+                    set_param(obj.FromFile(b).InterfaceHandle, 'FileName', name);
                     
                     % Connect to terminators/grounds
-                    allPorts = get_param(obj.FromFile(j).InterfaceHandle, 'PortHandles');
+                    allPorts = get_param(obj.FromFile(b).InterfaceHandle, 'PortHandles');
                     if ~isempty(allPorts)
-                        obj.FromFile(j).GroundHandle = fulfillPorts(allPorts.Inport);
-                        obj.FromFile(j).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                        obj.FromFile(b).GroundHandle = fulfillPorts(allPorts.Inport);
+                        obj.FromFile(b).TerminatorHandle = fulfillPorts(allPorts.Outport);
                     end
                 end
             end
@@ -613,26 +631,27 @@ classdef Interface
             nblock = 1;
             if ~isempty(obj.FromSpreadsheet)
                 obj.FromSpreadsheetHeader.Handle = Simulink.Annotation([bdroot '/' obj.FromSpreadsheetHeader.Label], 'FontSize', smallFontSize).Handle;
-                for k = 1:length(obj.FromSpreadsheet)
+                for c = 1:length(obj.FromSpreadsheet)
                     blockCreated = false;
                     while ~blockCreated
                         try
-                            obj.FromSpreadsheet(k).InterfaceHandle = add_block('simulink/Sources/From Spreadsheet', ...
+                            obj.FromSpreadsheet(c).InterfaceHandle = add_block('simulink/Sources/From Spreadsheet', ...
                                 [bdroot '/From Spreadsheet' num2str(nblock)],...
-                                varargin{:});
+                                options{:});
                             blockCreated = true;
                         catch
                             nblock = nblock + 1;
                         end
                     end
-                    tag = get_param(obj.FromSpreadsheet(k).Handle, 'FileName');
-                    set_param(obj.FromSpreadsheet(k).InterfaceHandle, 'FileName', tag);
+                    % Set name
+                    name = get_param(obj.FromSpreadsheet(c).Handle, 'FileName');
+                    set_param(obj.FromSpreadsheet(c).InterfaceHandle, 'FileName', name);
                     
                     % Connect to terminators/grounds
-                    allPorts = get_param(obj.FromSpreadsheet(k).InterfaceHandle, 'PortHandles');
+                    allPorts = get_param(obj.FromSpreadsheet(c).InterfaceHandle, 'PortHandles');
                     if ~isempty(allPorts)
-                        obj.FromSpreadsheet(k).GroundHandle = fulfillPorts(allPorts.Inport);
-                        obj.FromSpreadsheet(k).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                        obj.FromSpreadsheet(c).GroundHandle = fulfillPorts(allPorts.Inport);
+                        obj.FromSpreadsheet(c).TerminatorHandle = fulfillPorts(allPorts.Outport);
                     end
                 end
             end
@@ -640,26 +659,27 @@ classdef Interface
             nblock = 1;
             if ~isempty(obj.FromWorkspace)
                 obj.FromWorkspaceHeader.Handle = Simulink.Annotation([bdroot '/' obj.FromWorkspaceHeader.Label], 'FontSize', smallFontSize).Handle;
-                for l = 1:length(obj.FromWorkspace)
+                for d = 1:length(obj.FromWorkspace)
                     blockCreated = false;
                     while ~blockCreated
                         try
-                            obj.FromWorkspace(l).InterfaceHandle = add_block('simulink/Sources/From Workspace', ...
+                            obj.FromWorkspace(d).InterfaceHandle = add_block('simulink/Sources/From Workspace', ...
                                 [bdroot '/From Workspace' num2str(nblock)], ...
-                                varargin{:});
+                                options{:});
                             blockCreated = true;
                         catch
                             nblock = nblock + 1;
                         end
                     end
-                    tag = get_param(obj.FromWorkspace(l).Handle, 'VariableName');
-                    set_param(obj.FromWorkspace(l).InterfaceHandle, 'VariableName', tag);
+                    % Set name
+                    name = get_param(obj.FromWorkspace(d).Handle, 'VariableName');
+                    set_param(obj.FromWorkspace(d).InterfaceHandle, 'VariableName', name);
                     
                     % Connect to terminators/grounds
-                    allPorts = get_param(obj.FromWorkspace(l).InterfaceHandle, 'PortHandles');
+                    allPorts = get_param(obj.FromWorkspace(d).InterfaceHandle, 'PortHandles');
                     if ~isempty(allPorts)
-                        obj.FromWorkspace(l).GroundHandle = fulfillPorts(allPorts.Inport);
-                        obj.FromWorkspace(l).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                        obj.FromWorkspace(d).GroundHandle = fulfillPorts(allPorts.Inport);
+                        obj.FromWorkspace(d).TerminatorHandle = fulfillPorts(allPorts.Outport);
                     end
                 end
             end
@@ -667,28 +687,86 @@ classdef Interface
             nblock = 1;
             if ~isempty(obj.DataStoreRead)
                 obj.DataStoreReadHeader.Handle = Simulink.Annotation([bdroot '/' obj.DataStoreReadHeader.Label], 'FontSize', smallFontSize).Handle;
-                for m = 1:length(obj.DataStoreRead)
+                for e = 1:length(obj.DataStoreRead)
                     blockCreated = false;
                     while ~blockCreated
                         try
-                            obj.DataStoreRead(m).InterfaceHandle = add_block('simulink/Signal Routing/Data Store Read', ...
+                            obj.DataStoreRead(e).InterfaceHandle = add_block('simulink/Signal Routing/Data Store Read', ...
                                 [bdroot '/Data Store Read' num2str(nblock)], ...
-                                varargin{:});
+                                options{:});
                             blockCreated = true;
                         catch
                             nblock = nblock + 1;
                         end
                     end
-                    tag = get_param(obj.DataStoreRead(m).Handle, 'DataStoreName');
-                    set_param(obj.DataStoreRead(m).InterfaceHandle, 'DataStoreName', tag);
+                    % Set name
+                    name = get_param(obj.DataStoreRead(e).Handle, 'DataStoreName');
+                    set_param(obj.DataStoreRead(e).InterfaceHandle, 'DataStoreName', name);
                     
                     % Connect to terminators/grounds
-                    allPorts = get_param(obj.DataStoreRead(m).InterfaceHandle, 'PortHandles');
+                    allPorts = get_param(obj.DataStoreRead(e).InterfaceHandle, 'PortHandles');
                     if ~isempty(allPorts)
-                        obj.DataStoreRead(m).GroundHandle = fulfillPorts(allPorts.Inport);
-                        obj.DataStoreRead(m).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                        obj.DataStoreRead(e).GroundHandle = fulfillPorts(allPorts.Inport);
+                        obj.DataStoreRead(e).TerminatorHandle = fulfillPorts(allPorts.Outport);
                     end
                 end
+            end
+            
+            if ~isempty(obj, 'Import')
+                obj.ImportHeader.Handle = Simulink.Annotation([bdroot '/' obj.ImportHeader.Label], 'FontSize', largeFontSize).Handle; 
+            end
+            nblock = 1;
+            if ~isempty(obj.ModelReference)
+                obj.ModelReferenceHeader.Handle = Simulink.Annotation([bdroot '/' obj.ModelReferenceHeader.Label], 'FontSize', smallFontSize).Handle;
+                for f = 1:length(obj.ModelReference)
+                    blockCreated = false;
+                    while ~blockCreated
+                        try
+                            obj.ModelReference(f).InterfaceHandle = add_block('simulink/Ports & Subsystems/Model', ...
+                                [bdroot '/Model' num2str(nblock)], ...
+                                options{:});
+                            blockCreated = true;
+                        catch
+                            nblock = nblock + 1;
+                        end
+                    end
+                    % Set name
+                    name = get_param(obj.ModelReference(f).Handle, 'ModelName');
+                    set_param(obj.ModelReference(f).InterfaceHandle, 'ModelName', name);
+                    
+                    % Connect to terminators/grounds
+                    allPorts = get_param(obj.ModelReference(f).InterfaceHandle, 'PortHandles');
+                    if ~isempty(allPorts)
+                        obj.ModelReference(f).GroundHandle = fulfillPorts(allPorts.Inport);
+                        obj.ModelReference(f).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                    end
+                end
+            end
+            nblock = 1;
+            if ~isempty(obj.LibraryLink)
+                obj.LibraryLinkHeader.Handle = Simulink.Annotation([bdroot '/' obj.LibraryLinkHeader.Label], 'FontSize', smallFontSize).Handle;
+                for f = 1:length(obj.LibraryLink)
+                    blockCreated = false;
+                    while ~blockCreated
+                        try
+                            blockPath = get_param(obj.LibraryLink(f).Handle, 'ReferenceBlock');
+                            blockName = get_param(obj.LibraryLink(f).Handle, 'Name');
+                            obj.LibraryLink(f).InterfaceHandle = add_block(blockPath, ...
+                                [bdroot '/' blockName num2str(nblock)], ...
+                                options{:});
+                            blockCreated = true;
+                        catch
+                            nblock = nblock + 1;
+                        end
+                    end
+                    
+                    % Connect to terminators/grounds
+                    allPorts = get_param(obj.LibraryLink(f).InterfaceHandle, 'PortHandles');
+                    if ~isempty(allPorts)
+                        obj.LibraryLink(f).GroundHandle = fulfillPorts(allPorts.Inport);
+                        obj.LibraryLink(f).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                    end
+                end                
             end
             
             if ~isempty(obj, 'Output')
@@ -696,44 +774,45 @@ classdef Interface
             end
             if ~isempty(obj.Outport)
                 obj.OutportHeader.Handle = Simulink.Annotation([bdroot '/' obj.OutportHeader.Label], 'FontSize', smallFontSize).Handle;
-                for n = 1:length(obj.Outport)
-                    obj.Outport(n).InterfaceHandle = get_param(obj.Outport(n).Fullpath, 'Handle');
+                for h = 1:length(obj.Outport)
+                    obj.Outport(h).InterfaceHandle = get_param(obj.Outport(h).Fullpath, 'Handle');
                     
                     % Convert line(s) to goto/from connection
-                    lines = get_param(obj.Outport(n).Handle, 'LineHandles');
+                    lines = get_param(obj.Outport(h).Handle, 'LineHandles');
                     lines = lines.Inport;      
-                    tag = ['Goto' obj.Outport(n).Name];
+                    tag = ['Goto' obj.Outport(h).Name];
                     tag = strrep(tag, ':', '');   
                     line2Goto(obj.ModelName, lines, tag);
                     
-                    fromName = char(getSrcs(obj.Outport(n).Handle, 'IncludeImplicit', 'off'));
-                    obj.Outport(n).GroundHandle = get_param(fromName, 'Handle');
+                    fromName = char(getSrcs(obj.Outport(h).Handle, 'IncludeImplicit', 'off'));
+                    obj.Outport(h).GroundHandle = get_param(fromName, 'Handle');
                 end
             end
             
             nblock = 1;
             if ~isempty(obj.ToFile)
                 obj.ToFileHeader.Handle = Simulink.Annotation([bdroot '/' obj.ToFileHeader.Label], 'FontSize', smallFontSize).Handle;
-                for o = 1:length(obj.ToFile)
+                for i = 1:length(obj.ToFile)
                     blockCreated = false;
                     while ~blockCreated
                         try
-                            obj.ToFile(o).InterfaceHandle = add_block('simulink/Sinks/To File', ...
+                            obj.ToFile(i).InterfaceHandle = add_block('simulink/Sinks/To File', ...
                                 [bdroot '/To File' num2str(nblock)], ...
-                                varargin{:});
+                                options{:});
                             blockCreated = true;
                         catch
                             nblock = nblock + 1;
                         end
                     end
-                    tag = get_param(obj.ToFile(o).Handle, 'FileName');
-                    set_param(obj.ToFile(o).InterfaceHandle, 'FileName', tag);
+                    % Set name
+                    name = get_param(obj.ToFile(i).Handle, 'FileName');
+                    set_param(obj.ToFile(i).InterfaceHandle, 'FileName', name);
                     
                     % Connect to terminators/grounds
-                    allPorts = get_param(obj.ToFile(o).InterfaceHandle, 'PortHandles');
+                    allPorts = get_param(obj.ToFile(i).InterfaceHandle, 'PortHandles');
                     if ~isempty(allPorts)
-                        obj.ToFile(o).GroundHandle = fulfillPorts(allPorts.Inport);
-                        obj.ToFile(o).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                        obj.ToFile(i).GroundHandle = fulfillPorts(allPorts.Inport);
+                        obj.ToFile(i).TerminatorHandle = fulfillPorts(allPorts.Outport);
                     end
                 end
             end
@@ -741,26 +820,27 @@ classdef Interface
             nblock = 1;
             if ~isempty(obj.ToWorkspace)
                 obj.ToWorkspaceHeader.Handle = Simulink.Annotation([bdroot '/' obj.ToWorkspaceHeader.Label], 'FontSize', smallFontSize).Handle;
-                for p = 1:length(obj.ToWorkspace)
+                for j = 1:length(obj.ToWorkspace)
                     blockCreated = false;
                     while ~blockCreated
                         try
-                            obj.ToWorkspace(p).InterfaceHandle = add_block('simulink/Sinks/To Workspace', ...
+                            obj.ToWorkspace(j).InterfaceHandle = add_block('simulink/Sinks/To Workspace', ...
                                 [bdroot '/To Workspace' num2str(nblock)], ...
-                                varargin{:});
+                                options{:});
                             blockCreated = true;
                         catch
                             nblock = nblock + 1;
                         end
                     end
-                    tag = get_param(obj.ToWorkspace(p).Handle, 'VariableName');
-                    set_param(obj.ToWorkspace(p).InterfaceHandle, 'VariableName', tag);
+                    % Set name
+                    name = get_param(obj.ToWorkspace(j).Handle, 'VariableName');
+                    set_param(obj.ToWorkspace(j).InterfaceHandle, 'VariableName', name);
                     
                     % Connect to terminators/grounds
-                    allPorts = get_param(obj.ToWorkspace(p).InterfaceHandle, 'PortHandles');
+                    allPorts = get_param(obj.ToWorkspace(j).InterfaceHandle, 'PortHandles');
                     if ~isempty(allPorts)
-                        obj.ToWorkspace(p).GroundHandle = fulfillPorts(allPorts.Inport);
-                        obj.ToWorkspace(p).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                        obj.ToWorkspace(j).GroundHandle = fulfillPorts(allPorts.Inport);
+                        obj.ToWorkspace(j).TerminatorHandle = fulfillPorts(allPorts.Outport);
                     end
                 end
             end
@@ -768,26 +848,27 @@ classdef Interface
             nblock = 1;
             if ~isempty(obj.DataStoreWrite)
                 obj.DataStoreWriteHeader.Handle = Simulink.Annotation([bdroot '/' obj.DataStoreWriteHeader.Label], 'FontSize', smallFontSize).Handle;
-                for q = 1:length(obj.DataStoreWrite)
+                for k = 1:length(obj.DataStoreWrite)
                     blockCreated = false;
                     while ~blockCreated
                         try
-                            obj.DataStoreWrite(q).InterfaceHandle = add_block('simulink/Signal Routing/Data Store Write', ...
+                            obj.DataStoreWrite(k).InterfaceHandle = add_block('simulink/Signal Routing/Data Store Write', ...
                                 [bdroot '/Data Store Write' num2str(nblock)], ...
-                                varargin{:});
+                                options{:});
                             blockCreated = true;
                         catch
                             nblock = nblock + 1;
                         end
                     end
-                    tag = get_param(obj.DataStoreWrite(q).Handle, 'DataStoreName');
-                    set_param(obj.DataStoreWrite(q).InterfaceHandle, 'DataStoreName', tag);
+                    % Set name
+                    name = get_param(obj.DataStoreWrite(k).Handle, 'DataStoreName');
+                    set_param(obj.DataStoreWrite(k).InterfaceHandle, 'DataStoreName', name);
                     
                     % Connect to terminators/grounds
-                    allPorts = get_param(obj.DataStoreWrite(q).InterfaceHandle, 'PortHandles');
+                    allPorts = get_param(obj.DataStoreWrite(k).InterfaceHandle, 'PortHandles');
                     if ~isempty(allPorts)
-                        obj.DataStoreWrite(q).GroundHandle = fulfillPorts(allPorts.Inport);
-                        obj.DataStoreWrite(q).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                        obj.DataStoreWrite(k).GroundHandle = fulfillPorts(allPorts.Inport);
+                        obj.DataStoreWrite(k).TerminatorHandle = fulfillPorts(allPorts.Outport);
                     end
                 end
             end
@@ -797,16 +878,16 @@ classdef Interface
             end
             if ~isempty(obj.Function)
                 obj.FunctionHeader.Handle = Simulink.Annotation([bdroot '/' obj.FunctionHeader.Label], 'FontSize', smallFontSize).Handle;
-                for r = 1:length(obj.Function)
-                    obj.Function(r).InterfaceHandle = createFcnCaller(obj.ModelName, obj.Function(r).Fullpath);
-                    set_param(obj.Function(r).InterfaceHandle, varargin{:})
-                end
+                for l = 1:length(obj.Function)
+                    obj.Function(l).InterfaceHandle = createFcnCaller(obj.ModelName, obj.Function(l).Fullpath);
+                    set_param(obj.Function(l).InterfaceHandle, options{:})
                 
-                % Connect to terminators/grounds
-                allPorts = get_param(obj.Function(r).InterfaceHandle, 'PortHandles');
-                if ~isempty(allPorts)
-                    obj.Function(r).GroundHandle = fulfillPorts(allPorts.Inport);
-                    obj.Function(r).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                    % Connect to terminators/grounds
+                    allPorts = get_param(obj.Function(l).InterfaceHandle, 'PortHandles');
+                    if ~isempty(allPorts)
+                        obj.Function(l).GroundHandle = fulfillPorts(allPorts.Inport);
+                        obj.Function(l).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                    end
                 end
             end
 
@@ -818,13 +899,13 @@ classdef Interface
             % Correct block orientation of inport and outports, because they are
             % created by the user and can be flipped
             if ~isempty(obj.Inport)
-                for i = 1:length(obj.Inport)
-                    set_param(obj.Inport(i).InterfaceHandle, 'Orientation', 'right');
+                for m = 1:length(obj.Inport)
+                    set_param(obj.Inport(m).InterfaceHandle, 'Orientation', 'right');
                 end
             end
             if ~isempty(obj.Outport)
-                for i = 1:length(obj.Outport)
-                    set_param(obj.Outport(i).InterfaceHandle, 'Orientation', 'right');
+                for n = 1:length(obj.Outport)
+                    set_param(obj.Outport(n).InterfaceHandle, 'Orientation', 'right');
                 end
             end
             
@@ -834,21 +915,21 @@ classdef Interface
             % Don't show terminator/ground names. Block symbols are
             % self-explanatory
             sinks = [hGrnd, hTerm];
-            for i = 1:length(sinks)
-                set_param(sinks(i), 'ShowName', 'off');
+            for o = 1:length(sinks)
+                set_param(sinks(o), 'ShowName', 'off');
             end
  
             % Vertically distribute interface blocks/annotations
             topModelBound = modelBounds(2);
             pNext = topModelBound;
-            for i = 1:length(hAll)
-                pCurrent = get_param(hAll(i), 'Position');
+            for p = 1:length(hAll)
+                pCurrent = get_param(hAll(p), 'Position');
                 height = pCurrent(4) - pCurrent(2);
-                set_param(hAll(i), 'Position', [pCurrent(1), pNext, pCurrent(3), pNext + height]);
+                set_param(hAll(p), 'Position', [pCurrent(1), pNext, pCurrent(3), pNext + height]);
                 
-                if strcmp(get_param(hAll(i), 'Type'), 'annotation')
+                if strcmp(get_param(hAll(p), 'Type'), 'annotation')
                     % Next one is annotation too, use a smaller space
-                    if (i+1 <= length(hAll)) && strcmp(get_param(hAll(i+1), 'Type'), 'annotation') 
+                    if (p+1 <= length(hAll)) && strcmp(get_param(hAll(p+1), 'Type'), 'annotation') 
                         pNext = pNext + height + spaceAfter_MainHeader;
                     else
                          pNext = pNext + height + spaceAfter_Header;
@@ -867,16 +948,16 @@ classdef Interface
                 el = iter.next();
                 % Ground
                 if length(el.GroundHandle) > 1
-                    for i = 1:length(el.GroundHandle)
-                        moveToConnectedPort(el.GroundHandle(i), 30);
+                    for q = 1:length(el.GroundHandle)
+                        moveToConnectedPort(el.GroundHandle(q), 30);
                     end
                 else
                     moveToConnectedPort(el.GroundHandle, 30);
                 end
                 % Terminators
                 if length(el.TerminatorHandle) > 1
-                    for i = 1:length(el.TerminatorHandle)
-                        moveToConnectedPort(el.TerminatorHandle(i), 30);
+                    for r = 1:length(el.TerminatorHandle)
+                        moveToConnectedPort(el.TerminatorHandle(r), 30);
                     end
                 else
                     moveToConnectedPort(el.TerminatorHandle, 30);
@@ -900,16 +981,9 @@ classdef Interface
             end
             shiftBlocks(interfaceBlocks, [shift 0 shift 0]);
 
+            % Re-adjust the zoom so we can see the whole interface
             set_param(bdroot, 'Zoomfactor', 'FitSystem');
         end
-%         function obj = setTerminator(obj, item, handle)
-%             for i = 1:length(obj)
-%                 el = obj.get(i);
-%                 if el == item
-%                     obj.get(i).TerminatorHandle = handle;
-%                 end
-%             end
-%         end
         function iter = createIterator(obj)
             % CREATEITERATOR Create the iterator object for iterating over an
             %   interface.
@@ -1062,14 +1136,15 @@ classdef Interface
                 fcns_global = {};
                 for i = 1:length(fcns_all)
                     if scope{i} == Scope.Global
-                        fcns_global{end+1} = fcns_all{i};
+                        fcns_global{end+1,1} = fcns_all{i};
                     end
                 end
-                obj = add(obj, unique([fcns_scoped, fcns_global]));
+                obj = add(obj, unique(vertcat(fcns_scoped, fcns_global)));
             end
         end
         function resizeAll(obj)
-            % RESIZEALL Resize all blocks in the interface.            
+            % RESIZEALL Resize all main blocks in the interface.
+            %   (not terminators/grounds/gotos/froms).
             iter = createIterator(obj);
             while iter.hasNext()
                 el = iter.next();
@@ -1087,21 +1162,6 @@ classdef Interface
 %                         adjustHeight([get_param(el.InterfaceHandle, 'Parent'), '/', get_param(el.InterfaceHandle, 'Name')]);
 %                     end
                 end
-            end
-        end
-        function [main, grnd, term] = getInterfaceBlocks(obj)
-            % GETINTERFACEBLOCKS Return the blocks associated with the interface
-            %   after it has been modelled. They are returned in the order that
-            %   they appear on the interface.
-            iter = createIterator(obj);
-            main = [];  % Inport, ToFile, Function Caller, etc.
-            term = [];  % Terminators
-            grnd = [];  % Grounds
-            while iter.hasNext()
-                el = iter.next();
-                main = [main el.InterfaceHandle];
-                grnd = [grnd el.GroundHandle];
-                term = [term el.TerminatorHandle];
             end
         end
         function handles = getInterfaceHeaders(obj)

@@ -100,7 +100,7 @@ function [valid, type] = itemTypeCheck(handle)
     im  = {'ModelReference'};
     out = {'Outport', 'ToFile', 'ToWorkspace', 'DataStoreWrite'};
 
-    % Note: Both library links and Simulink functions are of BlockType
+    % Note: Both library links and Simulink functions are potentially of BlockType
     % SubSystem, so extra check will need to be done
     
     if isempty(blocktype)

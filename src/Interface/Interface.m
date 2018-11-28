@@ -592,6 +592,17 @@ classdef Interface
                     lines = lines.Outport;
                     tag = ['Goto' obj.Inport(a).Name];
                     tag = strrep(tag, ':', '');
+                    
+                    % Check for conflicts with existing gotos with the same name
+                    conflictLocalGotos = 1;
+                    conflictsGlobalGotos = 1;
+                    n = 1;
+                    while ~isempty(conflictLocalGotos) || ~isempty(conflictsGlobalGotos)
+                        tag = [tag num2str(n)];
+                        n = n + 1;
+                        conflictLocalGotos = find_system(obj.ModelName, 'SearchDepth', 1, 'BlockType', 'Goto', 'GotoTag', tag);
+                        conflictsGlobalGotos = find_system(obj.ModelName, 'BlockType', 'Goto', 'TagVisibility', 'global', 'GotoTag', tag);
+                    end
                     line2Goto(obj.ModelName, lines, tag);
                     
                     fromName = char(getDsts(obj.Inport(a).Handle, 'IncludeImplicit', 'off'));
@@ -781,7 +792,18 @@ classdef Interface
                     lines = get_param(obj.Outport(h).Handle, 'LineHandles');
                     lines = lines.Inport;      
                     tag = ['Goto' obj.Outport(h).Name];
-                    tag = strrep(tag, ':', '');   
+                    tag = strrep(tag, ':', '');
+                    
+                    % Check for conflicts with existing gotos with the same name
+                    conflictLocalGotos = 1;
+                    conflictsGlobalGotos = 1;
+                    n = 1;
+                    while ~isempty(conflictLocalGotos) || ~isempty(conflictsGlobalGotos)
+                        tag = [tag num2str(n)];
+                        n = n + 1;
+                        conflictLocalGotos = find_system(obj.ModelName, 'SearchDepth', 1, 'BlockType', 'Goto', 'GotoTag', tag);
+                        conflictsGlobalGotos = find_system(obj.ModelName, 'BlockType', 'Goto', 'TagVisibility', 'global', 'GotoTag', tag);
+                    end
                     line2Goto(obj.ModelName, lines, tag);
                     
                     fromName = char(getSrcs(obj.Outport(h).Handle, 'IncludeImplicit', 'off'));

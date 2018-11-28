@@ -161,10 +161,13 @@ classdef Interface
             %
             %   Inputs:
             %       obj         Interface object.
+            %       view        'Developer' or 'User' view.
             %       verbose     Whether to show empty items (1, default) or not (0).
             %
             %   Outputs:
             %       N/A
+            
+            %verbose = getInput('verbose', varargin);
             
             if nargin > 1
                 verbose = varargin{1};

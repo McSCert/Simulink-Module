@@ -222,15 +222,36 @@ function CheckGuidelines(callbackInfo)
     end
 end
 
-%% Define action: Get Interface
+%% Define menu: Interface
 function schema = InterfaceSchema(callbackInfo)
-    schema = sl_action_schema;
-    schema.label = 'Show Interface';
-    schema.userdata = 'interface';
-    schema.callback = @interface;
+    schema = sl_container_schema;
+    schema.label = 'Interface';
+    schema.ChildrenFcns = {@showInterface @printInterface};
 end
 
-function interface(callbackInfo)
+function schema = showInterface(callbackInfo)
+    schema = sl_action_schema;
+    schema.label = 'Show Developer Interface';
+    schema.userdata = 'ShowDeveloperInterface';
+    schema.callback = @showInterfaceCallback;
+end
+
+function showInterfaceCallback(callbackInfo)
+    sys = bdroot(gcs);
+    objName = [sys '_InterfaceObject'];
+    
+    eval([objName ' = Interface(sys);']);
+    eval([objName ' = ' objName '.model;']);   
+end
+
+function schema = printInterface(callbackInfo)
+    schema = sl_action_schema;
+    schema.label = 'Print Developer Interface';
+    schema.userdata = 'PrintDeveloperInterface';
+    schema.callback = @printInterfaceCallback;
+end
+
+function printInterfaceCallback(callbackInfo)
     sys = bdroot(gcs);
     objName = [sys '_InterfaceObject'];
     
@@ -250,5 +271,5 @@ function interface(callbackInfo)
 %     end
 %     
     eval([objName ' = Interface(sys);']);
-    eval([objName ' = ' objName '.model;']);   
+    eval([objName '.print;']);   
 end

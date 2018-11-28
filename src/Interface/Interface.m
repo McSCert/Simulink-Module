@@ -594,16 +594,17 @@ classdef Interface
                     tag = strrep(tag, ':', '');
                     
                     % Check for conflicts with existing gotos with the same name
-                    conflictLocalGotos = 1;
-                    conflictsGlobalGotos = 1;
-                    n = 1;
+                    conflictLocalGotos = find_system(obj.ModelName, 'SearchDepth', 1, 'BlockType', 'Goto', 'GotoTag', tag);
+                    conflictsGlobalGotos = find_system(obj.ModelName, 'BlockType', 'Goto', 'TagVisibility', 'global', 'GotoTag', tag);
+                    num = 0;
+                    newTag = tag;
                     while ~isempty(conflictLocalGotos) || ~isempty(conflictsGlobalGotos)
-                        tag = [tag num2str(n)];
-                        n = n + 1;
-                        conflictLocalGotos = find_system(obj.ModelName, 'SearchDepth', 1, 'BlockType', 'Goto', 'GotoTag', tag);
-                        conflictsGlobalGotos = find_system(obj.ModelName, 'BlockType', 'Goto', 'TagVisibility', 'global', 'GotoTag', tag);
+                        num = num + 1;
+                        newTag = [tag '_' num2str(num)];
+                        conflictLocalGotos = find_system(obj.ModelName, 'SearchDepth', 1, 'BlockType', 'Goto', 'GotoTag', newTag);
+                        conflictsGlobalGotos = find_system(obj.ModelName, 'BlockType', 'Goto', 'TagVisibility', 'global', 'GotoTag', newTag);
                     end
-                    line2Goto(obj.ModelName, lines, tag);
+                    line2Goto(obj.ModelName, lines, newTag);
                     
                     fromName = char(getDsts(obj.Inport(a).Handle, 'IncludeImplicit', 'off'));
                     obj.Inport(a).TerminatorHandle = get_param(fromName, 'Handle');
@@ -795,16 +796,17 @@ classdef Interface
                     tag = strrep(tag, ':', '');
                     
                     % Check for conflicts with existing gotos with the same name
-                    conflictLocalGotos = 1;
-                    conflictsGlobalGotos = 1;
-                    n = 1;
+                    conflictLocalGotos = find_system(obj.ModelName, 'SearchDepth', 1, 'BlockType', 'Goto', 'GotoTag', tag);
+                    conflictsGlobalGotos = find_system(obj.ModelName, 'BlockType', 'Goto', 'TagVisibility', 'global', 'GotoTag', tag);
+                    num = 0;
+                    newTag = tag;
                     while ~isempty(conflictLocalGotos) || ~isempty(conflictsGlobalGotos)
-                        tag = [tag num2str(n)];
-                        n = n + 1;
-                        conflictLocalGotos = find_system(obj.ModelName, 'SearchDepth', 1, 'BlockType', 'Goto', 'GotoTag', tag);
-                        conflictsGlobalGotos = find_system(obj.ModelName, 'BlockType', 'Goto', 'TagVisibility', 'global', 'GotoTag', tag);
+                        num = num + 1;
+                        newTag = [tag '_' num2str(num)];
+                        conflictLocalGotos = find_system(obj.ModelName, 'SearchDepth', 1, 'BlockType', 'Goto', 'GotoTag', newTag);
+                        conflictsGlobalGotos = find_system(obj.ModelName, 'BlockType', 'Goto', 'TagVisibility', 'global', 'GotoTag', newTag);
                     end
-                    line2Goto(obj.ModelName, lines, tag);
+                    line2Goto(obj.ModelName, lines, newTag);
                     
                     fromName = char(getSrcs(obj.Outport(h).Handle, 'IncludeImplicit', 'off'));
                     obj.Outport(h).GroundHandle = get_param(fromName, 'Handle');
@@ -926,8 +928,8 @@ classdef Interface
                 end
             end
             if ~isempty(obj.Outport)
-                for n = 1:length(obj.Outport)
-                    set_param(obj.Outport(n).InterfaceHandle, 'Orientation', 'right');
+                for o = 1:length(obj.Outport)
+                    set_param(obj.Outport(o).InterfaceHandle, 'Orientation', 'right');
                 end
             end
             
@@ -937,21 +939,21 @@ classdef Interface
             % Don't show terminator/ground names. Block symbols are
             % self-explanatory
             sinks = [hGrnd, hTerm];
-            for o = 1:length(sinks)
-                set_param(sinks(o), 'ShowName', 'off');
+            for p = 1:length(sinks)
+                set_param(sinks(p), 'ShowName', 'off');
             end
  
             % Vertically distribute interface blocks/annotations
             topModelBound = modelBounds(2);
             pNext = topModelBound;
-            for p = 1:length(hAll)
-                pCurrent = get_param(hAll(p), 'Position');
+            for q = 1:length(hAll)
+                pCurrent = get_param(hAll(q), 'Position');
                 height = pCurrent(4) - pCurrent(2);
-                set_param(hAll(p), 'Position', [pCurrent(1), pNext, pCurrent(3), pNext + height]);
+                set_param(hAll(q), 'Position', [pCurrent(1), pNext, pCurrent(3), pNext + height]);
                 
-                if strcmp(get_param(hAll(p), 'Type'), 'annotation')
+                if strcmp(get_param(hAll(q), 'Type'), 'annotation')
                     % Next one is annotation too, use a smaller space
-                    if (p+1 <= length(hAll)) && strcmp(get_param(hAll(p+1), 'Type'), 'annotation') 
+                    if (q+1 <= length(hAll)) && strcmp(get_param(hAll(q+1), 'Type'), 'annotation') 
                         pNext = pNext + height + SPACEAFTER_MainHeader;
                     else
                          pNext = pNext + height + SPACEAFTER_Header;
@@ -970,16 +972,16 @@ classdef Interface
                 el = iter.next();
                 % Ground
                 if length(el.GroundHandle) > 1
-                    for q = 1:length(el.GroundHandle)
-                        moveToConnectedPort(el.GroundHandle(q), 30);
+                    for r = 1:length(el.GroundHandle)
+                        moveToConnectedPort(el.GroundHandle(r), 30);
                     end
                 else
                     moveToConnectedPort(el.GroundHandle, 30);
                 end
                 % Terminators
                 if length(el.TerminatorHandle) > 1
-                    for r = 1:length(el.TerminatorHandle)
-                        moveToConnectedPort(el.TerminatorHandle(r), 30);
+                    for s = 1:length(el.TerminatorHandle)
+                        moveToConnectedPort(el.TerminatorHandle(s), 30);
                     end
                 else
                     moveToConnectedPort(el.TerminatorHandle, 30);

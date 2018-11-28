@@ -580,10 +580,10 @@ classdef Interface
             
             % ADD BLOCKS/ANNOTATIONS
             if ~isempty(obj, 'Input')
-                obj.InputHeader.Handle = Simulink.Annotation([bdroot '/' obj.InputHeader.Label], 'FontSize', LARGEFONT).Handle;
+                obj.InputHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.InputHeader.Label], 'FontSize', LARGEFONT).Handle;
             end
             if ~isempty(obj.Inport)
-                obj.InportHeader.Handle = Simulink.Annotation([bdroot '/' obj.InportHeader.Label], 'FontSize', SMALLFONT).Handle;
+                obj.InportHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.InportHeader.Label], 'FontSize', SMALLFONT).Handle;
                 for a = 1:length(obj.Inport)
                     obj.Inport(a).InterfaceHandle = get_param(obj.Inport(a).Fullpath, 'Handle');
                     
@@ -613,13 +613,13 @@ classdef Interface
             
             nblock = 1;
             if ~isempty(obj.FromFile)
-                obj.FromFileHeader.Handle = Simulink.Annotation([bdroot '/' obj.FromFileHeader.Label], 'FontSize', SMALLFONT).Handle;
+                obj.FromFileHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.FromFileHeader.Label], 'FontSize', SMALLFONT).Handle;
                 for b = 1:length(obj.FromFile)
                     blockCreated = false;
                     while ~blockCreated
                         try
                             obj.FromFile(b).InterfaceHandle = add_block('simulink/Sources/From File', ...
-                                [bdroot '/From File' num2str(nblock)], ...
+                                [obj.ModelName '/From File' num2str(nblock)], ...
                                 options{:});
                             
                             blockCreated = true;
@@ -642,13 +642,13 @@ classdef Interface
             
             nblock = 1;
             if ~isempty(obj.FromSpreadsheet)
-                obj.FromSpreadsheetHeader.Handle = Simulink.Annotation([bdroot '/' obj.FromSpreadsheetHeader.Label], 'FontSize', SMALLFONT).Handle;
+                obj.FromSpreadsheetHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.FromSpreadsheetHeader.Label], 'FontSize', SMALLFONT).Handle;
                 for c = 1:length(obj.FromSpreadsheet)
                     blockCreated = false;
                     while ~blockCreated
                         try
                             obj.FromSpreadsheet(c).InterfaceHandle = add_block('simulink/Sources/From Spreadsheet', ...
-                                [bdroot '/From Spreadsheet' num2str(nblock)],...
+                                [obj.ModelName '/From Spreadsheet' num2str(nblock)],...
                                 options{:});
                             blockCreated = true;
                         catch
@@ -670,13 +670,13 @@ classdef Interface
             
             nblock = 1;
             if ~isempty(obj.FromWorkspace)
-                obj.FromWorkspaceHeader.Handle = Simulink.Annotation([bdroot '/' obj.FromWorkspaceHeader.Label], 'FontSize', SMALLFONT).Handle;
+                obj.FromWorkspaceHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.FromWorkspaceHeader.Label], 'FontSize', SMALLFONT).Handle;
                 for d = 1:length(obj.FromWorkspace)
                     blockCreated = false;
                     while ~blockCreated
                         try
                             obj.FromWorkspace(d).InterfaceHandle = add_block('simulink/Sources/From Workspace', ...
-                                [bdroot '/From Workspace' num2str(nblock)], ...
+                                [obj.ModelName '/From Workspace' num2str(nblock)], ...
                                 options{:});
                             blockCreated = true;
                         catch
@@ -698,13 +698,13 @@ classdef Interface
             
             nblock = 1;
             if ~isempty(obj.DataStoreRead)
-                obj.DataStoreReadHeader.Handle = Simulink.Annotation([bdroot '/' obj.DataStoreReadHeader.Label], 'FontSize', SMALLFONT).Handle;
+                obj.DataStoreReadHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.DataStoreReadHeader.Label], 'FontSize', SMALLFONT).Handle;
                 for e = 1:length(obj.DataStoreRead)
                     blockCreated = false;
                     while ~blockCreated
                         try
                             obj.DataStoreRead(e).InterfaceHandle = add_block('simulink/Signal Routing/Data Store Read', ...
-                                [bdroot '/Data Store Read' num2str(nblock)], ...
+                                [obj.ModelName '/Data Store Read' num2str(nblock)], ...
                                 options{:});
                             blockCreated = true;
                         catch
@@ -725,17 +725,17 @@ classdef Interface
             end
             
             if ~isempty(obj, 'Import')
-                obj.ImportHeader.Handle = Simulink.Annotation([bdroot '/' obj.ImportHeader.Label], 'FontSize', LARGEFONT).Handle; 
+                obj.ImportHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.ImportHeader.Label], 'FontSize', LARGEFONT).Handle; 
             end
             nblock = 1;
             if ~isempty(obj.ModelReference)
-                obj.ModelReferenceHeader.Handle = Simulink.Annotation([bdroot '/' obj.ModelReferenceHeader.Label], 'FontSize', SMALLFONT).Handle;
+                obj.ModelReferenceHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.ModelReferenceHeader.Label], 'FontSize', SMALLFONT).Handle;
                 for f = 1:length(obj.ModelReference)
                     blockCreated = false;
                     while ~blockCreated
                         try
                             obj.ModelReference(f).InterfaceHandle = add_block('simulink/Ports & Subsystems/Model', ...
-                                [bdroot '/Model' num2str(nblock)], ...
+                                [obj.ModelName '/Model' num2str(nblock)], ...
                                 options{:});
                             blockCreated = true;
                         catch
@@ -756,7 +756,7 @@ classdef Interface
             end
             nblock = 1;
             if ~isempty(obj.LibraryLink)
-                obj.LibraryLinkHeader.Handle = Simulink.Annotation([bdroot '/' obj.LibraryLinkHeader.Label], 'FontSize', SMALLFONT).Handle;
+                obj.LibraryLinkHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.LibraryLinkHeader.Label], 'FontSize', SMALLFONT).Handle;
                 for f = 1:length(obj.LibraryLink)
                     blockCreated = false;
                     while ~blockCreated
@@ -764,7 +764,7 @@ classdef Interface
                             blockPath = get_param(obj.LibraryLink(f).Handle, 'ReferenceBlock');
                             blockName = get_param(obj.LibraryLink(f).Handle, 'Name');
                             obj.LibraryLink(f).InterfaceHandle = add_block(blockPath, ...
-                                [bdroot '/' blockName num2str(nblock)], ...
+                                [obj.ModelName '/' blockName num2str(nblock)], ...
                                 options{:});
                             blockCreated = true;
                         catch
@@ -782,10 +782,10 @@ classdef Interface
             end
             
             if ~isempty(obj, 'Output')
-                obj.OutputHeader.Handle = Simulink.Annotation([bdroot '/' obj.OutputHeader.Label], 'FontSize', LARGEFONT).Handle;
+                obj.OutputHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.OutputHeader.Label], 'FontSize', LARGEFONT).Handle;
             end
             if ~isempty(obj.Outport)
-                obj.OutportHeader.Handle = Simulink.Annotation([bdroot '/' obj.OutportHeader.Label], 'FontSize', SMALLFONT).Handle;
+                obj.OutportHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.OutportHeader.Label], 'FontSize', SMALLFONT).Handle;
                 for h = 1:length(obj.Outport)
                     obj.Outport(h).InterfaceHandle = get_param(obj.Outport(h).Fullpath, 'Handle');
                     
@@ -815,13 +815,13 @@ classdef Interface
             
             nblock = 1;
             if ~isempty(obj.ToFile)
-                obj.ToFileHeader.Handle = Simulink.Annotation([bdroot '/' obj.ToFileHeader.Label], 'FontSize', SMALLFONT).Handle;
+                obj.ToFileHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.ToFileHeader.Label], 'FontSize', SMALLFONT).Handle;
                 for i = 1:length(obj.ToFile)
                     blockCreated = false;
                     while ~blockCreated
                         try
                             obj.ToFile(i).InterfaceHandle = add_block('simulink/Sinks/To File', ...
-                                [bdroot '/To File' num2str(nblock)], ...
+                                [obj.ModelName '/To File' num2str(nblock)], ...
                                 options{:});
                             blockCreated = true;
                         catch
@@ -843,13 +843,13 @@ classdef Interface
             
             nblock = 1;
             if ~isempty(obj.ToWorkspace)
-                obj.ToWorkspaceHeader.Handle = Simulink.Annotation([bdroot '/' obj.ToWorkspaceHeader.Label], 'FontSize', SMALLFONT).Handle;
+                obj.ToWorkspaceHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.ToWorkspaceHeader.Label], 'FontSize', SMALLFONT).Handle;
                 for j = 1:length(obj.ToWorkspace)
                     blockCreated = false;
                     while ~blockCreated
                         try
                             obj.ToWorkspace(j).InterfaceHandle = add_block('simulink/Sinks/To Workspace', ...
-                                [bdroot '/To Workspace' num2str(nblock)], ...
+                                [obj.ModelName '/To Workspace' num2str(nblock)], ...
                                 options{:});
                             blockCreated = true;
                         catch
@@ -871,13 +871,13 @@ classdef Interface
             
             nblock = 1;
             if ~isempty(obj.DataStoreWrite)
-                obj.DataStoreWriteHeader.Handle = Simulink.Annotation([bdroot '/' obj.DataStoreWriteHeader.Label], 'FontSize', SMALLFONT).Handle;
+                obj.DataStoreWriteHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.DataStoreWriteHeader.Label], 'FontSize', SMALLFONT).Handle;
                 for k = 1:length(obj.DataStoreWrite)
                     blockCreated = false;
                     while ~blockCreated
                         try
                             obj.DataStoreWrite(k).InterfaceHandle = add_block('simulink/Signal Routing/Data Store Write', ...
-                                [bdroot '/Data Store Write' num2str(nblock)], ...
+                                [obj.ModelName '/Data Store Write' num2str(nblock)], ...
                                 options{:});
                             blockCreated = true;
                         catch
@@ -898,10 +898,10 @@ classdef Interface
             end
             
             if ~isempty(obj, 'Export')
-                obj.ExportHeader.Handle = Simulink.Annotation([bdroot '/' obj.ExportHeader.Label], 'FontSize', LARGEFONT).Handle; 
+                obj.ExportHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.ExportHeader.Label], 'FontSize', LARGEFONT).Handle; 
             end
             if ~isempty(obj.Function)
-                obj.FunctionHeader.Handle = Simulink.Annotation([bdroot '/' obj.FunctionHeader.Label], 'FontSize', SMALLFONT).Handle;
+                obj.FunctionHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.FunctionHeader.Label], 'FontSize', SMALLFONT).Handle;
                 for l = 1:length(obj.Function)
                     obj.Function(l).InterfaceHandle = createFcnCaller(obj.ModelName, obj.Function(l).Fullpath);
                     set_param(obj.Function(l).InterfaceHandle, options{:})
@@ -1006,7 +1006,7 @@ classdef Interface
             shiftBlocks(interfaceBlocks, [shift 0 shift 0]);
 
             % Re-adjust the zoom so we can see the whole interface
-            set_param(bdroot, 'Zoomfactor', 'FitSystem');
+            set_param(obj.ModelName, 'Zoomfactor', 'FitSystem');
         end
         function iter = createIterator(obj)
             % CREATEITERATOR Create the iterator object for iterating over an

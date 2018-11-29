@@ -161,19 +161,23 @@ classdef Interface
             %
             %   Inputs:
             %       obj         Interface object.
-            %       view        'Developer' or 'User' view.
-            %       verbose     Whether to show empty items (1, default) or not (0).
+            %       varargin    Parameter, Value pairs:   
+            %          'View'   'Developer' or 'User' view.
+            %       'Verbose'   Whether to show empty items (1, default) or not (0).
             %
             %   Outputs:
             %       N/A
             
-            %verbose = getInput('verbose', varargin);
+            verbose = getInput('Verbose', varargin);
+            view = getInput('View', varargin);
             
-            if nargin > 1
-                verbose = varargin{1};
-            else
+            if isempty(verbose)
                 verbose = false;
             end
+            if isempty(view)
+                view = 'Developer';
+            end
+            
             fprintf('%s\n', obj.InputHeader.Label);
             fprintf('------\n');
             
@@ -226,26 +230,28 @@ classdef Interface
                 end
             end
 
-            fprintf('\n%s\n', obj.ImportHeader.Label);
-            fprintf('------\n');
-            if isempty(obj, 'Import')
-                fprintf('N/A\n');
-            else
-                if isempty(obj.ModelReference) && verbose
-                    fprintf('%s:\n\tN/A\n', obj.ModelReferenceHeader.Label);
-                elseif ~isempty(obj.ModelReference)
-                    fprintf('%s:\n', obj.ModelReferenceHeader.Label);
-                    for i = 1:length(obj.ModelReference)
-                        fprintf('\t%s, %s\n', obj.ModelReference(i).Fullpath, obj.ModelReference(i).DataType);
-                    end
-                end            
+            if strcmpi(view, 'Developer')
+                fprintf('\n%s\n', obj.ImportHeader.Label);
+                fprintf('------\n');
+                if isempty(obj, 'Import')
+                    fprintf('N/A\n');
+                else
+                    if isempty(obj.ModelReference) && verbose
+                        fprintf('%s:\n\tN/A\n', obj.ModelReferenceHeader.Label);
+                    elseif ~isempty(obj.ModelReference)
+                        fprintf('%s:\n', obj.ModelReferenceHeader.Label);
+                        for i = 1:length(obj.ModelReference)
+                            fprintf('\t%s, %s\n', obj.ModelReference(i).Fullpath, obj.ModelReference(i).DataType);
+                        end
+                    end            
 
-                if isempty(obj.LibraryLink) && verbose
-                    fprintf('%s:\n\tN/A\n', obj.LibraryLinkHeader.Label);
-                elseif ~isempty(obj.LibraryLink)
-                    fprintf('%s:\n', obj.LibraryLinkHeader.Label);
-                    for i = 1:length(obj.LibraryLink)
-                        fprintf('\t%s, %s\n', obj.LibraryLink(i).Fullpath, obj.LibraryLink(i).DataType);
+                    if isempty(obj.LibraryLink) && verbose
+                        fprintf('%s:\n\tN/A\n', obj.LibraryLinkHeader.Label);
+                    elseif ~isempty(obj.LibraryLink)
+                        fprintf('%s:\n', obj.LibraryLinkHeader.Label);
+                        for i = 1:length(obj.LibraryLink)
+                            fprintf('\t%s, %s\n', obj.LibraryLink(i).Fullpath, obj.LibraryLink(i).DataType);
+                        end
                     end
                 end
             end
@@ -546,18 +552,17 @@ classdef Interface
             
             obj.ModelName = bdroot(name);
         end
-        function obj = model(obj)
+        function obj = model(obj, varargin)
             % MODEL Create a representation of the interface in the model.
             %   Moves blocks, adds annotations, and adds the blocks representing the
             %   interface.
             %
             %   Inputs:
-            %       obj      Interface object.
-            %       varargin Any additional parameters that the use wants to
-            %                include for the interface blocks created.
+            %       obj       Interface object.
+            %       varargin  
             %
             %   Outputs:
-            %       obj      Interface object.
+            %       obj       Interface object.
             
             if isempty(obj.ModelName)
                 error('Interface has no model.');
@@ -566,7 +571,12 @@ classdef Interface
                 return
             end
             
-            % Add default parameters for complying with MAAB
+            view = getInput('View', varargin);
+            if isempty(view)
+                view = 'Developer';
+            end
+            
+            % Default parameters for complying with MAAB
             options = {'ShowName' ,'on', 'HideAutomaticName', 'off', 'Commented', 'on'};
             
             % Get orignal model bounds before we start adding blocks
@@ -727,61 +737,63 @@ classdef Interface
                 end
             end
             
-            if ~isempty(obj, 'Import')
-                obj.ImportHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.ImportHeader.Label], 'FontSize', LARGEFONT).Handle; 
-            end
-            nblock = 1;
-            if ~isempty(obj.ModelReference)
-                obj.ModelReferenceHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.ModelReferenceHeader.Label], 'FontSize', SMALLFONT).Handle;
-                for f = 1:length(obj.ModelReference)
-                    blockCreated = false;
-                    while ~blockCreated
-                        try
-                            obj.ModelReference(f).InterfaceHandle = add_block('simulink/Ports & Subsystems/Model', ...
-                                [obj.ModelName '/Model' num2str(nblock)], ...
-                                options{:});
-                            blockCreated = true;
-                        catch
-                            nblock = nblock + 1;
+            if strcmpi(view, 'Developer')
+                if ~isempty(obj, 'Import')
+                    obj.ImportHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.ImportHeader.Label], 'FontSize', LARGEFONT).Handle; 
+                end
+                nblock = 1;
+                if ~isempty(obj.ModelReference)
+                    obj.ModelReferenceHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.ModelReferenceHeader.Label], 'FontSize', SMALLFONT).Handle;
+                    for f = 1:length(obj.ModelReference)
+                        blockCreated = false;
+                        while ~blockCreated
+                            try
+                                obj.ModelReference(f).InterfaceHandle = add_block('simulink/Ports & Subsystems/Model', ...
+                                    [obj.ModelName '/Model' num2str(nblock)], ...
+                                    options{:});
+                                blockCreated = true;
+                            catch
+                                nblock = nblock + 1;
+                            end
                         end
-                    end
-                    % Set name
-                    name = get_param(obj.ModelReference(f).Handle, 'ModelName');
-                    set_param(obj.ModelReference(f).InterfaceHandle, 'ModelName', name);
-                    
-                    % Connect to terminators/grounds
-                    allPorts = get_param(obj.ModelReference(f).InterfaceHandle, 'PortHandles');
-                    if ~isempty(allPorts)
-                        obj.ModelReference(f).GroundHandle = fulfillPorts(allPorts.Inport);
-                        obj.ModelReference(f).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                        % Set name
+                        name = get_param(obj.ModelReference(f).Handle, 'ModelName');
+                        set_param(obj.ModelReference(f).InterfaceHandle, 'ModelName', name);
+
+                        % Connect to terminators/grounds
+                        allPorts = get_param(obj.ModelReference(f).InterfaceHandle, 'PortHandles');
+                        if ~isempty(allPorts)
+                            obj.ModelReference(f).GroundHandle = fulfillPorts(allPorts.Inport);
+                            obj.ModelReference(f).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                        end
                     end
                 end
-            end
-            nblock = 1;
-            if ~isempty(obj.LibraryLink)
-                obj.LibraryLinkHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.LibraryLinkHeader.Label], 'FontSize', SMALLFONT).Handle;
-                for f = 1:length(obj.LibraryLink)
-                    blockCreated = false;
-                    while ~blockCreated
-                        try
-                            blockPath = get_param(obj.LibraryLink(f).Handle, 'ReferenceBlock');
-                            blockName = get_param(obj.LibraryLink(f).Handle, 'Name');
-                            obj.LibraryLink(f).InterfaceHandle = add_block(blockPath, ...
-                                [obj.ModelName '/' blockName num2str(nblock)], ...
-                                options{:});
-                            blockCreated = true;
-                        catch
-                            nblock = nblock + 1;
+                nblock = 1;
+                if ~isempty(obj.LibraryLink)
+                    obj.LibraryLinkHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.LibraryLinkHeader.Label], 'FontSize', SMALLFONT).Handle;
+                    for f = 1:length(obj.LibraryLink)
+                        blockCreated = false;
+                        while ~blockCreated
+                            try
+                                blockPath = get_param(obj.LibraryLink(f).Handle, 'ReferenceBlock');
+                                blockName = get_param(obj.LibraryLink(f).Handle, 'Name');
+                                obj.LibraryLink(f).InterfaceHandle = add_block(blockPath, ...
+                                    [obj.ModelName '/' blockName num2str(nblock)], ...
+                                    options{:});
+                                blockCreated = true;
+                            catch
+                                nblock = nblock + 1;
+                            end
                         end
-                    end
-                    
-                    % Connect to terminators/grounds
-                    allPorts = get_param(obj.LibraryLink(f).InterfaceHandle, 'PortHandles');
-                    if ~isempty(allPorts)
-                        obj.LibraryLink(f).GroundHandle = fulfillPorts(allPorts.Inport);
-                        obj.LibraryLink(f).TerminatorHandle = fulfillPorts(allPorts.Outport);
-                    end
-                end                
+
+                        % Connect to terminators/grounds
+                        allPorts = get_param(obj.LibraryLink(f).InterfaceHandle, 'PortHandles');
+                        if ~isempty(allPorts)
+                            obj.LibraryLink(f).GroundHandle = fulfillPorts(allPorts.Inport);
+                            obj.LibraryLink(f).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                        end
+                    end                
+                end
             end
             
             if ~isempty(obj, 'Output')

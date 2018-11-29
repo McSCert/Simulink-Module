@@ -12,7 +12,8 @@ function schemaFcns = getSLFcnTool(callbackInfo)
     if isempty(gcbs)
         schemaFcns{end+1} = @FcnCreatorSchema;
         schemaFcns{end+1} = @GuidelineSchema;
-        schemaFcns{end+1} = @InterfaceSchema;
+        schemaFcns{end+1} = @ModelInterfaceSchema;
+        schemaFcns{end+1} = @PrintInterfaceSchema;
     elseif any(selectedFcns) && ~isempty(gcbs)
         schemaFcns{end+1} = @ChangeFcnScopeSchema;
         schemaFcns{end+1} = @FcnCreatorLocalSchema;
@@ -222,38 +223,73 @@ function CheckGuidelines(callbackInfo)
     end
 end
 
-%% Define menu: Interface
-function schema = InterfaceSchema(callbackInfo)
+%% Define menu: Model Interface
+function schema = ModelInterfaceSchema(callbackInfo)
     schema = sl_container_schema;
-    schema.label = 'Interface';
-    schema.ChildrenFcns = {@showInterface @printInterface};
+    schema.label = 'Show Interface';
+    schema.ChildrenFcns = {@showUserInterface, @showDeveloperInterface};
 end
 
-function schema = showInterface(callbackInfo)
+function schema = showUserInterface(callbackInfo)
     schema = sl_action_schema;
-    schema.label = 'Show Developer Interface';
-    schema.userdata = 'ShowDeveloperInterface';
-    schema.callback = @showInterfaceCallback;
+    schema.label =  'User';
+    schema.userdata = 'ShowUserInterface';
+    schema.callback = @showUserInterfaceCallback;
 end
 
-function showInterfaceCallback(callbackInfo)
+function showUserInterfaceCallback(callbackInfo)
     sys = bdroot(gcs);
     objName = [sys '_InterfaceObject'];
-    
     eval([objName ' = Interface(sys);']);
-    eval([objName ' = ' objName '.model;']);   
+    eval([objName ' = ' objName '.model(''View'', ''User'');']);   
 end
 
-function schema = printInterface(callbackInfo)
+function schema = showDeveloperInterface(callbackInfo)
     schema = sl_action_schema;
-    schema.label = 'Print Developer Interface';
-    schema.userdata = 'PrintDeveloperInterface';
-    schema.callback = @printInterfaceCallback;
+    schema.label =  'Developer';
+    schema.userdata = 'ShowDeveloperInterface';
+    schema.callback = @showDeveloperInterfaceCallback;
 end
 
-function printInterfaceCallback(callbackInfo)
+function showDeveloperInterfaceCallback(callbackInfo)
+    sys = bdroot(gcs);
+    objName = [sys '_InterfaceObject'];  
+    eval([objName ' = Interface(sys);']);
+    eval([objName ' = ' objName '.model(''View'', ''Developer'');']);   
+end
+
+%% Define menu: Print Interface
+function schema = PrintInterfaceSchema(callbackInfo)
+    schema = sl_container_schema;
+    schema.label = 'Print Interface';
+    schema.ChildrenFcns = {@printUserInterface, @printDeveloperInterface};
+end
+function schema = printUserInterface(callbackInfo)
+    schema = sl_action_schema;
+    schema.label = 'User';
+    schema.userdata = 'PrintUserInterface';
+    schema.callback = @printUserInterfaceCallback;
+end
+
+function printUserInterfaceCallback(callbackInfo)
     sys = bdroot(gcs);
     objName = [sys '_InterfaceObject'];
+    eval([objName ' = Interface(sys);']);
+    eval([objName '.print(''View'', ''User'');']);  
+end
+
+function schema = printDeveloperInterface(callbackInfo)
+    schema = sl_action_schema;
+    schema.label = 'Developer';
+    schema.userdata = 'PrintDeveloperInterface';
+    schema.callback = @printDeveloperInterfaceCallback;
+end
+
+function printDeveloperInterfaceCallback(callbackInfo)
+    sys = bdroot(gcs);
+    objName = [sys '_InterfaceObject'];
+    eval([objName ' = Interface(sys);']);
+    eval([objName '.print(''View'', ''Developer'');']);  
     
     % Check if interface object already exists for this model
 %     eval(['global ' objName ';']);
@@ -270,6 +306,4 @@ function printInterfaceCallback(callbackInfo)
 %         eval([objName ' = Interface(sys);']);
 %     end
 %     
-    eval([objName ' = Interface(sys);']);
-    eval([objName '.print;']);   
 end

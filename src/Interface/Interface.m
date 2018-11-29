@@ -1197,12 +1197,11 @@ classdef Interface
                     if (newSize(3) - newSize(1)) > (oldSize(3) - oldSize(1))
                         set_param(block, 'Position', newSize);
                     end
-%                     try
-%                         adjustHeight(get_param(el.InterfaceHandle, 'Path'));
-%                     catch
-%                         % FromFile blocks don't have a path parameter
-%                         adjustHeight([get_param(el.InterfaceHandle, 'Parent'), '/', get_param(el.InterfaceHandle, 'Name')]);
-%                     end
+                    
+                    ports = get_param(block, 'Ports');
+                    if ports(1) > 1 || ports(2) > 1
+                        adjustHeight(block, 'PortParams', {'ConnectionType', {'Inport','Outport'}, 'Method', 'SumMax', 'HeightPerPort', 30});
+                    end
                 end
             end
         end

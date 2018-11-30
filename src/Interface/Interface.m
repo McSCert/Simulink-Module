@@ -603,8 +603,8 @@ classdef Interface
                     % Convert line(s) to goto/from connection
                     lines = get_param(obj.Inport(a).Handle, 'LineHandles');
                     lines = lines.Outport;
-                    tag = ['Goto' obj.Inport(a).Name];
-                    tag = strrep(tag, ':', '');
+                    tag = ['Goto_' obj.Inport(a).Name];
+                    tag = regexprep(tag, '[^\w]', '');
                     
                     % Check for conflicts with existing gotos with the same name
                     conflictLocalGotos = find_system(obj.ModelName, 'SearchDepth', 1, 'BlockType', 'Goto', 'GotoTag', tag);
@@ -807,8 +807,8 @@ classdef Interface
                     % Convert line(s) to goto/from connection
                     lines = get_param(obj.Outport(h).Handle, 'LineHandles');
                     lines = lines.Inport;      
-                    tag = ['Goto' obj.Outport(h).Name];
-                    tag = strrep(tag, ':', '');
+                    tag = ['Goto_' obj.Outport(h).Name];
+                    tag = regexprep(tag, '[^\w]', '');
                     
                     % Check for conflicts with existing gotos with the same name
                     conflictLocalGotos = find_system(obj.ModelName, 'SearchDepth', 1, 'BlockType', 'Goto', 'GotoTag', tag);

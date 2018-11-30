@@ -162,7 +162,7 @@ classdef Interface
             %   Inputs:
             %       obj         Interface object.
             %       varargin    Parameter, Value pairs:   
-            %          'View'   'Developer' or 'User' view.
+            %          'View'   'Developer' or 'Client' view.
             %       'Verbose'   Whether to show empty items (1, default) or not (0).
             %
             %   Outputs:
@@ -558,11 +558,11 @@ classdef Interface
             %   interface.
             %
             %   Inputs:
-            %       obj       Interface object.
-            %       varargin  
-            %
+            %       obj         Interface object.
+            %       varargin    Parameter, Value pairs:   
+            %          'View'   'Developer' or 'Client' view.            %
             %   Outputs:
-            %       obj       Interface object.
+            %       obj         Interface object.
             
             if isempty(obj.ModelName)
                 error('Interface has no model.');

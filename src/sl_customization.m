@@ -232,7 +232,7 @@ end
 
 function schema = showUserInterface(callbackInfo)
     schema = sl_action_schema;
-    schema.label =  'User';
+    schema.label =  'Client';
     schema.userdata = 'ShowUserInterface';
     schema.callback = @showUserInterfaceCallback;
 end
@@ -241,7 +241,7 @@ function showUserInterfaceCallback(callbackInfo)
     sys = bdroot(gcs);
     objName = [sys '_InterfaceObject'];
     eval([objName ' = Interface(sys);']);
-    eval([objName ' = ' objName '.model(''View'', ''User'');']);   
+    eval([objName ' = ' objName '.model(''View'', ''Client'');']);   
 end
 
 function schema = showDeveloperInterface(callbackInfo)
@@ -266,7 +266,7 @@ function schema = PrintInterfaceSchema(callbackInfo)
 end
 function schema = printUserInterface(callbackInfo)
     schema = sl_action_schema;
-    schema.label = 'User';
+    schema.label = 'Client';
     schema.userdata = 'PrintUserInterface';
     schema.callback = @printUserInterfaceCallback;
 end
@@ -275,7 +275,7 @@ function printUserInterfaceCallback(callbackInfo)
     sys = bdroot(gcs);
     objName = [sys '_InterfaceObject'];
     eval([objName ' = Interface(sys);']);
-    eval([objName '.print(''View'', ''User'');']);  
+    eval([objName '.print(''View'', ''Client'');']);  
 end
 
 function schema = printDeveloperInterface(callbackInfo)

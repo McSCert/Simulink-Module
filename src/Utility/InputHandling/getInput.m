@@ -15,18 +15,22 @@ function value = getInput(name, args)
 %
 %       >> getInput('otherFiles', {'imageFile', 'test.png', 'otherFiles', {'file1', 'file2'}})
 %           ans =
-%               1×2 cell array
+%               1ï¿½2 cell array
 %                   {'file1'}    {'file2'}
 
     if iscellcell(args)
-        idx = find(strcmp(args, name));
+        paramNames = args(1:2:end);
+        idx = find(strcmp(paramNames, name));
         exists = ~isempty(idx);
     else
         args2 = cellfun(@num2str, args, 'un', 0);
-        [exists, idx] = ismember(name, args2);
+        paramNames = args2(1:2:end);
+        [exists, idx] = ismember(name, paramNames);
     end
 
-    if exists && length(args) > idx
+    idx = idx*2;
+
+    if exists && length(args) >= idx
         value = args{idx+1};
     else
         value = [];

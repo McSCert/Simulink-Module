@@ -2,7 +2,7 @@ function dims = getDimensions(blocks)
 % GETDATATYPE Return the block's dimensions.
 %
 %   Inputs:
-%       blocks  Array of block names of handles.
+%       blocks  Array of block names or handles.
 %
 %   Outputs:
 %       types   Cell array of dimensions.

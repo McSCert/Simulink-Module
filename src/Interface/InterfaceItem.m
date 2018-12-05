@@ -7,6 +7,7 @@ classdef InterfaceItem
         Fullpath            % Fullpath.
         DataType            % Output or input types.
         Dimensions          % Dimensions, if applicable.
+        SampleTime          % SameTime.
         
         % Visual Representation
         InterfaceHandle     % If the block is represented on the interface by another 
@@ -75,9 +76,18 @@ classdef InterfaceItem
 
             % DATATYPE
             obj.DataType = char(getDataType(obj.Handle));
+%             portTypes = findPortDataTypes(obj.Handle);
+%             if strcmp(obj.InterfaceType, {'Inport','Import'})
+%                 obj.DataType = char(portTypes.Inport);
+%             else
+%                 obj.DataType = char(portTypes.Outport);
+%             end
 
             % DIMENSIONS
             obj.Dimensions = char(getDimensions(obj.Handle));
+            
+            % SAMPLE TIME
+            obj.SampleTime = getSampleTime(obj.Handle);
             
             % INTERFACEHANDLE
             % Added when the interface is modeled only.

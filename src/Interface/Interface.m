@@ -932,7 +932,7 @@ classdef Interface
 
             % Get all interface blocks
             hAll = getInterfaceSorted(obj);
-            [~, hGrnd, hTerm] = getInterfaceBlocks(obj);
+            [hMain, hGrnd, hTerm] = getInterfaceBlocks(obj);
             interfaceBlocks = [hAll, hGrnd, hTerm];
             
             % Correct block orientation of inport and outports, because they are
@@ -950,6 +950,12 @@ classdef Interface
             
             % Resize main interface blocks
             resizeAll(obj);
+            
+            % Show names of main blocks
+            for p = 1:length(hMain)
+                set_param(hMain(p), 'ShowName', 'on');
+                set_param(hMain(p), 'HideAutomaticName', 'off');
+            end
             
             % Don't show terminator/ground names. Block symbols are
             % self-explanatory

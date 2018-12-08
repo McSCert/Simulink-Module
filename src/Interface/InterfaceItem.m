@@ -111,7 +111,7 @@ function [valid, type] = itemTypeCheck(handle)
     out = {'Outport', 'ToFile', 'ToWorkspace', 'DataStoreWrite'};
 
     % Note: Both library links and Simulink functions are potentially of BlockType
-    % SubSystem, so extra check will need to be done
+    % SubSystem, so an extra check will need to be done
     
     if isempty(blocktype)
         type = '';
@@ -123,7 +123,7 @@ function [valid, type] = itemTypeCheck(handle)
         type = 'Input';
         valid = true;
     elseif any2(find(strcmp(out, blocktype)))
-        type = 'Outout';
+        type = 'Output';
         valid = true;
     elseif any2(find(strcmp(im, blocktype))) || isLibraryLink(handle)
         type = 'Import';

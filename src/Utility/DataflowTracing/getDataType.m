@@ -39,6 +39,11 @@ function [dataType, typeSource, dtStruct] = getDataType(obj, varargin)
     %     end
     % end
     
+    % TODO:
+    % - Look under model reference blocks
+    % - Read Fcn blocks as Inherit: Auto (consider if this is correct first)
+    % - Inherit: Inherit via internal rule of sum, product, switch blocks
+    
     % Handle parameter-value pair inputs
     SystemDepth = 0;
     TraversalMap = containers.Map('KeyType', 'double', 'ValueType', 'double');
@@ -245,6 +250,15 @@ function [dataType, typeSource, dtStruct] = getDataType_Aux(outBlock, SystemDept
                 'datatype', dataType, ...
                 'typesource', typeSource)};
         end
+    elseif any(strcmp('OutputArgumentSpecifications', fieldnames(blockParams))) % has OutputArgumentSpecifications parameter
+        outArgSpec = get_param(block, 'OutputArgumentSpecifications');
+        tmpDataType = regexp(outArgSpec, '^(.*)\((.*)\)', 'tokens');
+        dataType = tmpDataType{1}(1);
+        typeSource = {obj};
+        dtStruct = {struct( ...
+            'handle', obj, ...
+            'datatype', dataType, ...
+            'typesource', typeSource)};
     else
         % Unsupported / can't be determined
         [dataType, typeSource, dtStruct] = getDT_emp_src(obj);
@@ -414,6 +428,15 @@ function [dataType, typeSource, dtStruct] = getOutDataType_Aux(obj, SystemDepth,
                 'datatype', dataType, ...
                 'typesource', typeSource)};
         end
+    elseif any(strcmp('OutputArgumentSpecifications', fieldnames(blockParams))) % has OutputArgumentSpecifications parameter
+        outArgSpec = get_param(block, 'OutputArgumentSpecifications');
+        tmpDataType = regexp(outArgSpec, '^(.*)\((.*)\)', 'tokens');
+        dataType = tmpDataType{1}(1);
+        typeSource = {obj};
+        dtStruct = {struct( ...
+            'handle', obj, ...
+            'datatype', dataType, ...
+            'typesource', typeSource)};
     else
         % Unsupported / can't be determined
         [dataType, typeSource, dtStruct] = getDT_emp_src(obj);

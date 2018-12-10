@@ -189,8 +189,8 @@ classdef Interface
                 elseif ~isempty(obj.Inport)
                     fprintf('%s:\n', obj.InportHeader.Label);
                     for i = 1:length(obj.Inport)
+                        fprintf('\t');
                         obj.Inport(i).print;
-                        %fprintf('\t%s, %s\n', obj.Inport(i).Fullpath, obj.Inport(i).DataType);
                     end
                 end
 
@@ -199,8 +199,8 @@ classdef Interface
                 elseif ~isempty(obj.FromFile)
                     fprintf('%s:\n', obj.FromFileHeader.Label);
                     for i = 1:length(obj.FromFile)
+                        fprintf('\t');
                         obj.FromFile(i).print;
-                        %fprintf('\t%s, %s\n', obj.FromFile(i).Fullpath, obj.FromFile(i).DataType);
                     end
                 end
 
@@ -209,8 +209,8 @@ classdef Interface
                 elseif ~isempty(obj.FromWorkspace)
                     fprintf('%s:\n', obj.FromWorkspaceHeader.Label);
                     for i = 1:length(obj.FromWorkspace)
+                        fprintf('\t');
                         obj.FromWorkspace(i).print;
-                        %fprintf('\t%s, %s\n', obj.FromWorkspace(i).Fullpath, obj.FromWorkspace(i).DataType);
                     end
                 end
 
@@ -219,7 +219,8 @@ classdef Interface
                 elseif ~isempty(obj.FromSpreadsheet)
                     fprintf('%s:\n', obj.FromSpreadsheetHeader.Label);
                     for i = 1:length(obj.FromSpreadsheet)
-                        fprintf('\t%s, %s\n', obj.FromSpreadsheet(i).Fullpath, obj.FromSpreadsheet(i).DataType);
+                        fprintf('\t');
+                        obj.FromSpreadsheet(i).print;
                     end
                 end
 
@@ -228,8 +229,8 @@ classdef Interface
                 elseif ~isempty(obj.DataStoreRead)
                     fprintf('%s:\n', obj.DataStoreReadHeader.Label);
                     for i = 1:length(obj.DataStoreRead)
+                        fprintf('\t');
                         obj.DataStoreRead(i).print;
-                        %fprintf('\t%s, %s\n', obj.DataStoreRead(i).Fullpath, obj.DataStoreRead(i).DataType);
                     end
                 end
             end
@@ -245,8 +246,8 @@ classdef Interface
                     elseif ~isempty(obj.ModelReference)
                         fprintf('%s:\n', obj.ModelReferenceHeader.Label);
                         for i = 1:length(obj.ModelReference)
+                            fprintf('\t');
                             obj.ModelReference(i).print;
-                            %fprintf('\t%s, %s\n', obj.ModelReference(i).Fullpath, obj.ModelReference(i).DataType);
                         end
                     end            
 
@@ -255,8 +256,8 @@ classdef Interface
                     elseif ~isempty(obj.LibraryLink)
                         fprintf('%s:\n', obj.LibraryLinkHeader.Label);
                         for i = 1:length(obj.LibraryLink)
+                            fprintf('\t');
                             obj.LibraryLink(i).print;
-                            %fprintf('\t%s, %s\n', obj.LibraryLink(i).Fullpath, obj.LibraryLink(i).DataType);
                         end
                     end
                 end
@@ -273,8 +274,8 @@ classdef Interface
                 elseif ~isempty(obj.Outport)
                     fprintf('%s:\n', obj.OutportHeader.Label);
                     for i = 1:length(obj.Outport)
+                        fprintf('\t');
                         obj.Outport(i).print;
-                        %fprintf('\t%s, %s\n', obj.Outport(i).Fullpath, obj.Outport(i).DataType);
                     end
                 end
 
@@ -283,8 +284,8 @@ classdef Interface
                 elseif ~isempty(obj.ToFile)
                     fprintf('%s:\n', obj.ToFileHeader.Label);
                     for i = 1:length(obj.ToFile)
+                        fprintf('\t');
                         obj.ToFile(i).print;
-                        %fprintf('\t%s, %s\n', obj.ToFile(i).Fullpath, obj.ToFile(i).DataType);
                     end
                 end
 
@@ -293,8 +294,8 @@ classdef Interface
                 elseif ~isempty(obj.ToWorkspace)
                     fprintf('%s:\n', obj.ToWorkspaceHeader.Label);
                     for i = 1:length(obj.ToWorkspace)
+                        fprintf('\t');
                         obj.ToWorkspace(i).print;
-                        %fprintf('\t%s, %s\n', obj.ToWorkspace(i).Fullpath, obj.ToWorkspace(i).DataType);
                     end
                 end
 
@@ -303,8 +304,8 @@ classdef Interface
                 elseif ~isempty(obj.DataStoreWrite)
                     fprintf('%s:\n', obj.DataStoreWriteHeader.Label);
                     for i = 1:length(obj.DataStoreWrite)
+                        fprintf('\t');
                         obj.DataStoreWrite(i).print;
-                        %fprintf('\t%s, %s\n', obj.DataStoreWrite(i).Fullpath, obj.DataStoreWrite(i).DataType);
                     end
                 end
             end
@@ -320,8 +321,8 @@ classdef Interface
                 elseif ~isempty(obj.Function)
                     fprintf('%s:\n', obj.FunctionHeader.Label);
                     for i = 1:length(obj.Function)
+                        fprintf('\t');
                         obj.Function(i).print;
-                        %fprintf('\t%s, %s\n', obj.Function(i).Fullpath, obj.Function(i).DataType);
                     end
                 end
             end

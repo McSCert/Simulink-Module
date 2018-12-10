@@ -59,9 +59,9 @@ classdef InterfaceItem
         %       N/A
         
             if rem(abs(obj.SampleTime), 1) == 0 % Is an integer
-                fprintf('\t%s, %s, %s, %i\n', obj.Fullpath, obj.DataType, obj.Dimensions, obj.SampleTime);
+                fprintf('%s, %s, %s, %i\n', obj.Fullpath, obj.DataType, obj.Dimensions, obj.SampleTime);
             else
-                fprintf('\t%s, %s, %s, %.4f\n', obj.Fullpath, obj.DataType, obj.Dimensions, obj.SampleTime);
+                fprintf('%s, %s, %s, %.4f\n', obj.Fullpath, obj.DataType, obj.Dimensions, obj.SampleTime);
             end
         end
     end

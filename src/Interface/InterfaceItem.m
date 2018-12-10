@@ -41,7 +41,6 @@ classdef InterfaceItem
         %       obj2    InterfaceItem.
         %
         %   Outputs:
-        %
         %       b       Whether or not inputs are equal (1), or not (0).
         
              if obj1.Handle == obj2.Handle
@@ -49,7 +48,17 @@ classdef InterfaceItem
              else
                  b = false;
              end
-         end
+        end
+        function print(obj)
+        % PRINT Print the item to the Command Windows.
+        %
+        %   Inputs:
+        %       obj    InterfaceItem.
+        %
+        %   Outputs:
+        %       N/A
+            fprintf('\t%s, %s, %s, %.4f\n', obj.Fullpath, obj.DataType, obj.Dimensions, obj.SampleTime);
+        end
     end
     methods (Access = private)
         function obj = autoGetData(obj)
@@ -75,7 +84,7 @@ classdef InterfaceItem
             obj.Fullpath = replaceNewline(getfullname(obj.Handle));
 
             % DATATYPE
-            obj.DataType = char(getDataType(obj.Handle));
+            obj.DataType = char(getDataType_MJ(obj.Handle));
 %             portTypes = findPortDataTypes(obj.Handle);
 %             if strcmp(obj.InterfaceType, {'Inport','Import'})
 %                 obj.DataType = char(portTypes.Inport);

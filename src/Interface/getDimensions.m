@@ -1,8 +1,8 @@
 function dims = getDimensions(blocks)
-% GETDATATYPE Return the block's dimensions.
+% GETDATATYPE Return the block dimensions.
 %
 %   Inputs:
-%       blocks  Array of block names or handles.
+%       blocks  Array of block paths or handles.
 %
 %   Outputs:
 %       types   Cell array of dimensions.
@@ -31,8 +31,23 @@ function dims = getDimensions(blocks)
             dims{i} = ['In: ' strjoin(indim, ', '), '; Out: ' strjoin(outdim, ', ')];
 
         elseif any(find(strcmp(blockTypes{i}, {'DataStoreRead', 'DataStoreWrite'})))
-            % Find Simulink.Signal object, then get its DataType
-            dims{i} = 'Unknown';
+            % 1) Workspace
+            % Find Simulink.Signal object, then get its size
+            workspaceData = evalin('base', 'whos');
+            idx = ismember({workspaceData.class}, 'Simulink.Signal');
+            datastores = workspaceData(idx);
+            match = strcmp({datastores.name}, get_param(blocks(i), 'DataStoreName'));
+            ds = datastores(match);
+            %ds = evalin('base', ds.name);
+            
+            % 2) Data Dictionary
+            %TODO
+            
+            if ~isempty(ds)
+                dims{i} = strrep(['[' sprintf('%d,', ds.size) ')'], ',)', ']');
+            else
+                dims{i} = 'Unknown';
+            end
             
         elseif any(find(strcmp(blockTypes{i}, {'ToFile', 'FromFile'})))
             dims{i} = 'N/A';

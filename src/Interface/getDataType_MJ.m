@@ -1,8 +1,8 @@
 function types = getDataType_MJ(blocks)
-% GETDATATYPE Return the block's data type.
+% GETDATATYPE Return the block data type.
 %
 %   Inputs:
-%       blocks  Array of block names of handles.
+%       blocks  Array of block paths or handles.
 %
 %   Outputs:
 %       types   Cell array of data types.
@@ -38,12 +38,16 @@ function types = getDataType_MJ(blocks)
     
             % Assume Data Stores are in the base workspace/data dictionary
             %1) Workspace
-%             workspaceData = evalin('base', 'whos');
-%             idx = ismember({workspaceData.class}, 'Simulink.Signal');
-%             datastores = workspaceData(idx);
-%             match = strcmp({datastores.name}, get_param(blocks(i), 'DataStoreName'));
-            types{i} = 'Unknown';
+            workspaceData = evalin('base', 'whos');
+            idx = ismember({workspaceData.class}, 'Simulink.Signal');
+            allDs = workspaceData(idx);
+            match = strcmp({allDs.name}, get_param(blocks(i), 'DataStoreName'));
+            ds = allDs(match);
+            ds = evalin('base', ds.name);
+            types{i} = ds.DataType;
             
+            % 2) Data dictionary
+            % TODO
         elseif isSimulinkFcn(b)
             [intype, outtype] = getFcnArgsType(b);
             types{i} = ['In: ' strjoin(intype, ', '), '; Out: ' strjoin(outtype, ', ')];

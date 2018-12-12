@@ -1,12 +1,12 @@
 function time = getSampleTime(block)
-% GETSAMPLETIME Determine the sample time of the block. Based on the 
+% GETSAMPLETIME Determine the block sample time. Based on the 
 %   SampleTime and CompiledSampleTime parameters. Note that some blocks may have
 %   different sample rates for different ports (e.g. SubSystems containing blocks 
 %   with different rates). Sample time may be more accurate after model
 %   comilation.
 %
 %   Inputs:
-%       block   Block name or handle.
+%       block   Block path or handle.
 %
 %   Outputs:
 %       time    Vector of times.
@@ -25,31 +25,43 @@ function time = getSampleTime(block)
     
     narginchk(1,1);
     
-    explicitTime = [];
+    % 1) Get the SampleTime
+    sampleTime = [];
     try
-        explicitTime = str2double(get_param(block, 'SampleTime'));
+        sampleTime = str2double(get_param(block, 'SampleTime'));
     catch ME
         if ~strcmpi(ME.identifier, 'Simulink:Commands:ParamUnknown')
             rethrow(ME)
         end
     end
-    implicitTime = get_param(block, 'CompiledSampleTime');
-    if iscell(implicitTime)
-        implicitTime = cell2mat(implicitTime);
+    
+    % For Simulink.Signal objects
+    [isGlobal, obj] = isGlobalDataStore(block);
+    if isGlobal
+        sampleTimeDs = obj.SampleTime;
+        if (isInherited(sampleTime) || isempty(sampleFime)) && ~isempty(sampleTimeDs)
+            sampleTime = sampleTimeDs;
+        end
+    end    
+    
+    % 2) Get the CompiledSampleTime
+    compiledSampleTime = get_param(block, 'CompiledSampleTime');
+    if iscell(compiledSampleTime)
+        compiledSampleTime = cell2mat(compiledSampleTime);
     end
     
     % Get the first row only. Documentation doesn't say what the second row is for, 
     % and it contains zeros
-    implicitTime = implicitTime(:,1);  
-    
-    % Determine which to return. If the implicit time is available, always
-    % return it because it could be different from the explicit time.
-    if ~isInherited(implicitTime)
-        time = implicitTime;
-    elseif isempty(explicitTime)
-        time = implicitTime;
+    compiledSampleTime = compiledSampleTime(:,1);  
+
+    % Finally: Determine which to return. If the compiled time is available, always
+    % return it because it could be different from the sample time.
+    if ~isInherited(compiledSampleTime)
+        time = compiledSampleTime;
+    elseif isempty(sampleTime)
+        time = compiledSampleTime;
     else
-        time = explicitTime;
+        time = sampleTime;
     end
 end
 

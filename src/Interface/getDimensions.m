@@ -11,7 +11,7 @@ function dims = getDimensions(blocks)
 %       >> getDimensions{'model/In1', 'model/DataStore'})
 %           ans =
 %               {'-1'}    
-%               {'1'}
+%               {'[1 3]'}
 
     blocks = inputToNumeric(blocks);
 
@@ -31,21 +31,19 @@ function dims = getDimensions(blocks)
             dims{i} = ['In: ' strjoin(indim, ', '), '; Out: ' strjoin(outdim, ', ')];
 
         elseif any(find(strcmp(blockTypes{i}, {'DataStoreRead', 'DataStoreWrite'})))
-            
             [isGlobal, obj, ~] = isGlobalDataStore(b);
             if isGlobal
-                dims{i} = num2str(obj.Dimensions);
-                if length(dims{i}) > 1
-                    dims{i} = strrep(['[' sprintf('%d,', dims{i}) ')'], ',)', ']');
+                d = obj.Dimensions;
+                if length(d) > 1
+                    dims{i} = strrep(['[' sprintf('%d ', d) ']'], ' ]', ']');
+                else 
+                    dims{i} = num2str(d);
                 end
             else
                 dims{i} = 'Unknown';
             end               
 
         elseif any(find(strcmp(blockTypes{i}, {'ToFile', 'FromFile'})))
-            dims{i} = 'N/A';
-            
-        elseif strcmp(blockTypes{i}, 'FromWorkspace')            
             dims{i} = 'N/A';
 
         elseif strcmp(blockTypes{i}, 'FromSpreadsheet')
@@ -54,8 +52,22 @@ function dims = getDimensions(blocks)
             oneDims = regexprep(oneDims, ' +', ', ');
             dims{i} = oneDims;
             
-        elseif strcmp(blockTypes{i}, 'ToWorkspace')
-            dims{i} = get_param(b, 'SaveFormat'); % VariableName? SaveFormat?
+        elseif any(strcmp(blockTypes{i}, {'ToWorkspace', 'FromWorkspace'}))
+            workspaceData = evalin('base', 'whos');
+            idx = ismember({workspaceData.name}, get_param(b, 'VariableName'));
+            
+            if any(idx)
+                match = workspaceData(idx);
+                n = match.size;
+                if length(n) > 1
+                    dims{i} = ['[' num2str(n) ']'];
+                    dims{i} = strrep(dims{i}, '  ', ' ');
+                else
+                    dims{i} = num2str(n);
+                end
+            else
+                dims{i} = 'Unknown';
+            end
             
         elseif strcmp(blockTypes{i}, 'ModelReference')
              dims{i} = 'N/A';
@@ -69,4 +81,12 @@ function dims = getDimensions(blocks)
             end
         end
     end
+end
+
+function d = size2dim(s)
+   if s(1) == 1 && s(2) == 1
+       d = 1;
+   else 
+       d = 2;
+   end
 end

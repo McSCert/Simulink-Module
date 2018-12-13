@@ -24,14 +24,21 @@ function types = getDataType_MJ(blocks)
     for i = 1:length(blocks)
         b = blocks(i);
         
-        if any(find(strcmp(blockTypes{i}, {'Outport', 'Inport', 'FromFile', 'FromSpreadsheet', 'FromWorkspace'})))
+        if any(find(strcmp(blockTypes{i}, {'Outport', 'Inport', 'FromFile', 'FromSpreadsheet'})))
             types{i} = get_param(b, 'OutDataTypeStr');
             
         elseif strcmp(blockTypes{i}, 'ToFile')
             types{i} = get_param(b, 'SaveFormat');
             
-        elseif strcmp(blockTypes{i}, 'ToWorkspace')
-            types{i} = get_param(b, 'SaveFormat');
+        elseif any(strcmp(blockTypes{i}, {'ToWorkspace', 'FromWorkspace'}))
+            workspaceData = evalin('base', 'whos');
+            idx = ismember({workspaceData.name}, get_param(b, 'VariableName'));
+            if any(idx)
+                match = workspaceData(idx);
+                types{i} = match.class;
+            else
+                types{i} = get_param(gcb, 'OutDataTypeStr');
+            end
             
         elseif any(find(strcmp(blockTypes{i}, {'DataStoreRead', 'DataStoreWrite'})))
 

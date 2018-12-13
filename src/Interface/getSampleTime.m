@@ -39,7 +39,7 @@ function time = getSampleTime(block)
     [isGlobal, obj, ~] = isGlobalDataStore(block);
     if isGlobal
         sampleTimeDs = obj.SampleTime;
-        if (isInherited(sampleTime) || isempty(sampleFime)) && ~isempty(sampleTimeDs)
+        if (isInherited(sampleTime) || isempty(sampleTime)) && ~isempty(sampleTimeDs)
             sampleTime = sampleTimeDs;
         end
     end    

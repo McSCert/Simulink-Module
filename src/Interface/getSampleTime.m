@@ -36,7 +36,7 @@ function time = getSampleTime(block)
     end
     
     % For Simulink.Signal objects
-    [isGlobal, obj] = isGlobalDataStore(block);
+    [isGlobal, obj, ~] = isGlobalDataStore(block);
     if isGlobal
         sampleTimeDs = obj.SampleTime;
         if (isInherited(sampleTime) || isempty(sampleFime)) && ~isempty(sampleTimeDs)

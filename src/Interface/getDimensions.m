@@ -8,10 +8,10 @@ function dims = getDimensions(blocks)
 %       types   Cell array of dimensions.
 %
 %   Example:
-%       >> getDataType({'model/In1', 'model/Out1'})
+%       >> getDimensions{'model/In1', 'model/DataStore'})
 %           ans =
-%               {'auto:inherit'}    
-%               {'double'}
+%               {'-1'}    
+%               {'1'}
 
     blocks = inputToNumeric(blocks);
 
@@ -31,24 +31,17 @@ function dims = getDimensions(blocks)
             dims{i} = ['In: ' strjoin(indim, ', '), '; Out: ' strjoin(outdim, ', ')];
 
         elseif any(find(strcmp(blockTypes{i}, {'DataStoreRead', 'DataStoreWrite'})))
-            % 1) Workspace
-            % Find Simulink.Signal object, then get its size
-            workspaceData = evalin('base', 'whos');
-            idx = ismember({workspaceData.class}, 'Simulink.Signal');
-            datastores = workspaceData(idx);
-            match = strcmp({datastores.name}, get_param(blocks(i), 'DataStoreName'));
-            ds = datastores(match);
-            %ds = evalin('base', ds.name);
             
-            % 2) Data Dictionary
-            %TODO
-            
-            if ~isempty(ds)
-                dims{i} = strrep(['[' sprintf('%d,', ds.size) ')'], ',)', ']');
+            [isGlobal, obj, ~] = isGlobalDataStore(b);
+            if isGlobal
+                dims{i} = num2str(obj.Dimensions);
+                if length(dims{i}) > 1
+                    dims{i} = strrep(['[' sprintf('%d,', dims{i}) ')'], ',)', ']');
+                end
             else
                 dims{i} = 'Unknown';
-            end
-            
+            end               
+
         elseif any(find(strcmp(blockTypes{i}, {'ToFile', 'FromFile'})))
             dims{i} = 'N/A';
             

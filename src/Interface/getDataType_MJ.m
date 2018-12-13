@@ -34,20 +34,14 @@ function types = getDataType_MJ(blocks)
             types{i} = get_param(b, 'SaveFormat');
             
         elseif any(find(strcmp(blockTypes{i}, {'DataStoreRead', 'DataStoreWrite'})))
-            % Find Simulink.Signal object, then get its DataType
-    
-            % Assume Data Stores are in the base workspace/data dictionary
-            %1) Workspace
-            workspaceData = evalin('base', 'whos');
-            idx = ismember({workspaceData.class}, 'Simulink.Signal');
-            allDs = workspaceData(idx);
-            match = strcmp({allDs.name}, get_param(blocks(i), 'DataStoreName'));
-            ds = allDs(match);
-            ds = evalin('base', ds.name);
-            types{i} = ds.DataType;
+
+            [isGlobal, obj, ~] = isGlobalDataStore(b);
+            if isGlobal 
+                types{i} = obj.DataType;
+            else
+                types{i} = 'Unknown';
+            end
             
-            % 2) Data dictionary
-            % TODO
         elseif isSimulinkFcn(b)
             [intype, outtype] = getFcnArgsType(b);
             types{i} = ['In: ' strjoin(intype, ', '), '; Out: ' strjoin(outtype, ', ')];

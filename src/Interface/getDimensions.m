@@ -82,11 +82,3 @@ function dims = getDimensions(blocks)
         end
     end
 end
-
-function d = size2dim(s)
-   if s(1) == 1 && s(2) == 1
-       d = 1;
-   else 
-       d = 2;
-   end
-end

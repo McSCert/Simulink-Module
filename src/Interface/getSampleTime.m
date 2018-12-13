@@ -3,7 +3,7 @@ function time = getSampleTime(block)
 %   SampleTime and CompiledSampleTime parameters. Note that some blocks may have
 %   different sample rates for different ports (e.g. SubSystems containing blocks 
 %   with different rates). Sample time may be more accurate after model
-%   comilation.
+%   compilation.
 %
 %   Inputs:
 %       block   Block path or handle.

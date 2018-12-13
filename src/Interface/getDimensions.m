@@ -1,11 +1,11 @@
 function dims = getDimensions(blocks)
-% GETDATATYPE Return the block dimensions.
+% GETDIMENSIONS Return the block dimensions.
 %
 %   Inputs:
 %       blocks  Array of block paths or handles.
 %
 %   Outputs:
-%       types   Cell array of dimensions.
+%       dims   Cell array of dimensions.
 %
 %   Example:
 %       >> getDimensions{'model/In1', 'model/DataStore'})
@@ -55,7 +55,6 @@ function dims = getDimensions(blocks)
         elseif any(strcmp(blockTypes{i}, {'ToWorkspace', 'FromWorkspace'}))
             workspaceData = evalin('base', 'whos');
             idx = ismember({workspaceData.name}, get_param(b, 'VariableName'));
-            
             if any(idx)
                 match = workspaceData(idx);
                 n = match.size;

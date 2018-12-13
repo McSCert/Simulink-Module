@@ -9,7 +9,7 @@ function time = getSampleTime(block)
 %       block   Block path or handle.
 %
 %   Outputs:
-%       time    Vector of times.
+%       time    Vector of sample times.
 %
 %   Example:
 %       >> getSampleTime('ex_compiled_sample_new/Sine Wave3')

@@ -1,7 +1,7 @@
 classdef InterfaceHeader
     properties
-        Label
-        Handle
+        Label   % Label text.
+        Handle  % Handle of the annotation.
     end
     methods (Access = public)
         function obj = InterfaceHeader(label)

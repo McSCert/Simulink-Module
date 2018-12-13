@@ -1,5 +1,5 @@
 function types = getDataType_MJ(blocks)
-% GETDATATYPE Return the block data type.
+% GETDATATYPE_MJ Return the block data type.
 %
 %   Inputs:
 %       blocks  Array of block paths or handles.
@@ -41,7 +41,6 @@ function types = getDataType_MJ(blocks)
             end
             
         elseif any(find(strcmp(blockTypes{i}, {'DataStoreRead', 'DataStoreWrite'})))
-
             [isGlobal, obj, ~] = isGlobalDataStore(b);
             if isGlobal 
                 types{i} = obj.DataType;

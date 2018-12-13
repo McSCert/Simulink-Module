@@ -1,8 +1,7 @@
 function [isGlobal, obj, location] = isGlobalDataStore(block)
 % ISGLOBALDATASTORE Determine if a Data Store Read/Write block is a global data
-%   store, that is, it has a corresponding Simulink.Signal that it refers to. A
-%   Simulink.Signal object can be found in the base workspace, model workspace,
-%   or data dictionary.
+%   store, that is, it has a corresponding Simulink.Signal in the base workspace 
+%   or linked data dictionary. 
 %
 %   Inputs:
 %       block       Block path or handle.
@@ -11,6 +10,36 @@ function [isGlobal, obj, location] = isGlobalDataStore(block)
 %       isGlobal    Whether the block is a global data store (1) or not (0).
 %       obj         Simulink.Signal object corresponding to the block.
 %       location    Object where the Simulink.Signal definition resides.
+%
+%   Example:
+%       >> [gbl, obj, loc] = isGlobalStateStore('Example/Data Store Write1')
+%
+%             glb =
+%               logical
+%                1
+% 
+%             obj = 
+%               Signal with properties:
+%                      CoderInfo: [1x1 Simulink.CoderInfo]
+%                    Description: ''
+%                       DataType: 'double'
+%                            Min: []
+%                            Max: []
+%                           Unit: ''
+%                     Dimensions: [1 3]
+%                 DimensionsMode: 'Fixed'
+%                     Complexity: 'real'
+%                     SampleTime: -1
+%                   InitialValue: ''
+% 
+%             loc = 
+%               Dictionary with properties:
+%                                 DataSources: {0x1 cell}
+%                    HasAccessToBaseWorkspace: 0
+%                 EnableAccessToBaseWorkspace: 0
+%                           HasUnsavedChanges: 1
+%                             NumberOfEntries: 3
+
 
     % Convert input to path
     block = [get_param(block, 'Parent') '/' get_param(block, 'Name')];
@@ -25,7 +54,8 @@ function [isGlobal, obj, location] = isGlobalDataStore(block)
         
         % 0) Model
         % Check if the model contains an associated Data Store Memory block. If
-        % it does, it takes precedence over all other definitions.
+        % it does, it takes precedence over all other definitions. This is NOT a
+        % global data store.
         
         % Search for any associated memory block at the same level or above
         % Even if there is a workspace Simulink.Signal with the same name, the
@@ -36,21 +66,19 @@ function [isGlobal, obj, location] = isGlobalDataStore(block)
         memoryHere = find_system(parent, 'SearchDepth', 1, 'BlockType', 'DataStoreMemory', 'DataStoreName', name);
         memoryHereAndBelow = find_system(parent, 'BlockType', 'DataStoreMemory', 'DataStoreName', name);       
         memoryBelow = setdiff(memoryHereAndBelow, memoryHere);
-        
-        % As long as there is a Memory block in scope, the Data Store will not
-        % be global (We don't really care which one exactly is associated)
         memoryInScope = setdiff(memoryAll, memoryBelow);
         
         % Check for a Simulink.Signal object 
         if ~isempty(memoryInScope)
             isGlobal = false;
             obj = [];
-            location = []; % TODO: Find lowest common ancestor
+            location = []; % TODO: Find lowest common ancestor (Get from Rescope Tool)
         else
             
             % 1) Model Workspace
             % Check model workspace next, because it takes precedence over 
-            % data dictionary or base workspace definitions
+            % data dictionary or base workspace definitions. This is NOT a
+            % global data store.
             workspace = get_param(bdroot, 'modelworkspace');
             try
                 ds = getVariable(workspace, name);
@@ -71,7 +99,7 @@ function [isGlobal, obj, location] = isGlobalDataStore(block)
             
             % 2) Data Dictionary
             % Check data dictionary next, because if a model is linked to a dictionary,
-            % it no longer refers to the base workspace
+            % it no longer refers to the base workspace.
             dataDictName = get_param(root, 'DataDictionary');
             if ~isempty(dataDictName)
                 dataDict = Simulink.data.dictionary.open(dataDictName);

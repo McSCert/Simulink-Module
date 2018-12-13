@@ -40,7 +40,10 @@ function [isGlobal, obj, location] = isGlobalDataStore(block)
 %                           HasUnsavedChanges: 1
 %                             NumberOfEntries: 3
 
-
+    % TODO: Figure out if when the 'EnableAccessToBaseWorkspace' parameter is
+    % true, this affects the results of this function. See:
+    % https://www.mathworks.com/help/simulink/slref/simulink.data.dictionary-class.html#d120e428542
+    
     % Convert input to path
     block = [get_param(block, 'Parent') '/' get_param(block, 'Name')];
     

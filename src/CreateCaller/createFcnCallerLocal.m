@@ -78,8 +78,13 @@ function callers = createFcnCallerLocal(blocks)
                         'OutputArgumentSpecifications', argsOutSpec);
                     callerNum = callerNum + 1;
                     blockCreated = true;
-                catch
-                    callerNum = callerNum + 1;
+                catch ME
+                    if strcmp(ME.identifier, 'Simulink:Commands:AddBlockCantAdd')
+                        callerNum = callerNum + 1;
+                    else
+                        disp('Argument data type must specify built-in data types. User-defined data types, including Bus, Fixed-point, Enumerations, and Alias types, may be provided with a Simulink.Parameter object.');
+                        rethrow(ME)
+                    end
                 end
             end
         end

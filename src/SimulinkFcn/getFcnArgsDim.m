@@ -18,10 +18,10 @@ function [in, out] = getFcnArgsDim(fcn)
     out = cell(size(argsOut));
     
     for i = 1:length(argsIn)
-        in{i} = get_param(argsIn{i}, 'PortDimensions');
+        in{i} = str2num(get_param(argsIn{i}, 'PortDimensions'));
     end
 
     for j = 1:length(argsOut)
-        out{j} = get_param(argsOut{j}, 'PortDimensions');
+        out{j} = str2num(get_param(argsOut{j}, 'PortDimensions'));
     end 
 end

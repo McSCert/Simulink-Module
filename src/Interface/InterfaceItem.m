@@ -6,7 +6,7 @@ classdef InterfaceItem
         Name                % Name.
         Fullpath            % Fullpath.
         DataType            % Output or input types.
-        Dimensions          % Dimensions, if applicable.
+        Dimensions          % Struct of Inport and Outport dimensions.
         SampleTime          % SameTime.
         
         % Visual Representation
@@ -50,18 +50,144 @@ classdef InterfaceItem
              end
         end
         function print(obj)
-        % PRINT Print the item to the Command Windows.
+        % PRINT Print the item to the Command Window.
         %
         %   Inputs:
         %       obj    InterfaceItem.
         %
         %   Outputs:
         %       N/A
-        
-            if rem(abs(obj.SampleTime), 1) == 0 % Is an integer
-                fprintf('%s, %s, %s, %i\n', obj.Fullpath, obj.DataType, obj.Dimensions, obj.SampleTime);
+         
+             % TODO: Currently assumes one sample time. There can be
+            % multiple times
+         
+            if isSimulinkFcn(obj.Handle)
+                argsIn = find_system(obj.Handle, 'SearchDepth', 1, 'BlockType', 'ArgIn');
+                argsOut = find_system(obj.Handle, 'SearchDepth', 1, 'BlockType', 'ArgOut');
+                nIn = length(argsIn);
+                nOut = length(argsOut);
             else
-                fprintf('%s, %s, %s, %.4f\n', obj.Fullpath, obj.DataType, obj.Dimensions, obj.SampleTime);
+                handles = get_param(obj.Handle, 'PortHandles');
+                nIn = length(handles.Inport);
+                nOut = length(handles.Outport);
+            end
+            
+            oneInport = (nIn == 1);
+            oneOutport = (nOut == 1);
+
+            dt   = obj.DataType;
+            dim  = obj.Dimensions;
+            time = obj.SampleTime;
+                
+            % Only 1 port
+            if xor(oneInport, oneOutport) 
+                
+                if oneInport
+                    dt = dt.Inport;
+                    dim = dim.Inport;
+                else
+                    dt = dt.Outport;
+                    dim = dim.Outport;
+                end
+                
+                if size(dim,1) > 1 || size(dim,2) > 1 % Non-scalar
+                   dim = ['[' regexprep(num2str(dim), ' +', ', ') ']'];
+                end
+               
+                % Empty
+                if isempty(dt)
+                    dt = 'N/A';
+                end
+                
+                if isempty(dim)
+                    dim = 'N/A';
+                end
+
+                if isempty(time)
+                    time = 'N/A';
+                end
+                
+                % Account for different formatting                
+                dim_format = '%i';
+                if ischar(dim)
+                    dim_format = '%s';
+                end
+                
+                time_format = '%.4f';
+                if rem(abs(time), 1) == 0
+                    time_format = '%i';
+                elseif ischar(time)
+                    time_format = '%s';
+                end
+                
+                % Print
+                fprintf(['%s, %s, ' dim_format ', ' time_format '\n'], obj.Fullpath, dt, dim, time);
+                
+            % Multiple ports
+            else
+                fprintf('%s \n', obj.Fullpath);
+                
+                if nIn > 0
+                    fprintf('\t\tIn: ');
+                    for i = 1:nIn
+                        dt_i  = dt.Inport(i,:);
+                        dim_i = dim.Inport(i);
+                        
+                        % Separate from previous port
+                        if i ~= 1
+                            fprintf('; ');
+                        end
+                       
+                        % Account for different formatting                
+                        dim_format = '%i';
+                        if ischar(dim_i)
+                            dim_format = '%s';
+                        end
+                        
+                        time_format = '%.4f';
+                        if rem(abs(time), 1) == 0
+                            time_format = '%i';
+                        elseif ischar(time)
+                            time_format = '%s';
+                        end
+                        
+                        % Print
+                        fprintf(['%s, ' dim_format ', ' time_format], dt_i, dim_i, time);
+                    end
+                end
+                
+                if nOut > 0
+                    if nIn > 0
+                        fprintf('\n');
+                    end
+                    fprintf('\t\tOut: ');
+                    for i = 1:nOut
+                        dt_i  = dt.Outport(i,:);
+                        dim_i = dim.Outport(i);
+                        
+                        % Separate from previous port
+                        if i ~= 1
+                            fprintf('; ');
+                        end
+                       
+                        % Account for different formatting                
+                        dim_format = '%i';
+                        if ischar(dim_i)
+                            dim_format = '%s';
+                        end
+                        
+                        time_format = '%.4f';
+                        if rem(abs(time), 1) == 0
+                            time_format = '%i';
+                        elseif ischar(time)
+                            time_format = '%s';
+                        end
+                        
+                        % Print
+                        fprintf(['%s, ' dim_format ', ' time_format], dt_i, dim_i, time);
+                    end
+                    fprintf('\n');                    
+                end
             end
         end
     end
@@ -89,16 +215,10 @@ classdef InterfaceItem
             obj.Fullpath = replaceNewline(getfullname(obj.Handle));
 
             % DATATYPE
-            obj.DataType = char(getDataType_MJ(obj.Handle));
-%             portTypes = findPortDataTypes(obj.Handle);
-%             if strcmp(obj.InterfaceType, {'Inport','Import'})
-%                 obj.DataType = char(portTypes.Inport);
-%             else
-%                 obj.DataType = char(portTypes.Outport);
-%             end
+            obj.DataType = getDataType_MJ(obj.Handle);
 
             % DIMENSIONS
-            obj.Dimensions = char(getDimensions(obj.Handle));
+            obj.Dimensions = getDimensions(obj.Handle);
             
             % SAMPLE TIME
             obj.SampleTime = getSampleTime(obj.Handle);

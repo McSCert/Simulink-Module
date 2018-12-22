@@ -82,8 +82,8 @@ function types = getDataType_MJ(blocks)
             
         elseif isSimulinkFcn(b)
             [intype, outtype] = getFcnArgsType(b);
-            types{i}.Inport = cell2mat(intype);
-            types{i}.Outport = cell2mat(outtype); 
+            types{i}.Inport = char(intype);
+            types{i}.Outport = char(outtype); 
             
         elseif isLibraryLink(b)
             %types{i} = 'N/A';

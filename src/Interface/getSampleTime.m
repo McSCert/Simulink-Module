@@ -22,6 +22,7 @@ function time = getSampleTime(block)
 %               4
 %
 % See: www.mathworks.com/help/simulink/ug/determining-the-compiled-sample-time-of-a-block.html
+% See: https://www.mathworks.com/help/simulink/ug/types-of-sample-time.html
     
     narginchk(1,1);
     

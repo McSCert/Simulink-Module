@@ -78,6 +78,27 @@ classdef InterfaceItem
             dt   = obj.DataType;
             dim  = obj.Dimensions;
             time = obj.SampleTime;
+            
+            if strcmp(obj.BlockType, 'ModelReference') || isLibraryLink(obj.Handle)
+                if isempty(time)
+                    time_i = 'N/A';
+                elseif size(time,1) > 1 || size(time,2) > 1 % Non-scalar
+                    time_i = char(strjoin(string(time), ', ')); 
+                    time_i = ['[' time_i ']'];
+                else
+                    time_i = time;
+                end
+                
+                if isnumeric(time_i) && rem(abs(time_i), 1) == 0
+                    time_format = '%i';
+                elseif ischar(time_i)
+                    time_format = '%s';
+                else
+                    time_format = '%.4f';
+                end
+                fprintf(['%s, N/A, N/A, ' time_format '\n'], obj.Fullpath, time_i);
+                return
+            end
                 
             % Only 1 port
             if xor(oneInport, oneOutport) 
@@ -89,22 +110,25 @@ classdef InterfaceItem
                     dt = dt.Outport;
                     dim = dim.Outport;
                 end
-                
-                if size(dim,1) > 1 || size(dim,2) > 1 % Non-scalar
-                   dim = ['[' regexprep(num2str(dim), ' +', ', ') ']'];
-                end
                
-                % Empty
+                % Account for data that is empty or an array
                 if isempty(dt)
                     dt = 'N/A';
                 end
                 
                 if isempty(dim)
                     dim = 'N/A';
+                elseif size(dim,1) > 1 || size(dim,2) > 1 % Non-scalar
+                    dim = ['[' regexprep(num2str(dim), ' +', ', ') ']'];
                 end
 
                 if isempty(time)
-                    time = 'N/A';
+                    time_i = 'N/A';
+                elseif size(time,1) > 1 || size(time,2) > 1 % Non-scalar
+                    time_i = char(strjoin(string(time), ', ')); 
+                    time_i = ['[' time_i ']'];
+                else
+                    time_i = time;
                 end
                 
                 % Account for different formatting                
@@ -113,46 +137,72 @@ classdef InterfaceItem
                     dim_format = '%s';
                 end
                 
-                time_format = '%.4f';
-                if rem(abs(time), 1) == 0
+                if isnumeric(time_i) && rem(abs(time_i), 1) == 0
                     time_format = '%i';
-                elseif ischar(time)
+                elseif ischar(time_i)
                     time_format = '%s';
+                else
+                    time_format = '%.4f';
                 end
                 
                 % Print
-                fprintf(['%s, %s, ' dim_format ', ' time_format '\n'], obj.Fullpath, dt, dim, time);
+                fprintf(['%s, %s, ' dim_format ', ' time_format '\n'], obj.Fullpath, dt, dim, time_i);
                 
             % Multiple ports
             else
                 fprintf('%s \n', obj.Fullpath);
                 
                 if nIn > 0
-                    fprintf('\t\tIn: ');
+                    fprintf('\t\tIn:  ');
                     for i = 1:nIn
-                        dt_i  = dt.Inport(i,:);
-                        dim_i = dim.Inport(i);
+                        % Account for data that is empty or in an array
+                        if isempty(dt.Inport)
+                            dt_i = 'N/A';
+                        else
+                            dt_i  = dt.Inport(i,:);
+                        end
+
+                        if isempty(dim.Inport)
+                            dim_i = 'N/A';
+                        else
+                            dim_i = dim.Inport(i);
+                        end
+
+                        if isempty(time)
+                            time_i = 'N/A';
+                        elseif size(time,1) > 1 || size(time,2) > 1 % Non-scalar
+                            time_i = char(strjoin(string(time), ', ')); 
+                            time_i = ['[' time_i ']'];
+                        else
+                            time_i = time;
+                        end   
                         
                         % Separate from previous port
                         if i ~= 1
                             fprintf('; ');
                         end
-                       
+                        if nIn > 4 && i > 1
+                            fprintf('\n\t\t    ');
+                        end
+                        
                         % Account for different formatting                
-                        dim_format = '%i';
                         if ischar(dim_i)
                             dim_format = '%s';
+                        else
+                            dim_format = '%i';
                         end
                         
                         time_format = '%.4f';
-                        if rem(abs(time), 1) == 0
+                        if isnumeric(time_i) && rem(abs(time_i), 1) == 0
                             time_format = '%i';
-                        elseif ischar(time)
+                        elseif ischar(time_i)
                             time_format = '%s';
+                        else
+                            time_format = '%.4f';
                         end
                         
                         % Print
-                        fprintf(['%s, ' dim_format ', ' time_format], dt_i, dim_i, time);
+                        fprintf(['%s, ' dim_format ', ' time_format], dt_i, dim_i, time_i);
                     end
                 end
                 
@@ -162,29 +212,53 @@ classdef InterfaceItem
                     end
                     fprintf('\t\tOut: ');
                     for i = 1:nOut
-                        dt_i  = dt.Outport(i,:);
-                        dim_i = dim.Outport(i);
-                        
+                        % Account for data that is empty or in an array
+                        if isempty(dt.Outport)
+                            dt_i = 'N/A';
+                        else
+                            dt_i  = dt.Outport(i,:);
+                        end
+
+                        if isempty(dim.Outport)
+                            dim_i = 'N/A';
+                        else
+                            dim_i = dim.Outport(i);
+                        end
+
+                        if isempty(time)
+                            time_i = 'N/A';
+                        elseif size(time,1) > 1 || size(time,2) > 1 % Non-scalar
+                            time_i = char(strjoin(string(time), ', ')); 
+                            time_i = ['[' time_i ']'];
+                        else
+                            time_i = time;
+                        end   
+
                         % Separate from previous port
                         if i ~= 1
                             fprintf('; ');
                         end
+                        if nIn > 4 && i > 1
+                            fprintf('\n\t\t     ');
+                        end
                        
                         % Account for different formatting                
-                        dim_format = '%i';
                         if ischar(dim_i)
                             dim_format = '%s';
+                        else
+                            dim_format = '%i';
                         end
                         
-                        time_format = '%.4f';
-                        if rem(abs(time), 1) == 0
+                        if isnumeric(time_i) && rem(abs(time_i), 1) == 0
                             time_format = '%i';
-                        elseif ischar(time)
+                        elseif ischar(time_i)
                             time_format = '%s';
+                        else
+                            time_format = '%.4f';
                         end
                         
                         % Print
-                        fprintf(['%s, ' dim_format ', ' time_format], dt_i, dim_i, time);
+                        fprintf(['%s, ' dim_format ', ' time_format], dt_i, dim_i, time_i);
                     end
                     fprintf('\n');                    
                 end

@@ -572,7 +572,8 @@ classdef Interface
             %   Inputs:
             %       obj         Interface object.
             %       varargin    Parameter, Value pairs:   
-            %          'View'   'Developer' or 'Client' view.            %
+            %          'View'   'Developer' or 'Client' view.
+            %
             %   Outputs:
             %       obj         Interface object.
             
@@ -596,7 +597,7 @@ classdef Interface
             modelBounds = bounds_of_sim_objects(modelBlocks);
             
             % Spacing constants
-            SPACEBETWEEN_ModelAndInterface = 100;
+            SPACEBETWEEN_ModelAndInterface = 150;
             SPACEAFTER_Block = 30;
             SPACEAFTER_Header = 10;
             SPACEAFTER_MainHeader = 4;
@@ -1218,7 +1219,7 @@ classdef Interface
                     
                     ports = get_param(block, 'Ports');
                     if ports(1) > 1 || ports(2) > 1
-                        adjustHeight(block, 'PortParams', {'ConnectionType', {'Inport','Outport'}, 'Method', 'SumMax', 'HeightPerPort', 30});
+                        adjustHeight(block, 'PortParams', {'ConnectionType', {'Inport','Outport'}, 'Method', 'Compact', 'HeightPerPort', 40});
                     end
                 end
             end

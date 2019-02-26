@@ -1,0 +1,66 @@
+.../tools/Simulink/Tools/Utility/
+    BackwardsCompatability/
+        any2.m
+        contains2.m
+        
+	Bounds/
+		bounds_of_sim_objects.m
+        separate_objects_by_type.m
+
+	DataflowTracing/
+        findPortDataTypes.m
+        getConnectedPorts.m
+        getDataType.m
+		getDstPorts.m
+		getDsts.m
+		getPorts.m
+		getSrcPorts.m
+		getSrcs.m
+        inoutblock2subport.m
+        subport2inoutblock.m
+        
+	FindingConnectedBlocks/
+		findDataStoreMemory.m
+		findFromsInScope.m
+		findGotoFromsInScope.m
+		findGotosInScope.m
+		findReadsInScope.m
+		findReadWritesInScope.m
+		findVisibilityTag.m
+		findWritesInScope.m
+
+     GetCurrentFunctions/
+		gcbs.m
+        
+	InputHandling/
+		inputToNumeric.m
+        inputToCell.m
+        inputToNumeric.m
+        
+    PositionUtil/
+		adjustHeight.m
+		adjustHeightForConnectedBlocks.m
+		adjustWidth.m
+		alignBlocksInColumn.m
+		getBlockWidth.m
+		move_block.m
+		shiftBlocks.m
+		Alignment/
+			moveToConnectedPort.m 
+        
+	TextDimensions/
+		blockStringDims.m
+		getBlockTextWidth.m
+		getTextDims.m
+        
+    find_in_models.m
+    fulfillPorts.m
+	getDepthFromSys.m
+    getDepthFromSystem.m
+    getParentSystem.m
+    new_system_makenameunique.m
+    replaceNewline.m
+.../tools/Simulink/Tools/LineToGotoFrom
+    src/
+        getLine2GotoConfig.m
+        line2Goto.m

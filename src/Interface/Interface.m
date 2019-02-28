@@ -1044,7 +1044,13 @@ classdef Interface
             set_param(obj.ModelName, 'Zoomfactor', 'FitSystem');
         end
         function obj = delete(obj, varargin)
-            % Delete interface in the model
+            % DELETE Remove the interface model representation (blocks, headings).
+            %
+            %   Inputs:
+            %       obj         Interface object.
+            %
+            %   Outputs:
+            %       obj         Interface object.
             
             if isempty(obj.ModelName)
                 error('Interface has no model.');
@@ -1053,6 +1059,7 @@ classdef Interface
                 return
             end
             
+            % Remove headings
             obj.InputHeader = delete(obj.InputHeader);
             obj.InportHeader = delete(obj.InportHeader);
             obj.FromFileHeader = delete(obj.FromFileHeader);
@@ -1070,6 +1077,7 @@ classdef Interface
             obj.ExportHeader = delete(obj.ExportHeader);
             obj.FunctionHeader = delete(obj.FunctionHeader);            
             
+            % Remove blocks
             for a = 1:length(obj.Inport)                    
                 obj.Inport(a) = deleteFromModel(obj.Inport(a));
             end

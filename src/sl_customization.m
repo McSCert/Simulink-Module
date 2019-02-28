@@ -12,8 +12,7 @@ function schemaFcns = getSLFcnTool(callbackInfo)
     if isempty(gcbs)
         schemaFcns{end+1} = @FcnCreatorSchema;
         schemaFcns{end+1} = @GuidelineSchema;
-        schemaFcns{end+1} = @ModelInterfaceSchema;
-        schemaFcns{end+1} = @PrintInterfaceSchema;
+        schemaFcns{end+1} = @InterfaceSchema;
     elseif any(selectedFcns) && ~isempty(gcbs)
         schemaFcns{end+1} = @ChangeFcnScopeSchema;
         schemaFcns{end+1} = @FcnCreatorLocalSchema;
@@ -224,22 +223,29 @@ function CheckGuidelines(callbackInfo)
 end
 
 %% Define menu: Model Interface
+function schema = InterfaceSchema(callbackInfo)
+    schema = sl_container_schema;
+    schema.label = 'Interface';
+    schema.ChildrenFcns = {@ModelInterfaceSchema, @PrintInterfaceSchema, @deleteInterface};
+end
+
 function schema = ModelInterfaceSchema(callbackInfo)
     schema = sl_container_schema;
     schema.label = 'Show Interface';
-    schema.ChildrenFcns = {@showUserInterface, @showDeveloperInterface};
+    schema.ChildrenFcns = {@showClientInterface, @showDeveloperInterface};
 end
 
-function schema = showUserInterface(callbackInfo)
+function schema = showClientInterface(callbackInfo)
     schema = sl_action_schema;
     schema.label =  'Client';
-    schema.userdata = 'ShowUserInterface';
-    schema.callback = @showUserInterfaceCallback;
+    schema.userdata = 'ShowClientInterface';
+    schema.callback = @showClientInterfaceCallback;
 end
 
-function showUserInterfaceCallback(callbackInfo)
+function showClientInterfaceCallback(callbackInfo)
     sys = bdroot(gcs);
     objName = [sys '_InterfaceObject'];
+    eval(['global ' objName ';']);
     eval([objName ' = Interface(sys);']);
     eval([objName ' = ' objName '.model(''View'', ''Client'');']);   
 end
@@ -254,6 +260,7 @@ end
 function showDeveloperInterfaceCallback(callbackInfo)
     sys = bdroot(gcs);
     objName = [sys '_InterfaceObject'];  
+    eval(['global ' objName ';']);
     eval([objName ' = Interface(sys);']);
     eval([objName ' = ' objName '.model(''View'', ''Developer'');']);   
 end
@@ -262,16 +269,16 @@ end
 function schema = PrintInterfaceSchema(callbackInfo)
     schema = sl_container_schema;
     schema.label = 'Print Interface';
-    schema.ChildrenFcns = {@printUserInterface, @printDeveloperInterface};
+    schema.ChildrenFcns = {@printClientInterface, @printDeveloperInterface};
 end
-function schema = printUserInterface(callbackInfo)
+function schema = printClientInterface(callbackInfo)
     schema = sl_action_schema;
     schema.label = 'Client';
-    schema.userdata = 'PrintUserInterface';
-    schema.callback = @printUserInterfaceCallback;
+    schema.userdata = 'PrintClientInterface';
+    schema.callback = @printClientInterfaceCallback;
 end
 
-function printUserInterfaceCallback(callbackInfo)
+function printClientInterfaceCallback(callbackInfo)
     sys = bdroot(gcs);
     objName = [sys '_InterfaceObject'];
     eval([objName ' = Interface(sys);']);
@@ -290,20 +297,27 @@ function printDeveloperInterfaceCallback(callbackInfo)
     objName = [sys '_InterfaceObject'];
     eval([objName ' = Interface(sys);']);
     eval([objName '.print(''View'', ''Developer'');']);  
+end
+
+%% Delete Interface
+function schema = deleteInterface(callbackInfo)
+    schema = sl_action_schema;
+    schema.label = 'Delete';
+    schema.userdata = 'DeleteInterface';
+    schema.callback = @deleteInterfaceCallback;    
+end
+
+function deleteInterfaceCallback(callbackInfo)
+% Check if interface object already exists for this model
+
+    sys = bdroot(gcs);
+    objName = [sys '_InterfaceObject'];
+    eval(['global ' objName ';']);
+    eval(['notempty_obj = ~isempty(' objName ');']);
     
-    % Check if interface object already exists for this model
-%     eval(['global ' objName ';']);
-%     eval(['notempty_obj = ~isempty(' objName ');']);
-%     
-%     if notempty_obj
-%         eval(['this_sys = strcmp(get_param(sys, ''name''), ' objName '.ModelName);'])
-%         if this_sys
-%             % don't recreate it because it already exists
-%         else
-%             eval([objName ' = Interface(sys);']);
-%         end
-%     else
-%         eval([objName ' = Interface(sys);']);
-%     end
-%     
+    if notempty_obj
+        eval([objName ' = delete(' objName ');']);
+    else
+        warning('No interface representation is present in the moodel.');
+    end
 end

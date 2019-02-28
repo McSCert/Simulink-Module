@@ -264,7 +264,27 @@ classdef InterfaceItem
                 end
             end
         end
-    end
+        function obj = deleteFromModel(obj)
+            % DELETEFROMMODEL Delete the representation of the item in the
+            % model.
+            if any2(strcmp(obj.BlockType, {'Inport', 'Outport'}))
+                obj = deleteGrndTrm(obj);
+                % Move inport/outport back
+                moveToConnectedPort(obj.InterfaceHandle, 30);
+                redraw_block_lines(obj.InterfaceHandle, 'AutoRouting', 'smart');
+            else
+                try
+                    delete(obj.InterfaceHandle);
+                    obj = deleteGrndTrm(obj);
+                catch ME % Already deleted
+                    if ~strcmp(ME.identifier, 'MATLAB:hg:udd_interface:CannotDelete')
+                        rethrow(ME)
+                    end
+                end
+            end
+            obj.InterfaceHandle = [];
+        end
+    end 
     methods (Access = private)
         function obj = autoGetData(obj)
         % AUTOGETDATA Automatically populate the item's fields based on the model.
@@ -299,6 +319,38 @@ classdef InterfaceItem
             
             % INTERFACEHANDLE
             % Added when the interface is modeled only.
+        end
+        function obj = deleteGrndTrm(obj)
+        % DELETEGRNDTRM Delete the ground and terminator elements with their
+        %   lines.
+            for i = 1:length(obj.GroundHandle)
+                g = obj.GroundHandle(i);
+                if ishandle(g)
+                    if strcmp(obj.BlockType, 'Outport')
+                        goto2Line(bdroot(obj.Fullpath), obj.GroundHandle);
+                    else
+                        lines = get_param(g, 'LineHandles');
+                        delete(lines.Outport);
+                        delete(g);
+                    end                    
+                end
+            end
+            obj.GroundHandle = [];
+            
+            for j = 1:length(obj.TerminatorHandle)
+                t = obj.TerminatorHandle(j);
+                if ishandle(t)
+                                        
+                    if strcmp(obj.BlockType, 'Inport')
+                        goto2Line(bdroot(obj.Fullpath), obj.TerminatorHandle);
+                    else
+                        lines = get_param(t, 'LineHandles');
+                        delete(lines.Inport);
+                        delete(t);
+                    end   
+                end
+            end
+            obj.TerminatorHandle = [];
         end
     end
 end

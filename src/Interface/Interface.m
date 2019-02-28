@@ -1,4 +1,5 @@
 classdef Interface
+% INTERFACE A representation of a Simulink model interface.
     properties
         ModelName
         
@@ -120,7 +121,7 @@ classdef Interface
             %
             %   Inputs:
             %       obj      Interface object.
-            %       varargin Part of the interface: 
+            %       varargin Part of the interface to check if empty: 
             %                ['Input' | 'Import' | 'Output' | 'Export']
             %
             %   Outputs:
@@ -613,7 +614,7 @@ classdef Interface
                 for a = 1:length(obj.Inport)
                     obj.Inport(a).InterfaceHandle = get_param(obj.Inport(a).Fullpath, 'Handle');
                     
-                    % Convert line(s) to goto/from connection
+                    % Convert lines to goto/from connections
                     lines = get_param(obj.Inport(a).Handle, 'LineHandles');
                     lines = lines.Outport;
                     tag = ['Goto_' obj.Inport(a).Name];
@@ -1040,6 +1041,84 @@ classdef Interface
             shiftBlocks(interfaceBlocks, [shift 0 shift 0]);
 
             % Re-adjust the zoom so we can see the whole interface
+            set_param(obj.ModelName, 'Zoomfactor', 'FitSystem');
+        end
+        function obj = delete(obj, varargin)
+            % Delete interface in the model
+            
+            if isempty(obj.ModelName)
+                error('Interface has no model.');
+            elseif isempty(obj)
+                warning('No elements on the interface.');
+                return
+            end
+            
+            obj.InputHeader = delete(obj.InputHeader);
+            obj.InportHeader = delete(obj.InportHeader);
+            obj.FromFileHeader = delete(obj.FromFileHeader);
+            obj.FromWorkspaceHeader = delete(obj.FromWorkspaceHeader);
+            obj.FromSpreadsheetHeader = delete(obj.FromSpreadsheetHeader);
+            obj.DataStoreReadHeader = delete(obj.DataStoreReadHeader);
+            obj.ImportHeader = delete(obj.ImportHeader);
+            obj.ModelReferenceHeader = delete(obj.ModelReferenceHeader);
+            obj.LibraryLinkHeader = delete(obj.LibraryLinkHeader);
+            obj.OutputHeader = delete(obj.OutputHeader);
+            obj.OutportHeader = delete(obj.OutportHeader);
+            obj.ToFileHeader = delete(obj.ToFileHeader);
+            obj.ToWorkspaceHeader = delete(obj.ToWorkspaceHeader);
+            obj.DataStoreWriteHeader = delete(obj.DataStoreWriteHeader);
+            obj.ExportHeader = delete(obj.ExportHeader);
+            obj.FunctionHeader = delete(obj.FunctionHeader);            
+            
+            for a = 1:length(obj.Inport)                    
+                obj.Inport(a) = deleteFromModel(obj.Inport(a));
+            end
+            
+            for b = 1:length(obj.FromFile)
+                obj.FromFile(b) = deleteFromModel(obj.FromFile(b));
+            end
+            
+            for c = 1:length(obj.FromSpreadsheet)
+                obj.FromSpreadsheet(c) = deleteFromModel(obj.FromSpreadsheet(c));
+            end
+
+            for d = 1:length(obj.FromWorkspace)
+                obj.FromWorkspace(d) = deleteFromModel(obj.FromWorkspace(d));
+            end
+
+            for e = 1:length(obj.DataStoreRead)
+                obj.DataStoreRead(e) = deleteFromModel(obj.DataStoreRead(e));
+            end
+            
+            for f = 1:length(obj.ModelReference)
+                obj.ModelReference(f) = deleteFromModel(obj.ModelReference(f));
+            end
+            
+            for g = 1:length(obj.LibraryLink)
+                obj.LibraryLink(g) = deleteFromModel(obj.LibraryLink(g));
+            end
+            
+            for h = 1:length(obj.Outport)
+                obj.Outport(h) = deleteFromModel(obj.Outport(h));
+            end
+            
+            for i = 1:length(obj.ToFile)
+                obj.ToFile(i) = deleteFromModel(obj.ToFile(i));
+            end
+            
+            for j = 1:length(obj.ToWorkspace)
+                obj.ToWorkspace(j) = deleteFromModel(obj.ToWorkspace(j));
+            end
+            
+            for k = 1:length(obj.DataStoreWrite)
+                obj.DataStoreWrite(k) = deleteFromModel(obj.DataStoreWrite(k));
+            end
+            
+            for l = 1:length(obj.Function)
+                obj.Function(l) = deleteFromModel(obj.Function(l));
+            end
+            
+            % Re-adjust the zoom
             set_param(obj.ModelName, 'Zoomfactor', 'FitSystem');
         end
         function iter = createIterator(obj)

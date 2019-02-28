@@ -36,6 +36,9 @@
 		inputToNumeric.m
         inputToCell.m
         inputToNumeric.m
+
+    LineRouting/
+        redraw_block_lines.m
         
     PositionUtil/
 		adjustHeight.m
@@ -60,7 +63,9 @@
     getParentSystem.m
     new_system_makenameunique.m
     replaceNewline.m
+
 .../tools/Simulink/Tools/LineToGotoFrom
     src/
         getLine2GotoConfig.m
         line2Goto.m
+        goto2Line.m

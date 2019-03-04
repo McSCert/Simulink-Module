@@ -50,8 +50,6 @@ function types = getDataType_MJ(blocks)
             if any(idx)
                 match = workspaceData(idx);
                 types{i}.Inport = match.class;
-            else
-                types{i}.Inport = get_param(gcb, 'OutDataTypeStr');
             end
             
         elseif strcmp(blockTypes{i}, 'FromWorkspace')
@@ -61,7 +59,7 @@ function types = getDataType_MJ(blocks)
                 match = workspaceData(idx);
                 types{i}.Outport = match.class;
             else
-                types{i}.Outport = get_param(gcb, 'OutDataTypeStr');
+                types{i}.Outport = get_param(b, 'OutDataTypeStr');
             end
             
         elseif strcmp(blockTypes{i}, {'DataStoreRead'})

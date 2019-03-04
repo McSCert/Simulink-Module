@@ -1,6 +1,7 @@
 %% Register custom menu function to beginning of Simulink Editor's context menu
 function sl_customization(cm)
 	cm.addCustomMenuFcn('Simulink:PreContextMenu', @getSLFcnTool);
+    cm.addCustomFilterFcn('Tool:Delete', @deleteFilter);
 end
 
 %% Define custom menu function: Changing Scope
@@ -247,8 +248,7 @@ function showClientInterfaceCallback(callbackInfo)
     objName = [sys '_InterfaceObject'];
     eval(['global ' objName ';']);
     
-    eval(['notempty_obj = ~isempty(' objName ');']);
-    if notempty_obj
+    if interface_exists(sys)
        warning('Interface already exists.'); 
     end
     
@@ -268,8 +268,7 @@ function showDeveloperInterfaceCallback(callbackInfo)
     objName = [sys '_InterfaceObject'];
     eval(['global ' objName ';']);
     
-    eval(['notempty_obj = ~isempty(' objName ');']);
-    if notempty_obj
+    if interface_exists(sys)
        warning('Interface already exists.'); 
     end
     
@@ -314,23 +313,42 @@ end
 %% Delete Interface
 function schema = deleteInterface(callbackInfo)
     schema = sl_action_schema;
+    schema.tag = 'Tool:Delete';
     schema.label = 'Delete';
     schema.userdata = 'DeleteInterface';
     schema.callback = @deleteInterfaceCallback;    
 end
 
 function deleteInterfaceCallback(callbackInfo)
-% Check if interface object already exists for this model
-
     sys = bdroot(gcs);
     objName = [sys '_InterfaceObject'];
     eval(['global ' objName ';']);
-    eval(['notempty_obj = ~isempty(' objName ');']);
     
-    if notempty_obj
+    if interface_exists(sys)
         eval([objName ' = delete(' objName ');']);
         eval(['clear global ' objName ';']);
     else
         warning('No interface representation is present in the moodel.');
+    end
+end
+
+function state = deleteFilter(callbackInfo)
+    % DELETEFILTER Determine whether to enable/disable the delete menu option.
+    if interface_exists(bdroot(gcs))
+        state = 'Enabled';
+    else
+        state = 'Disabled';
+    end
+end
+
+function e = interface_exists(sys)
+    % INTERFACE_EXISTS Determine if there exists an interface object for a model.
+    objName = [sys '_InterfaceObject'];
+    eval(['global ' objName ';']);
+    eval(['notempty_obj = ~isempty(' objName ');']); 
+    if notempty_obj
+        e = true;
+    else
+        e = false;
     end
 end

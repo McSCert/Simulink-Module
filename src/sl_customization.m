@@ -246,6 +246,12 @@ function showClientInterfaceCallback(callbackInfo)
     sys = bdroot(gcs);
     objName = [sys '_InterfaceObject'];
     eval(['global ' objName ';']);
+    
+    eval(['notempty_obj = ~isempty(' objName ');']);
+    if notempty_obj
+       warning('Interface already exists.'); 
+    end
+    
     eval([objName ' = Interface(sys);']);
     eval([objName ' = ' objName '.model(''View'', ''Client'');']);   
 end
@@ -259,8 +265,14 @@ end
 
 function showDeveloperInterfaceCallback(callbackInfo)
     sys = bdroot(gcs);
-    objName = [sys '_InterfaceObject'];  
+    objName = [sys '_InterfaceObject'];
     eval(['global ' objName ';']);
+    
+    eval(['notempty_obj = ~isempty(' objName ');']);
+    if notempty_obj
+       warning('Interface already exists.'); 
+    end
+    
     eval([objName ' = Interface(sys);']);
     eval([objName ' = ' objName '.model(''View'', ''Developer'');']);   
 end
@@ -317,6 +329,7 @@ function deleteInterfaceCallback(callbackInfo)
     
     if notempty_obj
         eval([objName ' = delete(' objName ');']);
+        eval(['clear global ' objName ';']);
     else
         warning('No interface representation is present in the moodel.');
     end

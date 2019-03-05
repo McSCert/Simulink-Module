@@ -253,7 +253,9 @@ function showClientInterfaceCallback(callbackInfo)
     end
     
     eval([objName ' = Interface(sys);']);
-    eval([objName ' = ' objName '.model(''View'', ''Client'');']);   
+    eval([objName ' = ' objName '.model(''View'', ''Client'');']);
+    
+    garbageCollection();
 end
 
 function schema = showDeveloperInterface(callbackInfo)
@@ -273,7 +275,9 @@ function showDeveloperInterfaceCallback(callbackInfo)
     end
     
     eval([objName ' = Interface(sys);']);
-    eval([objName ' = ' objName '.model(''View'', ''Developer'');']);   
+    eval([objName ' = ' objName '.model(''View'', ''Developer'');']);  
+    
+    garbageCollection();
 end
 
 %% Define menu: Print Interface
@@ -293,7 +297,9 @@ function printClientInterfaceCallback(callbackInfo)
     sys = bdroot(gcs);
     objName = [sys '_InterfaceObject'];
     eval([objName ' = Interface(sys);']);
-    eval([objName '.print(''View'', ''Client'');']);  
+    eval([objName '.print(''View'', ''Client'');']);
+    
+    garbageCollection();
 end
 
 function schema = printDeveloperInterface(callbackInfo)
@@ -308,6 +314,8 @@ function printDeveloperInterfaceCallback(callbackInfo)
     objName = [sys '_InterfaceObject'];
     eval([objName ' = Interface(sys);']);
     eval([objName '.print(''View'', ''Developer'');']);  
+    
+    garbageCollection();
 end
 
 %% Delete Interface
@@ -330,6 +338,8 @@ function deleteInterfaceCallback(callbackInfo)
     else
         warning('No interface representation is present in the moodel.');
     end
+    
+    garbageCollection();
 end
 
 function state = deleteFilter(callbackInfo)
@@ -350,5 +360,33 @@ function e = interface_exists(sys)
         e = true;
     else
         e = false;
+    end
+end
+
+%% Garbage collection for objects
+function garbageCollection()
+    globals = who('global');
+    
+    suffix = 'InterfaceObject';
+    suffixLen = length(suffix) + 1;
+    
+    sysAll = cellfun(@(x) x(1:end-suffixLen), globals, 'un', 0);
+    sysOpen = find_system('SearchDepth', 0);
+    sysDelete = ~ismember(sysAll, sysOpen);
+    
+    for i = 1:length(globals)
+        if sysDelete(i)
+            isInterfaceName = ~isempty(strfind(globals{i}, suffix));
+            if isInterfaceName
+                eval(['global ' globals{i} ';'])
+                eval(['x =~ isempty(' globals{i} ');']);
+                if x
+                    %eval(['y =~ isvalid(' globals{i} ');']);
+                    %if y
+                        eval([globals{i} '.delete;']);
+                    %end
+                end
+            end
+        end
     end
 end

@@ -1,7 +1,6 @@
 %% Register custom menu function to beginning of Simulink Editor's context menu
 function sl_customization(cm)
 	cm.addCustomMenuFcn('Simulink:PreContextMenu', @getSLFcnTool);
-    cm.addCustomFilterFcn('Tool:Delete', @deleteFilter);
 end
 
 %% Define custom menu function: Changing Scope
@@ -321,10 +320,16 @@ end
 %% Delete Interface
 function schema = deleteInterface(callbackInfo)
     schema = sl_action_schema;
-    schema.tag = 'Tool:Delete';
     schema.label = 'Delete';
     schema.userdata = 'DeleteInterface';
-    schema.callback = @deleteInterfaceCallback;    
+    schema.callback = @deleteInterfaceCallback;
+    
+    % Hide the delete option when there is nothing to delete
+    if interface_exists(bdroot(gcs))
+        schema.state = 'Enabled';
+    else
+        schema.state = 'Disabled';
+    end
 end
 
 function deleteInterfaceCallback(callbackInfo)
@@ -340,15 +345,6 @@ function deleteInterfaceCallback(callbackInfo)
     end
     
     garbageCollection();
-end
-
-function state = deleteFilter(callbackInfo)
-    % DELETEFILTER Determine whether to enable/disable the delete menu option.
-    if interface_exists(bdroot(gcs))
-        state = 'Enabled';
-    else
-        state = 'Disabled';
-    end
 end
 
 function e = interface_exists(sys)

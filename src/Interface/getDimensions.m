@@ -61,7 +61,7 @@ function dims = getDimensions(blocks)
             
         elseif strcmp(blockTypes{i}, 'FromSpreadsheet')
             % Only one dimensional signals are supported
-            dims{i}.Outport = ones(1, length(get_param(gcb, 'PortConnectivity')));
+            dims{i}.Outport = ones(1, length(get_param(b, 'PortConnectivity')));
              
         elseif strcmp(blockTypes{i}, 'ToWorkspace')
             workspaceData = evalin('base', 'whos');

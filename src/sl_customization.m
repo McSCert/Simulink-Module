@@ -230,9 +230,11 @@ function schema = InterfaceSchema(callbackInfo)
 end
 
 function schema = ModelInterfaceSchema(callbackInfo)
-    schema = sl_container_schema;
+    schema = sl_action_schema;
+    %schema = sl_container_schema;
     schema.label = 'Show Interface';
-    schema.ChildrenFcns = {@showClientInterface, @showDeveloperInterface};
+    %schema.ChildrenFcns = {@showClientInterface, @showDeveloperInterface};
+    schema.callback = @showClientInterfaceCallback;
 end
 
 function schema = showClientInterface(callbackInfo)
@@ -281,9 +283,11 @@ end
 
 %% Define menu: Print Interface
 function schema = PrintInterfaceSchema(callbackInfo)
-    schema = sl_container_schema;
+    schema = sl_action_schema;
+    %schema = sl_container_schema;
     schema.label = 'Print Interface';
-    schema.ChildrenFcns = {@printClientInterface, @printDeveloperInterface};
+    %schema.ChildrenFcns = {@printClientInterface, @printDeveloperInterface};
+    schema.callback = @printClientInterfaceCallback;
 end
 function schema = printClientInterface(callbackInfo)
     schema = sl_action_schema;

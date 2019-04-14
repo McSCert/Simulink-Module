@@ -226,7 +226,7 @@ end
 function schema = InterfaceSchema(callbackInfo)
     schema = sl_container_schema;
     schema.label = 'Interface';
-    schema.ChildrenFcns = {@ModelInterfaceSchema, @PrintInterfaceSchema, @deleteInterface};
+    schema.ChildrenFcns = {@ModelInterfaceSchema, @PrintInterfaceSchema, @DeleteInterface, @PrintDependencies};
 end
 
 function schema = ModelInterfaceSchema(callbackInfo)
@@ -322,9 +322,9 @@ function printDeveloperInterfaceCallback(callbackInfo)
 end
 
 %% Delete Interface
-function schema = deleteInterface(callbackInfo)
+function schema = DeleteInterface(callbackInfo)
     schema = sl_action_schema;
-    schema.label = 'Delete';
+    schema.label = 'Delete Interface';
     schema.userdata = 'DeleteInterface';
     schema.callback = @deleteInterfaceCallback;
     
@@ -361,6 +361,19 @@ function e = interface_exists(sys)
     else
         e = false;
     end
+end
+
+%% Print dependencies
+function schema = PrintDependencies(callbackInfo)
+    schema = sl_action_schema;
+    schema.label = 'Print Dependencies';
+    schema.userdata = 'PrintDependencies';
+    schema.callback = @printDependenciesCallback;
+end
+
+function printDependenciesCallback(callbackInfo)
+    sys = bdroot(gcs);
+    dependencies(sys);
 end
 
 %% Garbage collection for objects

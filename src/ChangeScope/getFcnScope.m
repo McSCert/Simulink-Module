@@ -1,6 +1,7 @@
 function visibility = getFcnScope(blocks)
 % GETFCNSCOPE Get a Simulink Function's scope, considering its Visibility Parameter
-%   and placement in the model.
+%   and placement in the model. This parameter does not exist prior to
+%   2017b. 
 %
 %   Inputs:
 %       blocks      Block path names or handles.
@@ -25,7 +26,7 @@ function visibility = getFcnScope(blocks)
             visibilityOfPort = get_param(triggerPort{1}, 'FunctionVisibility');
         catch
             % Either not a Simulink Function, or earlier versions of
-            % Simulink Functions (e.g. 2014b) do not have this parameter
+            % Simulink Functions (previous to 2017b) do not have this parameter
             visibility{i} = '';
             continue
         end

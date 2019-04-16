@@ -1,10 +1,15 @@
 classdef Interface
 % INTERFACE A representation of a Simulink model interface.
+%
+%   Note: This class will not work with versions earlier than R2016a, due to 
+%   the use of "Property Restriction Syntax". See the Matlab Object-Oriented
+%   Programming guide.
+
     properties
         ModelName
         
         % INPUTS
-        Inport          InterfaceItem
+        Inport          InterfaceItem  
         FromFile        InterfaceItem
         FromWorkspace   InterfaceItem
         FromSpreadsheet InterfaceItem

@@ -20,10 +20,14 @@ function dependencies(sys)
     end
     
     % Data Dictionary
-    dd = get_param(sys, 'DataDictionary');
-    if isempty(dd)
+    try
+        dd = get_param(sys, 'DataDictionary');
+        if isempty(dd)
+            dd = 'N/A';
+        end
+    catch % Parameter does not exists in earlier versions
         dd = 'N/A';
-    end    
+    end
 
     % Print
     fprintf('Model References\n');

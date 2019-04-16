@@ -1,6 +1,6 @@
 function [fcns, prototype] = getCallableFunctions(sys)
-% GETCALLABLEFUNCTIONS For some system, find what functions are availble to
-%   call and how to call them (e.g. if a qualifier is necessary).
+% GETCALLABLEFUNCTIONS For some system, find which functions are availble to
+%   call and how to call them (e.g., if a qualifier is necessary).
 %
 %   How is this different than the Prototype drop-down list in the Function Caller block?
 %   The list provided by the Function Caller block does not consider restrictions 
@@ -10,7 +10,7 @@ function [fcns, prototype] = getCallableFunctions(sys)
 %       sys             Subsystem path name or handle.
 %
 %   Outputs:
-%       simFcns         Cell array of path names.
+%       fcns            Cell array of path names.
 %       prototype       Prototye for calling simFcns from sys.
 
     [f1, p1] = getFcns(sys);
@@ -20,12 +20,12 @@ function [fcns, prototype] = getCallableFunctions(sys)
 end
 
 function [fcns, prototype] = getFcns(sys)
-% GETFCNS Find functions in this model that can be called from a subsystem.
+% GETFCNS Find Simulink Functions in this model that can be called from a subsystem.
 %   Inputs:
 %       sys             Subsystem path name or handle.
 %
 %   Outputs:
-%       simFcns         Cell array of path names.
+%       fcns            Cell array of path names.
 %       prototype       Prototye for calling simFcns from sys.
 
     fcns = {};

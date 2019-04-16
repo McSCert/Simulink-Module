@@ -4,7 +4,7 @@ function setFcnScope(blocks, scope, subsystem)
 %
 %   Inputs:
 %       blocks      Block path names or handles.
-%       visibility  Scope.Global(0), Scope.Scoped(1), or Scope.Local(2).
+%       scope       Scope.Global(0), Scope.Scoped(1), or Scope.Local(2).
 %       subsystem   For a Local function, the path of the existing subsystem to
 %                   move it to. [Optional]
 %

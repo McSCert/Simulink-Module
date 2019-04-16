@@ -3,7 +3,7 @@ function [in, out] = getFcnArgsType(fcn)
 %   i.e., any ArgIn or ArgOut blocks.
 %
 %   Inputs:
-%       fcn    Simulink function path name or handle.
+%       fcn    Simulink Function path name or handle.
 %
 %   Outputs:
 %       in     Data types of ArgIn blocks.

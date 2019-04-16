@@ -1,5 +1,5 @@
 function [isAtomic, sysAtomic] = inAtomicSubsystem(block)
-% Determine if the block is contained in an atomic subsystem.
+% ISATOMICSUBSYSTEM Determine if the block is contained in an atomic subsystem.
 %
 %   Inputs:
 %       block      Block name.

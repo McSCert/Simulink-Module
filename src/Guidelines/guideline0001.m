@@ -8,7 +8,7 @@ function [blocks, location] = guideline0001(model)
 %       model   Simulink model name.
 %
 %   Outputs:
-%       blocks  Simulink function block fullnames.
+%       blocks  Simulink Function block fullnames.
 
     % Get the model
     try

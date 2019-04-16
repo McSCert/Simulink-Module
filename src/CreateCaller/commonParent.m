@@ -1,4 +1,4 @@
-function path1 = commonParent(sys1, sys2)
+function path = commonParent(sys1, sys2)
 % COMMONPARENT Find the first (top-most) common parent between two blocks.
 %
 %   Inputs:
@@ -30,5 +30,5 @@ function path1 = commonParent(sys1, sys2)
             break;
         end
     end
-    path1 = commonPath;
+    path = commonPath;
 end

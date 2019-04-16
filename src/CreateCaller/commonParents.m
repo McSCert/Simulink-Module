@@ -1,5 +1,5 @@
 function path = commonParents(varargin)
-% COMMONPARENT Find the first (top-most) common parent between two or more blocks
+% COMMONPARENTS Find the first (top-most) common parent between two or more blocks
 %	in the same model. This is done by comparing each element in the path, 
 %   starting at the root, and stopping when they are no longer the same.
 %

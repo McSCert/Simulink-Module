@@ -6,8 +6,8 @@ function b = inParentDescendants(sys, block)
 %       sys     System path name.
 %       block   Name of block.
 %
-%   Outputs:System containing block.
-%       sys2    
+%   Outputs:
+%       b       System containing block.
 
     sys2 = get_param(block, 'Parent'); % Get system where block is located
     

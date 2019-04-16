@@ -3,11 +3,11 @@ function [in, out] = getFcnArgsDim(fcn)
 %   i.e., any ArgIn or ArgOut blocks.
 %
 %   Inputs:
-%       fcn    Simulink function path name or handle.
+%       fcn    Simulink Function path name or handle.
 %
 %   Outputs:
-%       in     Data types of ArgIn blocks.
-%       out    Data types of ArgOut blocks.
+%       in     Dimensions of ArgIn blocks.
+%       out    Dimensions of ArgOut blocks.
 
     fcn = inputToCell(fcn);
     

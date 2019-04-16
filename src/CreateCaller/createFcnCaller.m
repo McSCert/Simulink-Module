@@ -1,5 +1,5 @@
 function caller = createFcnCaller(sys, blockPath, varargin)
-% CREATECALLER Create a function caller block for a Simulink function, 
+% CREATEFCNCALLER Create a function caller block for a Simulink function, 
 %   anywhere in the model or parent hierarchy, with the prototype and the input/output  
 %   argument specifications populated.
 %

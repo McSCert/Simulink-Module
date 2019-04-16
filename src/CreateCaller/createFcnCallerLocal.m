@@ -1,5 +1,5 @@
 function callers = createFcnCallerLocal(blocks)
-% CREATECALLERLOCAL Create a function caller block for a Simulink function, in 
+% CREATEFCNCALLERLOCAL Create a function caller block for a Simulink function, in 
 %   the same subystem, with the prototype and the input/output argument specifications populated.
 %
 %   Inputs:

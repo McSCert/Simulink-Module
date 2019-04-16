@@ -10,7 +10,7 @@ function blocks = guideline0002(model)
 %       model   Simulink model name.
 %
 %   Outputs:
-%       blocks  Simulink function block names.
+%       blocks  Simulink Function block names.
 
     blocks = find_system(model, 'BlockType', 'SubSystem');
     blocks = blocks(isSimulinkFcn(blocks) == 1);

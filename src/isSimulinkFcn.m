@@ -1,5 +1,5 @@
 function b = isSimulinkFcn(blocks)
-% ISSIMULINKFUNCTION Determines if the block is a Simulink Function.
+% ISSIMULINKFUNCTION Determine if the block is a Simulink Function.
 %
 %   Inputs:
 %       block   Pathname or handle of a block.

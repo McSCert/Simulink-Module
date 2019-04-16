@@ -1,4 +1,11 @@
 function dependencies(sys)
+% DEPENDENCIES List the model dependencies.
+%
+%   Inputs:
+%       sys     Model model
+
+    sys = bdroot(sys);
+
     % Model References
     mr = find_system(sys, 'BlockType', 'ModelReference', 'Commented', 'off');
     % Remove non-unique based on ModelFile
@@ -18,14 +25,14 @@ function dependencies(sys)
     if isempty(ll)
         ll = {'N/A'};
     end
-    
+
     % Data Dictionary
     try
         dd = get_param(sys, 'DataDictionary');
         if isempty(dd)
             dd = 'N/A';
         end
-    catch % Parameter does not exists in earlier versions
+    catch % Parameter does not exist in earlier versions
         dd = 'N/A';
     end
 
@@ -35,13 +42,13 @@ function dependencies(sys)
     for i = 1:length(mr)
         fprintf('%s\n', mr{i});
     end
-    
+
     fprintf('\nLibrary Links\n');
     fprintf('------\n');
     for i = 1:length(ll)
         fprintf('%s\n', ll{i});
     end
-    
+
     fprintf('\nData Dictionaries\n');
     fprintf('------\n');
     %for i = 1:length(dd)

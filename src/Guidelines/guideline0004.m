@@ -22,10 +22,17 @@ function blocks = guideline0004(model)
     tf = find_system(model, 'BlockType', 'ToFile', 'Commented', 'off');
     tw = find_system(model, 'BlockType', 'ToWorkspace', 'Commented', 'off');
     
-    % TO REVISIT: Global data stores in the base workspace should not be allowed. 
-    % DD and model workspace are ok
-    %dsw = find_system(model, 'BlockType', 'DataStoreWrite', 'Commented', 'off');
-    %dsr = find_system(model, 'BlockType', 'DataStoreRead', 'Commented', 'off');
+    % Global data stores in the base workspace are not be allowed. 
+    % Data Dictionary and model workspace are OK.
+    dswr = [find_system(model, 'BlockType', 'DataStoreWrite', 'Commented', 'off'); ...
+                find_system(model, 'BlockType', 'DataStoreRead', 'Commented', 'off');];
+    ds = {};
+    for i = 1:length(dswr)
+        [isGlobal, ~, location] = isGlobalDataStore(dswr{i});
+        if isGlobal && strcmp(location, 'base')
+            ds{end+1,1} = dswr{i};
+        end
+    end
     
-    blocks = vertcat(ff, fs, fw, tf, tw);
+    blocks = vertcat(ff, fs, fw, tf, tw, ds);
 end

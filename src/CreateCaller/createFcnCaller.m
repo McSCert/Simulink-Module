@@ -5,7 +5,7 @@ function caller = createFcnCaller(sys, blockPath, varargin)
 %
 %   Inputs:
 %       sys         Subsystem in which to place the new caller.
-%       blockName   Simulink Function block path name.
+%       blockPath   Simulink Function block path name.
 %       varargin{1} Simulink Function prototype. [Optional]
 %
 %   Outputs:
@@ -66,19 +66,39 @@ function caller = createFcnCaller(sys, blockPath, varargin)
         try
             caller = add_block('simulink/User-Defined Functions/Function Caller', ...
                 [sys '/Function Caller' num2str(callerNum)], ...
-                'FunctionPrototype', prototype, ...
-                'InputArgumentSpecifications', argsInSpec, ...
-                'OutputArgumentSpecifications', argsOutSpec);
+                'FunctionPrototype', prototype);
             callerNum = callerNum + 1;
             blockCreated = true;
         catch ME
-            if contains(ME.message, 'identifier') % Identifier is not valid
-                rethrow(ME);
-            else % Block with that name exists already
+           if strcmp(ME.identifier, 'Simulink:Commands:AddBlockCantAdd')
                 callerNum = callerNum + 1;
+            else
+                rethrow(ME)
             end
         end
     end
+    % Try setting the input and output arguments
+    triggerPort = find_system(blockPath, 'SearchDepth', 1,'FollowLinks', 'on', ...
+        'BlockType', 'TriggerPort', ...
+        'TriggerType', 'function-call');
+    try
+        set_param(caller, 'InputArgumentSpecifications', argsInSpec)
+    catch
+        [~, fcnname, ~] = fileparts(triggerPort{:});
+        warndlg(['Error creating Function Caller for ''' fcnname ''' because an input argument is a user defined data type. ', ...
+            'Argument data type must be built-in data types. ', ...
+            'User-defined data types, including Bus, Fixed-point, Enumerations, and Alias types, may be provided with a Simulink.Parameter object.'], ...
+            'Input Argument Error');
+    end
+    try
+        set_param(callers, 'OutputArgumentSpecifications', argsOutSpec)
+    catch
+        [~, fcnname, ~] = fileparts(triggerPort{:});
+        warndlg(['Error creating Function Caller for ''' fcnname ''' because an output argument is a user defined data type. ', ...
+            'Argument data type must be built-in data types. ', ...
+            'User-defined data types, including Bus, Fixed-point, Enumerations, and Alias types, may be provided with a Simulink.Parameter object.'], ...
+            'Output Argument Error');
+    end 
     
     %  Resize block width
     pos = get_param(caller, 'Position');

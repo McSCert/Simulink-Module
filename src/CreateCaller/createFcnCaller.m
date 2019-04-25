@@ -91,7 +91,7 @@ function caller = createFcnCaller(sys, blockPath, varargin)
             'Input Argument Error');
     end
     try
-        set_param(callers, 'OutputArgumentSpecifications', argsOutSpec)
+        set_param(caller, 'OutputArgumentSpecifications', argsOutSpec)
     catch
         [~, fcnname, ~] = fileparts(triggerPort{:});
         warndlg(['Error creating Function Caller for ''' fcnname ''' because an output argument is a user defined data type. ', ...

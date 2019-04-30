@@ -1,14 +1,15 @@
 function [blocks, location] = guideline0001(model)
-% GUIDELINE0001 Check that a model complies to guideline MJ_0001. Return blocks 
+% GUIDELINE0001 Check that a model complies to Guideline 1. Return blocks 
 %   that are not in compliance. Blocks are not in compliance if they are not
 %   placed in the lowest possible hierarchical position that is a common parent
 %   amoung its callers.
 %
 %   Inputs:
-%       model   Simulink model name.
+%       model    Simulink model name.
 %
 %   Outputs:
-%       blocks  Simulink Function block fullnames.
+%       blocks   Simulink Function block fullnames.
+%       location Proposed correct location.
 
     % Get the model
     try

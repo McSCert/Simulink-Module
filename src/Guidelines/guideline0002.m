@@ -1,5 +1,5 @@
 function blocks = guideline0002(model)
-% GUIDELINE0002 Check that a model complies to guideline MJ_0002. Return blocks  
+% GUIDELINE0002 Check that a model complies to Guideline 2. Return blocks  
 %   that are not in compliance. Blocks are not in compliance if they have global
 %   visibility, and are not used outside of the model. It is not possible to
 %   check is all models (loaded and unloaded) use the function, which would

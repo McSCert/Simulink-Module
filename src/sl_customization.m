@@ -174,7 +174,7 @@ function CheckGuidelines(callbackInfo)
     guidelines = guidelineSelector;
     if guidelines(1)
         [blocks, locations] = guideline0001(sys);
-        fprintf('Guideline MJ_00001 ''Simulink Function Placement'' violations: ');
+        fprintf('Guideline 1 ''Simulink Function Placement'' violations: ');
         if isempty(blocks)
             fprintf('None\n');
         else
@@ -186,7 +186,7 @@ function CheckGuidelines(callbackInfo)
     end
     if guidelines(2)
         blocks = guideline0002(sys);
-        fprintf('Guideline MJ_00002 ''Simulink Function Scope'' violations: ');
+        fprintf('Guideline 2 ''Simulink Function Visibility'' violations: ');
         if isempty(blocks)
             fprintf('None\n');
         else
@@ -198,7 +198,7 @@ function CheckGuidelines(callbackInfo)
     end
     if guidelines(3)
         [blocks, shadows] = guideline0003(sys);
-        fprintf('Guideline MJ_00003 ''Simulink Function Shadowing'' violations: ');
+        fprintf('Guideline 3 ''Simulink Function Shadowing'' violations: ');
         if isempty(blocks)
             fprintf('None\n');
         else
@@ -212,7 +212,7 @@ function CheckGuidelines(callbackInfo)
     end
     if guidelines(4)
         blocks = guideline0004(sys);
-        fprintf('Guideline MJ_00004 ''Use of Base Workspace'' violations: ');
+        fprintf('Guideline 4 ''Use of Base Workspace'' violations: ');
         if isempty(blocks)
             fprintf('None\n');
         else

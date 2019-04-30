@@ -1,5 +1,5 @@
 function blocks = guideline0004(model)
-% GUIDELINE0004 Check that a model complies to guideline MJ_0004. Return blocks 
+% GUIDELINE0004 Check that a model complies to Guideline 4. Return blocks 
 %   that are not in compliance. Blocks are not in compliance if they interact
 %   with the base workspace (e.g., To Workspace, From File, etc.)
 %

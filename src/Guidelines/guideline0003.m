@@ -1,5 +1,5 @@
 function [blocks, shadows] = guideline0003(model)
-% GUIDELINE003 Check that a model complies to guideline MJ_0003. Return blocks 
+% GUIDELINE003 Check that a model complies to Guideline 3. Return blocks 
 %   that are not in compliance. Blocks are not in compliance if they are in the  
 %   scope of one or more function blocks with the same name and parameters.
 %

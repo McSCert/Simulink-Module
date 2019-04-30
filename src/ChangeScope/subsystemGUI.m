@@ -91,14 +91,16 @@ function varargout = subsystemGUI_OutputFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+ varargout{1} = ''; % Default is to return nothing
+ 
 % Get listbox value to return
 if strcmp(handles.output, 'OK')
     indexSelected = get(handles.listbox1, 'Value');
     subsystemList = get(handles.listbox1, 'String');
-    selection = subsystemList{indexSelected};
-    varargout{1} = selection;
-else
-    varargout{1} = '';
+    if ~isempty(subsystemList) % List may be empty
+        selection = subsystemList{indexSelected};
+        varargout{1} = selection;
+    end
 end
 
 delete(handles.figure1);

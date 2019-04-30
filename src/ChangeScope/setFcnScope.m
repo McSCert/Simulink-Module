@@ -57,8 +57,9 @@ function moveToAdjustScope(blocks, visibility, subsystem)
         for i = 1:length(blocks)
             callers = findCallers(blocks{i});
             if ~isempty(callers)
-                warning([blocks{i} ' has moved, but has existing Function ' ...
+                warning([blocks{i} ' has moved or changed scope, but has existing Function ' ...
                     'Callers which may need updating.']);
+                disp(callers);
             end
         end
     end

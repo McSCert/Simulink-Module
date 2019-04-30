@@ -982,7 +982,10 @@ classdef Interface
             end
             
             % Re-adjust the zoom
-            set_param(obj.ModelName, 'Zoomfactor', 'FitSystem');
+            try
+                set_param(obj.ModelName, 'Zoomfactor', 'FitSystem');
+            catch
+            end
         end
         function iter = createIterator(obj)
             % CREATEITERATOR Create the iterator object for iterating over an

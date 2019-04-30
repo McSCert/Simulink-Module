@@ -362,9 +362,10 @@ function garbageCollection()
             if ~globalHasSysOpen(i) % Has no associated model open          
                 eval(['x =~ isempty(' globals{i} ');']);
                 if x
-                    eval([globals{i} '.delete;']);
+                    eval(['clearvars -global ' globals{i} ';']);
+                    %eval([globals{i} '.delete;']);
                 end
-            else % There is a system open that matches the oject name
+            else % There is a system open that matches the object name
                 % A different instance of the same model could be open, so we
                 % check that the model handles match
                 sameHdl = false;

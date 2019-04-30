@@ -1,7 +1,7 @@
 classdef InterfaceItem
     properties
         BlockType           % BlockType.
-        InterfaceType       % Input, Import, Output, or Export.
+        InterfaceType       % Input, Output, or Export.
         Handle              % Handle of the item that is on the interface.
         Name                % Name.
         Fullpath            % Fullpath.
@@ -369,21 +369,18 @@ function [valid, type] = itemTypeCheck(handle)
 %
 %   Outputs:
 %       valid   Whether or not it is a supported InterfaceItem block.
-%       type    'Input', 'Import', 'Output', 'Export'
+%       type    'Input', 'Output', 'Export'
 
     blocktype  = get_param(handle, 'BlockType');
     in  = {'Inport', 'FromFile', 'FromWorkspace', 'FromSpreadsheet', 'DataStoreRead'};
     out = {'Outport', 'ToFile', 'ToWorkspace', 'DataStoreWrite'};
 
-    % Note: Both library links and Simulink functions are potentially of BlockType
-    % SubSystem, so an extra check will need to be done
-    
     if isempty(blocktype)
         type = '';
         valid = false;
         return
     end
-    
+
     if any2(find(strcmp(in, blocktype)))
         type = 'Input';
         valid = true;

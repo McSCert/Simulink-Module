@@ -81,11 +81,12 @@ function caller = createFcnCaller(sys, blockPath, varargin)
     triggerPort = find_system(blockPath, 'SearchDepth', 1,'FollowLinks', 'on', ...
         'BlockType', 'TriggerPort', ...
         'TriggerType', 'function-call');
+    fcnName = get_param(triggerPort, 'FunctionName');
+    fcnName = fcnName{:};
     try
         set_param(caller, 'InputArgumentSpecifications', argsInSpec)
     catch
-        [~, fcnname, ~] = fileparts(triggerPort{:});
-        warndlg(['Error creating Function Caller for ''' fcnname ''' because an input argument is a user defined data type. ', ...
+        warndlg(['Error creating Function Caller for ''' fcnName ''' because an input argument is a user defined data type. ', ...
             'Argument data type must be built-in data types. ', ...
             'User-defined data types, including Bus, Fixed-point, Enumerations, and Alias types, may be provided with a Simulink.Parameter object.'], ...
             'Input Argument Error');
@@ -93,23 +94,24 @@ function caller = createFcnCaller(sys, blockPath, varargin)
     try
         set_param(caller, 'OutputArgumentSpecifications', argsOutSpec)
     catch
-        [~, fcnname, ~] = fileparts(triggerPort{:});
-        warndlg(['Error creating Function Caller for ''' fcnname ''' because an output argument is a user defined data type. ', ...
+        warndlg(['Error creating Function Caller for ''' fcnName ''' because an output argument is a user defined data type. ', ...
             'Argument data type must be built-in data types. ', ...
             'User-defined data types, including Bus, Fixed-point, Enumerations, and Alias types, may be provided with a Simulink.Parameter object.'], ...
             'Output Argument Error');
     end 
     
-    %  Resize block width
-    pos = get_param(caller, 'Position');
-    [~, newWidth] = blockStringDims(caller, prototype);
-    origWidth = pos(3) - pos(1);
-    newPos = pos(1) + newWidth;
-    if newWidth > origWidth
-        pos(3) = newPos;
+    % Resize block width    
+    oldSize = get_param(caller, 'Position');
+    [~, newSize] = adjustWidth(caller, 'PerformOperation', 'off', 'Buffer', 12);
+    if (newSize(3) - newSize(1)) > (oldSize(3) - oldSize(1)) % Only resize if it's getting bigger
+        set_param(caller, 'Position', newSize);
     end
-    set_param(caller, 'Position', pos);
-    
+    % Resize block height
+    ports = get_param(caller, 'Ports');
+    if ports(1) > 1 || ports(2) > 1
+        adjustHeight(caller, 'PortParams', {'ConnectionType', {'Inport','Outport'}, 'Method', 'Compact', 'HeightPerPort', 30});
+    end
+
     % Close system
     if loadedSys
         close_system(blockSys);

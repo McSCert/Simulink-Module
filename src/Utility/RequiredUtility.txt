@@ -1,10 +1,15 @@
 .../tools/Simulink/Tools/Utility/
     BackwardsCompatability/
+        add_line2.m
         any2.m
         contains2.m
         
 	Bounds/
+        annotationBounds.m
+        blockBounds.m
 		bounds_of_sim_objects.m
+        lineBounds.m
+        portBounds.m
         separate_objects_by_type.m
 
 	DataflowTracing/
@@ -31,9 +36,10 @@
 
      GetCurrentFunctions/
 		gcbs.m
+        gcls.m
         
 	InputHandling/
-		inputToNumeric.m
+		getInput.m
         inputToCell.m
         inputToNumeric.m
 

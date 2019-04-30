@@ -15,10 +15,6 @@ classdef Interface
         FromSpreadsheet InterfaceItem
         DataStoreRead   InterfaceItem
         
-        % IMPORTS
-        ModelReference  InterfaceItem
-        LibraryLink     InterfaceItem   
-        
         % OUTPUTS
         Outport         InterfaceItem
         ToFile          InterfaceItem
@@ -36,11 +32,6 @@ classdef Interface
         FromWorkspaceHeader   = InterfaceHeader('From Workspaces');
         FromSpreadsheetHeader = InterfaceHeader('From Spreadsheets');
         DataStoreReadHeader   = InterfaceHeader('Data Store Reads');
-
-        % IMPORTS
-        ImportHeader          = InterfaceHeader('Imports');
-        ModelReferenceHeader  = InterfaceHeader('Model References');
-        LibraryLinkHeader     = InterfaceHeader('Library Links');
                 
         % OUTPUTS
         OutputHeader          = InterfaceHeader('Outputs');
@@ -52,6 +43,9 @@ classdef Interface
         % EXPORTS
         ExportHeader          = InterfaceHeader('Exports');
         FunctionHeader        = InterfaceHeader('Simulink Functions');
+        
+        % Other
+        RootSystemHandle
     end
     methods (Access = public)
         function obj = Interface(m)
@@ -59,8 +53,12 @@ classdef Interface
                 obj.ModelName = '';
             elseif nargin == 1
                 obj.ModelName = bdroot(m);
+                obj.RootSystemHandle = get_param(obj.ModelName, 'Handle');
                 obj = autoAdd(obj);
             end
+        end
+        function hdl = getHandle(obj)
+            hdl = obj.RootSystemHandle;
         end
         function n = numel(obj)
             % NUMEL Number of elements in the interface.
@@ -76,8 +74,6 @@ classdef Interface
                 numel(obj.FromWorkspace) + ...
                 numel(obj.FromSpreadsheet) + ...
                 numel(obj.DataStoreRead) + ...
-                numel(obj.ModelReference) + ...
-                numel(obj.LibraryLink) + ...
                 numel(obj.Outport) + ...
                 numel(obj.ToFile) + ...
                 numel(obj.ToWorkspace) + ...
@@ -112,8 +108,6 @@ classdef Interface
                 numel(obj.FromWorkspace), ...
                 numel(obj.FromSpreadsheet), ...
                 numel(obj.DataStoreRead), ...
-                numel(obj.ModelReference), ...
-                numel(obj.LibraryLink), ...
                 numel(obj.Outport), ...
                 numel(obj.ToFile), ...
                 numel(obj.ToWorkspace), ...
@@ -127,7 +121,7 @@ classdef Interface
             %   Inputs:
             %       obj      Interface object.
             %       varargin Part of the interface to check if empty: 
-            %                ['Input' | 'Import' | 'Output' | 'Export']
+            %                ['Input' | 'Output' | 'Export']
             %
             %   Outputs:
             %       b        Whether the interface is empty (1) or not (0).
@@ -141,9 +135,6 @@ classdef Interface
                             && isempty(obj.FromWorkspace) ...
                             && isempty(obj.FromSpreadsheet) ...
                             && isempty(obj.DataStoreRead);
-                    case 'Import'
-                        b = isempty(obj.ModelReference) ...
-                            && isempty(obj.LibraryLink);
                     case 'Output'
                         b = isempty(obj.Outport) ...
                             && isempty(obj.ToFile) ...
@@ -168,20 +159,14 @@ classdef Interface
             %   Inputs:
             %       obj         Interface object.
             %       varargin    Parameter, Value pairs:   
-            %          'View'   'Developer' or 'Client' view.
             %       'Verbose'   Whether to show empty items (1, default) or not (0).
             %
             %   Outputs:
             %       N/A
             
-            verbose = getInput('Verbose', varargin);
-            view = getInput('View', varargin);
-            
+            verbose = getInput('Verbose', varargin);           
             if isempty(verbose)
                 verbose = false;
-            end
-            if isempty(view)
-                view = 'Developer';
             end
             
             fprintf('%s\n', obj.InputHeader.Label);
@@ -237,34 +222,6 @@ classdef Interface
                     for i = 1:length(obj.DataStoreRead)
                         fprintf('\t');
                         obj.DataStoreRead(i).print;
-                    end
-                end
-            end
-
-            if strcmpi(view, 'Developer')
-                fprintf('\n%s\n', obj.ImportHeader.Label);
-                fprintf('------\n');
-                if isempty(obj, 'Import')
-                    fprintf('N/A\n');
-                else
-                    if isempty(obj.ModelReference) && verbose
-                        fprintf('%s:\n\tN/A\n', obj.ModelReferenceHeader.Label);
-                    elseif ~isempty(obj.ModelReference)
-                        fprintf('%s:\n', obj.ModelReferenceHeader.Label);
-                        for i = 1:length(obj.ModelReference)
-                            fprintf('\t');
-                            obj.ModelReference(i).print;
-                        end
-                    end            
-
-                    if isempty(obj.LibraryLink) && verbose
-                        fprintf('%s:\n\tN/A\n', obj.LibraryLinkHeader.Label);
-                    elseif ~isempty(obj.LibraryLink)
-                        fprintf('%s:\n', obj.LibraryLinkHeader.Label);
-                        for i = 1:length(obj.LibraryLink)
-                            fprintf('\t');
-                            obj.LibraryLink(i).print;
-                        end
                     end
                 end
             end
@@ -338,7 +295,7 @@ classdef Interface
             %
             %   Inputs:
             %       obj     Interface object.
-            %       locs    Location.
+            %       loc    Location.
             %
             %   Outputs:
             %       el      Element.
@@ -401,31 +358,7 @@ classdef Interface
                 el = all{loc};
                 return
             end
-            
-            if curr < loc
-                for m = 1:numel(obj.ModelReference)
-                    all{curr+m} = obj.ModelReference(m);
-                end
-                if ~isempty(m)
-                    curr = curr + m;
-                end
-            else
-                el = all{loc};
-                return
-            end
-
-            if curr < loc
-                for m = 1:numel(obj.LibraryLink)
-                    all{curr+m} = obj.LibraryLink(m);
-                end
-                if ~isempty(m)
-                    curr = curr + m;
-                end
-            else
-                el = all{loc};
-                return
-            end
-            
+       
             if curr < loc
                 for n = 1:numel(obj.Outport)
                     all{curr+n} = obj.Outport(n);
@@ -504,7 +437,7 @@ classdef Interface
             end
         end
         function obj = add(obj, names)
-            % ADD Add item to interface.
+            % ADD Add item to the interface.
             %
             %   Inputs:
             %       obj     Interface object.
@@ -534,9 +467,6 @@ classdef Interface
                     case 'DataStoreRead'
                         j = length(obj.DataStoreRead)+1;
                         obj.DataStoreRead(j) = InterfaceItem(names(i));
-                    case 'ModelReference'
-                         j = length(obj.ModelReference)+1;
-                        obj.ModelReference(j) = InterfaceItem(names(i));
                     case 'Outport'
                         j = length(obj.Outport)+1;
                         obj.Outport(j) = InterfaceItem(names(i));
@@ -553,9 +483,6 @@ classdef Interface
                         if isSimulinkFcn(names(i)) && ~isLibraryLink(names(i))
                             j = length(obj.Function)+1;
                             obj.Function(j) = InterfaceItem(names(i));
-                        elseif isLibraryLink(names(i))
-                            j = length(obj.LibraryLink)+1;
-                            obj.LibraryLink(j) = InterfaceItem(names(i));
                         end
                 end
             end
@@ -570,15 +497,13 @@ classdef Interface
             
             obj.ModelName = bdroot(name);
         end
-        function obj = model(obj, varargin)
+        function obj = model(obj)
             % MODEL Create a representation of the interface in the model.
             %   Moves blocks, adds annotations, and adds the blocks representing the
             %   interface.
             %
             %   Inputs:
             %       obj         Interface object.
-            %       varargin    Parameter, Value pairs:   
-            %          'View'   'Developer' or 'Client' view.
             %
             %   Outputs:
             %       obj         Interface object.
@@ -588,11 +513,6 @@ classdef Interface
             elseif isempty(obj)
                 warning('No elements on the interface.');
                 return
-            end
-            
-            view = getInput('View', varargin);
-            if isempty(view)
-                view = 'Developer';
             end
             
             % Default parameters for complying with MAAB
@@ -755,66 +675,7 @@ classdef Interface
                     end
                 end
             end
-            
-            if strcmpi(view, 'Developer')
-                if ~isempty(obj, 'Import')
-                    obj.ImportHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.ImportHeader.Label], 'FontSize', LARGEFONT).Handle; 
-                end
-                nblock = 1;
-                if ~isempty(obj.ModelReference)
-                    obj.ModelReferenceHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.ModelReferenceHeader.Label], 'FontSize', SMALLFONT).Handle;
-                    for f = 1:length(obj.ModelReference)
-                        blockCreated = false;
-                        while ~blockCreated
-                            try
-                                obj.ModelReference(f).InterfaceHandle = add_block('simulink/Ports & Subsystems/Model', ...
-                                    [obj.ModelName '/Model' num2str(nblock)], ...
-                                    options{:});
-                                blockCreated = true;
-                            catch
-                                nblock = nblock + 1;
-                            end
-                        end
-                        % Set name
-                        name = get_param(obj.ModelReference(f).Handle, 'ModelName');
-                        set_param(obj.ModelReference(f).InterfaceHandle, 'ModelName', name);
-
-                        % Connect to terminators/grounds
-                        allPorts = get_param(obj.ModelReference(f).InterfaceHandle, 'PortHandles');
-                        if ~isempty(allPorts)
-                            obj.ModelReference(f).GroundHandle = fulfillPorts(allPorts.Inport);
-                            obj.ModelReference(f).TerminatorHandle = fulfillPorts(allPorts.Outport);
-                        end
-                    end
-                end
-                nblock = 1;
-                if ~isempty(obj.LibraryLink)
-                    obj.LibraryLinkHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.LibraryLinkHeader.Label], 'FontSize', SMALLFONT).Handle;
-                    for f = 1:length(obj.LibraryLink)
-                        blockCreated = false;
-                        while ~blockCreated
-                            try
-                                blockPath = get_param(obj.LibraryLink(f).Handle, 'ReferenceBlock');
-                                blockName = get_param(obj.LibraryLink(f).Handle, 'Name');
-                                obj.LibraryLink(f).InterfaceHandle = add_block(blockPath, ...
-                                    [obj.ModelName '/' blockName num2str(nblock)], ...
-                                    options{:});
-                                blockCreated = true;
-                            catch
-                                nblock = nblock + 1;
-                            end
-                        end
-
-                        % Connect to terminators/grounds
-                        allPorts = get_param(obj.LibraryLink(f).InterfaceHandle, 'PortHandles');
-                        if ~isempty(allPorts)
-                            obj.LibraryLink(f).GroundHandle = fulfillPorts(allPorts.Inport);
-                            obj.LibraryLink(f).TerminatorHandle = fulfillPorts(allPorts.Outport);
-                        end
-                    end                
-                end
-            end
-            
+           
             if ~isempty(obj, 'Output')
                 obj.OutputHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.OutputHeader.Label], 'FontSize', LARGEFONT).Handle;
             end
@@ -1048,7 +909,7 @@ classdef Interface
             % Re-adjust the zoom so we can see the whole interface
             set_param(obj.ModelName, 'Zoomfactor', 'FitSystem');
         end
-        function obj = delete(obj, varargin)
+        function obj = delete(obj)
             % DELETE Remove the interface model representation (blocks, headings).
             %
             %   Inputs:
@@ -1071,9 +932,6 @@ classdef Interface
             obj.FromWorkspaceHeader = delete(obj.FromWorkspaceHeader);
             obj.FromSpreadsheetHeader = delete(obj.FromSpreadsheetHeader);
             obj.DataStoreReadHeader = delete(obj.DataStoreReadHeader);
-            obj.ImportHeader = delete(obj.ImportHeader);
-            obj.ModelReferenceHeader = delete(obj.ModelReferenceHeader);
-            obj.LibraryLinkHeader = delete(obj.LibraryLinkHeader);
             obj.OutputHeader = delete(obj.OutputHeader);
             obj.OutportHeader = delete(obj.OutportHeader);
             obj.ToFileHeader = delete(obj.ToFileHeader);
@@ -1101,15 +959,7 @@ classdef Interface
 
             for e = 1:length(obj.DataStoreRead)
                 obj.DataStoreRead(e) = deleteFromModel(obj.DataStoreRead(e));
-            end
-            
-            for f = 1:length(obj.ModelReference)
-                obj.ModelReference(f) = deleteFromModel(obj.ModelReference(f));
-            end
-            
-            for g = 1:length(obj.LibraryLink)
-                obj.LibraryLink(g) = deleteFromModel(obj.LibraryLink(g));
-            end
+            end 
             
             for h = 1:length(obj.Outport)
                 obj.Outport(h) = deleteFromModel(obj.Outport(h));
@@ -1155,7 +1005,6 @@ classdef Interface
             if isempty(varargin)
                 varargin = {...
                     'inport', 'fromfile', 'fromspreadsheet', 'fromworkspace', 'datastoreread', ...
-                    'modelreference', 'librarylink', ...
                     'outport', 'tofile', 'toworkspace', 'datastorewrite', ...
                     'function'};
             end
@@ -1212,28 +1061,7 @@ classdef Interface
                         obj = add(obj, blocks(i));
                     end
                 end
-            end
-            
-            if contains2(varargin, 'modelreference')
-                blocks = find_system(obj.ModelName, 'BlockType', 'ModelReference', 'Commented', 'off');
-                
-                % Remove non-unique based on ModelFile
-                modelname = get_param(blocks, 'ModelFile');
-                [~, idx] = unique(modelname);
-                blocks = blocks(idx);
-                
-                obj = add(obj, blocks);
-            end
-            if contains2(varargin, 'librarylink')
-                blocks = find_system(obj.ModelName, 'LinkStatus', 'resolved', 'Commented', 'off');
-                
-                % Remove non-unique based on ReferenceBlock
-                libraryname = get_param(blocks, 'ReferenceBlock');
-                [~, idx] = unique(libraryname);
-                blocks = blocks(idx);
-                
-                obj = add(obj, blocks);
-            end           
+            end        
             
             if contains2(varargin, 'outport')
                 ports = find_system(obj.ModelName, 'SearchDepth', 1, 'BlockType', 'Outport', 'Commented', 'off');
@@ -1326,9 +1154,6 @@ classdef Interface
                 obj.FromWorkspaceHeader.Handle, ...
                 obj.FromSpreadsheetHeader.Handle, ...
                 obj.DataStoreReadHeader.Handle, ...
-                obj.ImportHeader.Handle, ...
-                obj.ModelReferenceHeader.Handle, ... 
-                obj.LibraryLinkHeader.Handle, ...
                 obj.OutputHeader.Handle, ...
                 obj.OutportHeader.Handle, ...
                 obj.ToFileHeader.Handle, ...
@@ -1349,11 +1174,6 @@ classdef Interface
                 obj.FromSpreadsheet.InterfaceHandle, ...
                 obj.DataStoreReadHeader.Handle, ...
                 obj.DataStoreRead.InterfaceHandle, ...
-                obj.ImportHeader.Handle, ...
-                obj.ModelReferenceHeader.Handle, ... 
-                obj.ModelReference.InterfaceHandle, ...
-                obj.LibraryLinkHeader.Handle, ...
-                obj.LibraryLink.InterfaceHandle, ...
                 obj.OutputHeader.Handle, ...
                 obj.OutportHeader.Handle, ...
                 obj.Outport.InterfaceHandle, ...

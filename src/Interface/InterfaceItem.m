@@ -270,14 +270,20 @@ classdef InterfaceItem
             if any2(strcmp(obj.BlockType, {'Inport', 'Outport'}))
                 obj = deleteGrndTrm(obj);
                 % Move inport/outport back
-                moveToConnectedPort(obj.InterfaceHandle, 30);
-                redraw_block_lines(obj.InterfaceHandle, 'AutoRouting', 'smart');
+                try
+                    moveToConnectedPort(obj.InterfaceHandle, 30);
+                    redraw_block_lines(obj.InterfaceHandle, 'AutoRouting', 'smart');
+                catch ME 
+                    if ~strcmp(ME.identifier, 'Simulink:Commands:InvSimulinkObjHandle') % The model was closed
+                        rethrow(ME)
+                    end
+                end
             else
                 try
                     delete(obj.InterfaceHandle);
                     obj = deleteGrndTrm(obj);
-                catch ME % Already deleted
-                    if ~strcmp(ME.identifier, 'MATLAB:hg:udd_interface:CannotDelete')
+                catch ME
+                    if ~strcmp(ME.identifier, 'MATLAB:hg:udd_interface:CannotDelete')  % Already deleted
                         rethrow(ME)
                     end
                 end
@@ -318,7 +324,7 @@ classdef InterfaceItem
             obj.SampleTime = getSampleTime(obj.Handle);
             
             % INTERFACEHANDLE
-            % Added when the interface is modeled only.
+            % Added when the interface is modelled only.
         end
         function obj = deleteGrndTrm(obj)
         % DELETEGRNDTRM Delete the ground and terminator elements with their
@@ -367,7 +373,6 @@ function [valid, type] = itemTypeCheck(handle)
 
     blocktype  = get_param(handle, 'BlockType');
     in  = {'Inport', 'FromFile', 'FromWorkspace', 'FromSpreadsheet', 'DataStoreRead'};
-    im  = {'ModelReference'};
     out = {'Outport', 'ToFile', 'ToWorkspace', 'DataStoreWrite'};
 
     % Note: Both library links and Simulink functions are potentially of BlockType
@@ -384,9 +389,6 @@ function [valid, type] = itemTypeCheck(handle)
         valid = true;
     elseif any2(find(strcmp(out, blocktype)))
         type = 'Output';
-        valid = true;
-    elseif any2(find(strcmp(im, blocktype))) || isLibraryLink(handle)
-        type = 'Import';
         valid = true;
     elseif isSimulinkFcn(handle)
         type = 'Export';

@@ -1,12 +1,16 @@
 function dependencies(sys)
-% DEPENDENCIES List the model dependencies.
+% DEPENDENCIES List the model dependencies in the Command Window.
 %
 %   Inputs:
 %       sys     Model model
+%
+%   Outputs:
+%       N/A
+%
 
     sys = bdroot(sys);
 
-    % Model References
+    %% 1) Model References
     mr = find_system(sys, 'BlockType', 'ModelReference', 'Commented', 'off');
     % Remove non-unique based on ModelFile
     modelname = get_param(mr, 'ModelFile');
@@ -16,7 +20,7 @@ function dependencies(sys)
         mr = {'N/A'};
     end
 
-    % Linked Library Blocks
+    %% 2) Linked Library Blocks
     ll = find_system(sys, 'LinkStatus', 'resolved', 'Commented', 'off');
     % Remove non-unique based on ReferenceBlock
     libraryname = get_param(ll, 'ReferenceBlock');
@@ -26,7 +30,7 @@ function dependencies(sys)
         ll = {'N/A'};
     end
 
-    % Data Dictionary
+    %% 3) Data Dictionary
     try
         dd = get_param(sys, 'DataDictionary');
         if isempty(dd)
@@ -36,7 +40,7 @@ function dependencies(sys)
         dd = 'N/A';
     end
 
-    % Print
+    %% Print
     fprintf('Model References\n');
     fprintf('------\n');
     for i = 1:length(mr)
@@ -51,7 +55,5 @@ function dependencies(sys)
 
     fprintf('\nData Dictionaries\n');
     fprintf('------\n');
-    %for i = 1:length(dd)
         fprintf('%s\n', dd);
-    %end
 end

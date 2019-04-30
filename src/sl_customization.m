@@ -1,10 +1,10 @@
 %% Register custom menu function to beginning of Simulink Editor's context menu
 function sl_customization(cm)
-	cm.addCustomMenuFcn('Simulink:PreContextMenu', @getSLFcnTool);
+	cm.addCustomMenuFcn('Simulink:PreContextMenu', @getSLModuleTool);
 end
 
 %% Define custom menu function: Changing Scope
-function schemaFcns = getSLFcnTool(callbackInfo)
+function schemaFcns = getSLModuleTool(callbackInfo)
     schemaFcns = {};
     selection = find_system(gcs, 'Type', 'block', 'Selected', 'on');
     selectedFcns = isSimulinkFcn(selection);
@@ -100,6 +100,8 @@ function schema = ChangeFcnScopeSchema(callbackInfo)
     if isempty(schema.childrenFcns)
         schema.state = 'Disabled'; 
     end
+    
+    garbageCollection();
 end
 
 %% Define action: Convert to Global
@@ -220,6 +222,8 @@ function CheckGuidelines(callbackInfo)
             end
         end
     end
+    
+    garbageCollection();
 end
 
 %% Define menu: Model Interface
@@ -231,92 +235,46 @@ end
 
 function schema = ModelInterfaceSchema(callbackInfo)
     schema = sl_action_schema;
-    %schema = sl_container_schema;
     schema.label = 'Show Interface';
-    %schema.ChildrenFcns = {@showClientInterface, @showDeveloperInterface};
-    schema.callback = @showClientInterfaceCallback;
+    schema.callback = @showInterfaceCallback;
 end
 
-function schema = showClientInterface(callbackInfo)
-    schema = sl_action_schema;
-    schema.label =  'Client';
-    schema.userdata = 'ShowClientInterface';
-    schema.callback = @showClientInterfaceCallback;
-end
+function showInterfaceCallback(callbackInfo)
 
-function showClientInterfaceCallback(callbackInfo)
+    garbageCollection();
+       
     sys = bdroot(gcs);
     objName = [sys '_InterfaceObject'];
     eval(['global ' objName ';']);
     
     if interface_exists(sys)
-       warning('Interface already exists.'); 
-    end
-    
-    eval([objName ' = Interface(sys);']);
-    eval([objName ' = ' objName '.model(''View'', ''Client'');']);
-    
-    garbageCollection();
-end
+        answer = questdlg('An interface already exists. Do you wish to replace it?', 'Interface Exists');
+        if strcmp(answer, 'Yes')
+            % Delete old representation
+            eval([objName '.delete;'])
 
-function schema = showDeveloperInterface(callbackInfo)
-    schema = sl_action_schema;
-    schema.label =  'Developer';
-    schema.userdata = 'ShowDeveloperInterface';
-    schema.callback = @showDeveloperInterfaceCallback;
-end
-
-function showDeveloperInterfaceCallback(callbackInfo)
-    sys = bdroot(gcs);
-    objName = [sys '_InterfaceObject'];
-    eval(['global ' objName ';']);
-    
-    if interface_exists(sys)
-       warning('Interface already exists.'); 
+            % Create new interface
+            eval([objName ' = Interface(sys);']);
+            eval([objName ' = ' objName '.model();']);
+        end
+    else
+        eval([objName ' = Interface(sys);']);
+        eval([objName ' = ' objName '.model();']);        
     end
-    
-    eval([objName ' = Interface(sys);']);
-    eval([objName ' = ' objName '.model(''View'', ''Developer'');']);  
-    
-    garbageCollection();
 end
 
 %% Define menu: Print Interface
 function schema = PrintInterfaceSchema(callbackInfo)
     schema = sl_action_schema;
-    %schema = sl_container_schema;
     schema.label = 'Print Interface';
-    %schema.ChildrenFcns = {@printClientInterface, @printDeveloperInterface};
-    schema.callback = @printClientInterfaceCallback;
-end
-function schema = printClientInterface(callbackInfo)
-    schema = sl_action_schema;
-    schema.label = 'Client';
-    schema.userdata = 'PrintClientInterface';
-    schema.callback = @printClientInterfaceCallback;
+    schema.callback = @printInterfaceCallback;
 end
 
-function printClientInterfaceCallback(callbackInfo)
+function printInterfaceCallback(callbackInfo)
     sys = bdroot(gcs);
     objName = [sys '_InterfaceObject'];
     eval([objName ' = Interface(sys);']);
-    eval([objName '.print(''View'', ''Client'');']);
-    
-    garbageCollection();
-end
-
-function schema = printDeveloperInterface(callbackInfo)
-    schema = sl_action_schema;
-    schema.label = 'Developer';
-    schema.userdata = 'PrintDeveloperInterface';
-    schema.callback = @printDeveloperInterfaceCallback;
-end
-
-function printDeveloperInterfaceCallback(callbackInfo)
-    sys = bdroot(gcs);
-    objName = [sys '_InterfaceObject'];
-    eval([objName ' = Interface(sys);']);
-    eval([objName '.print(''View'', ''Developer'');']);  
+    eval([objName '.print();']);
     
     garbageCollection();
 end
@@ -355,9 +313,18 @@ function e = interface_exists(sys)
     % INTERFACE_EXISTS Determine if there exists an interface object for a model.
     objName = [sys '_InterfaceObject'];
     eval(['global ' objName ';']);
-    eval(['notempty_obj = ~isempty(' objName ');']); 
-    if notempty_obj
-        e = true;
+    eval(['objEmpty = isempty(' objName ');']);
+    
+    if ~objEmpty
+        % Check that the object refers to the same model instance
+        eval(['objHdl = ' objName '.getHandle;']);
+        sysHdl = get_param(sys, 'Handle');
+        sameHdl = (objHdl == sysHdl);
+        if sameHdl
+            e = true;
+        else
+            e = false;
+        end
     else
         e = false;
     end
@@ -374,6 +341,7 @@ end
 function printDependenciesCallback(callbackInfo)
     sys = bdroot(gcs);
     dependencies(sys);
+    garbageCollection();
 end
 
 %% Garbage collection for objects
@@ -384,20 +352,34 @@ function garbageCollection()
     suffixLen = length(suffix) + 1;
     
     sysAll = cellfun(@(x) x(1:end-suffixLen), globals, 'un', 0);
-    sysOpen = find_system('SearchDepth', 0);
-    sysDelete = ~ismember(sysAll, sysOpen);
+    allSysOpen = find_system('SearchDepth', 0);
+    globalHasSysOpen = ismember(sysAll, allSysOpen);
     
     for i = 1:length(globals)
-        if sysDelete(i)
-            isInterfaceName = ~isempty(strfind(globals{i}, suffix));
-            if isInterfaceName
-                eval(['global ' globals{i} ';'])
+        isInterfaceName = ~isempty(strfind(globals{i}, suffix));
+        if isInterfaceName
+            eval(['global ' globals{i} ';']) % Get this object
+            if ~globalHasSysOpen(i) % Has no associated model open          
                 eval(['x =~ isempty(' globals{i} ');']);
                 if x
-                    %eval(['y =~ isvalid(' globals{i} ');']);
-                    %if y
-                        eval([globals{i} '.delete;']);
-                    %end
+                    eval([globals{i} '.delete;']);
+                end
+            else % There is a system open that matches the oject name
+                % A different instance of the same model could be open, so we
+                % check that the model handles match
+                sameHdl = false;
+                try
+                    eval(['objHdl = ' globals{i} '.getHandle;']);
+                    sysHdl = get_param(sysAll{i}, 'Handle');
+                    sameHdl = (objHdl == sysHdl);
+                catch
+                    continue
+                end
+                
+                if ~sameHdl %|| ~ishandle(objHdl
+                    eval(['clearvars -global ' globals{i} ';']);
+                %else
+                    %eval([globals{i} '.delete;']);
                 end
             end
         end

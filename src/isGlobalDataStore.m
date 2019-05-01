@@ -47,6 +47,14 @@ function [isGlobal, obj, location] = isGlobalDataStore(block)
     % Convert input to path
     block = [get_param(block, 'Parent') '/' get_param(block, 'Name')];
     
+    % Default vaules:
+    % If we can't find the associated Memory block, that means that it is a Simuilink.Signal
+    % elsewhere, but can't detetmine where. This can happen if a model has a
+    % global data store, but the Simuilink.Signal is not loaded in any workspace.
+    isGlobal = true; 
+    obj = [];
+    location = 'unknown';
+    
     blockType = get_param(block, 'BlockType');
     if ~any(find(strcmp(blockType, {'DataStoreRead', 'DataStoreWrite'})))   
         isGlobal = false;
@@ -69,9 +77,7 @@ function [isGlobal, obj, location] = isGlobalDataStore(block)
         memoryHere = find_system(parent, 'SearchDepth', 1, 'BlockType', 'DataStoreMemory', 'DataStoreName', name);
         memoryHereAndBelow = find_system(parent, 'BlockType', 'DataStoreMemory', 'DataStoreName', name);       
         memoryBelow = setdiff(memoryHereAndBelow, memoryHere);
-        memoryInScope = setdiff(memoryAll, memoryBelow);
-        
-        % Check for a Simulink.Signal object 
+        memoryInScope = setdiff(memoryAll, memoryBelow);    
         if ~isempty(memoryInScope)
             isGlobal = false;
             obj = [];

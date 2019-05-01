@@ -13,8 +13,11 @@ classdef InterfaceItem
         InterfaceHandle     % If the block is represented on the interface by another 
                             % block, this is the handle to that block (not
                             % applicable for Inports and Outports).
+        InterfacePath       % Fullpath.
         GroundHandle        % Handle(s) of Ground blocks (or Goto for ports).
+        GroundPath          % Fullpath.
         TerminatorHandle    % Handle(s) of Terminators blocks (or From for ports).
+        TerminatorPath      % Fullpath.
     end
     methods (Access = public)
         function obj = InterfaceItem(handle)
@@ -58,7 +61,7 @@ classdef InterfaceItem
         %   Outputs:
         %       N/A
          
-             % TODO: Currently assumes one sample time. There can be
+            % TODO: Currently assumes one sample time. There can be
             % multiple times
          
             if isSimulinkFcn(obj.Handle)
@@ -289,6 +292,38 @@ classdef InterfaceItem
                 end
             end
             obj.InterfaceHandle = [];
+            obj.InterfacePath = [];
+        end
+        function obj = updateHandle(obj)
+            % UPDATEHANDLE Re-populate the handle properties.
+            %	Try getting the handles according to the fullpath. If the
+            %   interface has changed (e.g., inport was deleted), the handle will
+            %   not be found.
+            try
+                obj.Handle = get_param(obj.Fullpath, 'Handle');
+            catch
+                obj.Handle = [];
+            end
+            
+            try
+                if ~any2(strcmp(obj.BlockType, {'Inport', 'Outport'}))
+                    obj.InterfaceHandle = get_param(obj.InterfacePath, 'Handle');
+                end
+            catch
+                obj.InterfaceHandle = [];
+            end
+            
+            try
+                obj.GroundHandle = get_param(obj.GroundPath, 'Handle');
+            catch
+                obj.GroundHandle = [];
+            end
+            
+            try
+                obj.TerminatorHandle = get_param(obj.TerminatorPath, 'Handle');
+            catch
+                obj.TerminatorHandle = [];
+            end
         end
     end 
     methods (Access = private)
@@ -323,7 +358,7 @@ classdef InterfaceItem
             % SAMPLE TIME
             obj.SampleTime = getSampleTime(obj.Handle);
             
-            % INTERFACEHANDLE
+            % INTERFACEHANDLE, INERFACEPATH, ETC.
             % Added when the interface is modelled only.
         end
         function obj = deleteGrndTrm(obj)
@@ -342,6 +377,7 @@ classdef InterfaceItem
                 end
             end
             obj.GroundHandle = [];
+            obj.GroundPath = [];
             
             for j = 1:length(obj.TerminatorHandle)
                 t = obj.TerminatorHandle(j);
@@ -357,6 +393,7 @@ classdef InterfaceItem
                 end
             end
             obj.TerminatorHandle = [];
+            obj.TerminatorPath = [];
         end
     end
 end

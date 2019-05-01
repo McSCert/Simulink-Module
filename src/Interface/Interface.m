@@ -570,9 +570,11 @@ classdef Interface
                     blockCreated = false;
                     while ~blockCreated
                         try
+                            name = [obj.ModelName '/From File' num2str(nblock)];
                             obj.FromFile(b).InterfaceHandle = add_block('simulink/Sources/From File', ...
-                                [obj.ModelName '/From File' num2str(nblock)], ...
+                                name, ...
                                 options{:});
+                            obj.FromFile(b).InterfacePath = name;
                             
                             blockCreated = true;
                         catch
@@ -588,6 +590,8 @@ classdef Interface
                     if ~isempty(allPorts)
                         obj.FromFile(b).GroundHandle = fulfillPorts(allPorts.Inport);
                         obj.FromFile(b).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                        obj.FromFile(b).GroundPath = getfullname(obj.FromFile(b).GroundHandle);
+                        obj.FromFile(b).TerminatorPath = getfullname(obj.FromFile(b).TerminatorHandle);
                     end
                 end
             end
@@ -599,9 +603,11 @@ classdef Interface
                     blockCreated = false;
                     while ~blockCreated
                         try
+                            name = [obj.ModelName '/From Spreadsheet' num2str(nblock)];
                             obj.FromSpreadsheet(c).InterfaceHandle = add_block('simulink/Sources/From Spreadsheet', ...
-                                [obj.ModelName '/From Spreadsheet' num2str(nblock)],...
+                                name,...
                                 options{:});
+                            obj.FromSpreadsheet(c).InterfacePath = name;
                             blockCreated = true;
                         catch
                             nblock = nblock + 1;
@@ -616,6 +622,8 @@ classdef Interface
                     if ~isempty(allPorts)
                         obj.FromSpreadsheet(c).GroundHandle = fulfillPorts(allPorts.Inport);
                         obj.FromSpreadsheet(c).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                        obj.FromSpreadsheet(c).GroundPath = getfullname(obj.FromSpreadsheet(c).GroundHandle);
+                        obj.FromSpreadsheet(c).TerminatorPath = getfullname(obj.FromSpreadsheet(c).TerminatorHandle);
                     end
                 end
             end
@@ -627,9 +635,11 @@ classdef Interface
                     blockCreated = false;
                     while ~blockCreated
                         try
+                            name = [obj.ModelName '/From Workspace' num2str(nblock)];
                             obj.FromWorkspace(d).InterfaceHandle = add_block('simulink/Sources/From Workspace', ...
-                                [obj.ModelName '/From Workspace' num2str(nblock)], ...
+                                name, ...
                                 options{:});
+                            obj.FromWorkspace(d).InterfacePath = name;
                             blockCreated = true;
                         catch
                             nblock = nblock + 1;
@@ -644,6 +654,8 @@ classdef Interface
                     if ~isempty(allPorts)
                         obj.FromWorkspace(d).GroundHandle = fulfillPorts(allPorts.Inport);
                         obj.FromWorkspace(d).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                        obj.FromWorkspace(d).GroundPath = getfullname(obj.FromWorkspace(d).GroundHandle);
+                        obj.FromWorkspace(d).TerminatorPath = getfullname(obj.FromWorkspace(d).TerminatorHandle);
                     end
                 end
             end
@@ -655,9 +667,11 @@ classdef Interface
                     blockCreated = false;
                     while ~blockCreated
                         try
+                            name = [obj.ModelName '/Data Store Read' num2str(nblock)];
                             obj.DataStoreRead(e).InterfaceHandle = add_block('simulink/Signal Routing/Data Store Read', ...
-                                [obj.ModelName '/Data Store Read' num2str(nblock)], ...
+                                name, ...
                                 options{:});
+                            obj.DataStoreRead(e).InterfacePath = name;
                             blockCreated = true;
                         catch
                             nblock = nblock + 1;
@@ -672,6 +686,8 @@ classdef Interface
                     if ~isempty(allPorts)
                         obj.DataStoreRead(e).GroundHandle = fulfillPorts(allPorts.Inport);
                         obj.DataStoreRead(e).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                        obj.DataStoreRead(e).GroundPath = getfullname(obj.DataStoreRead(e).GroundHandle);
+                        obj.DataStoreRead(e).TerminatorPath = getfullname(obj.DataStoreRead(e).TerminatorHandle);
                     end
                 end
             end
@@ -715,9 +731,11 @@ classdef Interface
                     blockCreated = false;
                     while ~blockCreated
                         try
+                            name = [obj.ModelName '/To File' num2str(nblock)];
                             obj.ToFile(i).InterfaceHandle = add_block('simulink/Sinks/To File', ...
-                                [obj.ModelName '/To File' num2str(nblock)], ...
+                                name, ...
                                 options{:});
+                            obj.ToFile(i).InterfacePath = name;
                             blockCreated = true;
                         catch
                             nblock = nblock + 1;
@@ -732,6 +750,8 @@ classdef Interface
                     if ~isempty(allPorts)
                         obj.ToFile(i).GroundHandle = fulfillPorts(allPorts.Inport);
                         obj.ToFile(i).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                        obj.ToFile(i).GroundPath = getfullname(obj.ToFile(i).GroundHandle);
+                        obj.ToFile(i).TerminatorPath = getfullname(obj.ToFile(i).TerminatorHandle);
                     end
                 end
             end
@@ -743,9 +763,11 @@ classdef Interface
                     blockCreated = false;
                     while ~blockCreated
                         try
+                            name = [obj.ModelName '/To Workspace' num2str(nblock)];
                             obj.ToWorkspace(j).InterfaceHandle = add_block('simulink/Sinks/To Workspace', ...
-                                [obj.ModelName '/To Workspace' num2str(nblock)], ...
+                                name, ...
                                 options{:});
+                            obj.ToWorkspace(j).InterfacePath = name;
                             blockCreated = true;
                         catch
                             nblock = nblock + 1;
@@ -760,6 +782,8 @@ classdef Interface
                     if ~isempty(allPorts)
                         obj.ToWorkspace(j).GroundHandle = fulfillPorts(allPorts.Inport);
                         obj.ToWorkspace(j).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                        obj.ToWorkspace(j).GroundPath = getfullname(obj.ToWorkspace(j).GroundHandle);
+                        obj.ToWorkspace(j).TerminatorPath = getfullname(obj.ToWorkspace(j).TerminatorHandle);
                     end
                 end
             end
@@ -771,9 +795,11 @@ classdef Interface
                     blockCreated = false;
                     while ~blockCreated
                         try
+                            name = [obj.ModelName '/Data Store Write' num2str(nblock)];
                             obj.DataStoreWrite(k).InterfaceHandle = add_block('simulink/Signal Routing/Data Store Write', ...
-                                [obj.ModelName '/Data Store Write' num2str(nblock)], ...
+                                name, ...
                                 options{:});
+                             obj.DataStoreWrite(k).InterfacePath = name;
                             blockCreated = true;
                         catch
                             nblock = nblock + 1;
@@ -788,6 +814,8 @@ classdef Interface
                     if ~isempty(allPorts)
                         obj.DataStoreWrite(k).GroundHandle = fulfillPorts(allPorts.Inport);
                         obj.DataStoreWrite(k).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                        obj.DataStoreWrite(k).GroundPath = getfullname(obj.DataStoreWrite(k).GroundHandle);
+                        obj.DataStoreWrite(k).TerminatorPath = getfullname(obj.DataStoreWrite(k).TerminatorHandle);
                     end
                 end
             end
@@ -799,6 +827,7 @@ classdef Interface
                 obj.FunctionHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.FunctionHeader.Label], 'FontSize', SMALLFONT).Handle;
                 for l = 1:length(obj.Function)
                     obj.Function(l).InterfaceHandle = createFcnCaller(obj.ModelName, obj.Function(l).Fullpath);
+                    obj.Function(l).InterfacePath = getfullname(obj.Function(l).InterfaceHandle);
                     set_param(obj.Function(l).InterfaceHandle, options{:})
                 
                     % Connect to terminators/grounds
@@ -806,6 +835,8 @@ classdef Interface
                     if ~isempty(allPorts)
                         obj.Function(l).GroundHandle = fulfillPorts(allPorts.Inport);
                         obj.Function(l).TerminatorHandle = fulfillPorts(allPorts.Outport);
+                        obj.Function(l).GroundPath = getfullname(obj.Function(l).GroundHandle);
+                        obj.Function(l).TerminatorPath = getfullname(obj.Function(l).TerminatorHandle);
                     end
                 end
             end
@@ -986,6 +1017,9 @@ classdef Interface
                 set_param(obj.ModelName, 'Zoomfactor', 'FitSystem');
             catch
             end
+        end
+        function obj = updateHandles(obj)
+
         end
         function iter = createIterator(obj)
             % CREATEITERATOR Create the iterator object for iterating over an

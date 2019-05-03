@@ -1,10 +1,10 @@
 function setFcnScope(blocks, scope, subsystem)
-% SETFCNSCOPE Change a Simulink Function's scope.
-%   This means adjusting a block's Visibility Parameter and/or placement in the model.
+% SETFCNSCOPE Change a Simulink Function's scope. This means adjusting a block's
+%   Function Visibility Parameter and/or placement in the model.
 %
 %   Inputs:
 %       blocks      Block path names or handles.
-%       scope       Scope.Global(0), Scope.Scoped(1), or Scope.Local(2).
+%       scope       Scope.Global, Scope.Scoped, or Scope.Local.
 %       subsystem   For a Local function, the path of the existing subsystem to
 %                   move it to. [Optional]
 %

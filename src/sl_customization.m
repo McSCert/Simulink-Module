@@ -96,7 +96,7 @@ function schema = ChangeFcnScopeSchema(callbackInfo)
         schema.childrenFcns{end+1} = @LocalFcnSchema;
     end
     
-    % If there ae functions selected, but the functions don't have a scope
+    % If there are functions selected, but the functions don't have a scope
     if isempty(schema.childrenFcns)
         schema.state = 'Disabled'; 
     end
@@ -113,7 +113,7 @@ function schema = GlobalFcnSchema(callbackInfo)
 end
 
 function convertToGlobalFcnCallback(callbackInfo)
-    setFcnScope(gcbs, 0, '');
+    setFcnScope(gcbs, Scope.Global, '');
 end
 
 %% Define action: Convert to Scoped
@@ -125,7 +125,7 @@ function schema = ScopedFcnSchema(callbackInfo)
 end
 
 function convertToScopedFcnCallback(callbackInfo)
-    setFcnScope(gcbs, 1, '');
+    setFcnScope(gcbs, Scope.Scoped, '');
 end
 
 %% Define action: Convert to Local
@@ -144,7 +144,7 @@ function schema = LocalFcnNewSchema(callbackInfo)
 end
 
 function convertToLocalFcnNewCallback(callbackInfo)
-    setFcnScope(gcbs, 2, '');
+    setFcnScope(gcbs, Scope.Local, '');
 end
 
 function schema = LocalFcnExistSchema(callbackInfo)
@@ -157,7 +157,7 @@ end
 function convertToLocalFcnExistCallback(callbackInfo)
     subsystem = subsystemGUI(bdroot);
     if ~isempty(subsystem)
-        setFcnScope(gcbs, 2, subsystem);
+        setFcnScope(gcbs, Scope.Local, subsystem);
     end
 end
 

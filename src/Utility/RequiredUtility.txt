@@ -43,6 +43,7 @@
         inputToCell.m
         inputToNumeric.m
         iscellcell.m
+        replaceNewline.m
 
     LineRouting/
         redraw_block_lines.m
@@ -63,13 +64,10 @@
 		getBlockTextWidth.m
 		getTextDims.m
         
-    find_in_models.m
     fulfillPorts.m
 	getDepthFromSys.m
-    getDepthFromSystem.m
     getParentSystem.m
     new_system_makenameunique.m
-    replaceNewline.m
 
 .../tools/Simulink/Tools/LineToGotoFrom
     src/

@@ -40,7 +40,12 @@ function schema = FcnCreatorSchema(callbackInfo)
 end
 
 function FcnCreatorCallback(callbackInfo)
-    sys = gcs; % save in case it changes
+    sys = gcs; % Save in case it changes
+    
+    % Position the caller in the center of the model
+    bounds = bounds_of_sim_objects(find_system(sys, 'SearchDepth', 1));
+    x = ((bounds(3)-bounds(1))/2) + bounds(1);
+    y = ((bounds(4)-bounds(2))/2) + bounds(2);
     
     [fcns, proto] = getCallableFunctions(sys);
     idx = functionGUI(fcns, proto); % let user make selection
@@ -48,7 +53,7 @@ function FcnCreatorCallback(callbackInfo)
     p = char(proto(idx));
     
     if ~isempty(f)
-        % load model is necessary
+        % Load model is necessary
         i = regexp(f, '/', 'once');
         mdl = f(1:i-1);
         loaded = bdIsLoaded(mdl);
@@ -56,9 +61,9 @@ function FcnCreatorCallback(callbackInfo)
             load_system(mdl);
         end
         
-        createFcnCaller(sys, f, p);
+        createFcnCaller(sys, f, 'prototype', p, 'position', [x, y]);
         
-        % close model is necessary
+        % Close model if necessary
         if ~loaded
             close_system(mdl, 0);
         end

@@ -6,7 +6,8 @@ function caller = createFcnCaller(sys, blockPath, varargin)
 %   Inputs:
 %       sys         Subsystem in which to place the new caller.
 %       blockPath   Simulink Function block path name.
-%       varargin{1} Simulink Function prototype. [Optional]
+%       prototype   Simulink Function prototype. [Optional]
+%       position    [x,y] coordinate where to insert the block. [Optional]
 %
 %   Outputs:
 %       caller      Handle of Function Caller block.
@@ -29,12 +30,14 @@ function caller = createFcnCaller(sys, blockPath, varargin)
     
     % Determine Simulink Function block parameters
     % 1) Prototype
-    if nargin < 3
+    prototype = getInput('prototype', varargin);
+    if isempty(prototype)
         prototype = createPrototype(sys, blockPath);
-    else
-        prototype = varargin{1};
     end
-
+    
+    % 3) Position
+    position = getInput('position', varargin);
+    
     % 2) InputArgumentSpecifications, OutputArgumentSpecifications
     argsIn = find_system(blockPath, 'SearchDepth', 1, 'BlockType', 'ArgIn');
     argsOut = find_system(blockPath, 'SearchDepth', 1, 'BlockType', 'ArgOut');
@@ -98,6 +101,18 @@ function caller = createFcnCaller(sys, blockPath, varargin)
             'User-defined data types, including Bus, Fixed-point, Enumerations, and Alias types, may be provided with a Simulink.Parameter object.']);
     end 
     
+    % Position the block 
+    if ~isempty(position)
+        oldPosition = get_param(caller, 'Position');
+        height = oldPosition(4) - oldPosition(2);
+        width  = oldPosition(3) - oldPosition(1);
+        
+        heightOffset = height/2;
+        widthOffset = width/2;
+        newPosition = [position(1)-widthOffset, position(2)-heightOffset, position(1)+widthOffset, position(2)+heightOffset];
+        set_param(caller, 'Position', newPosition);
+    end    
+        
     % Resize block width    
     oldSize = get_param(caller, 'Position');
     [~, newSize] = adjustWidth(caller, 'PerformOperation', 'off', 'Buffer', 12);

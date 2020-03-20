@@ -28,12 +28,11 @@ function dependencies(sys)
     end
 
     %% 2) Linked Library Blocks
-    % Find all unique, linked blocks (but don't go into the linked block)
-    ll = find_system(sys, 'LinkStatus', 'resolved', 'Commented', 'off');
-    % Remove non-unique based on ReferenceBlock
-    %libraryname = get_param(ll, 'ReferenceBlock');
-    %[~, idx] = unique(libraryname);
-    %ll = ll(idx);
+    ll = find_system(sys, 'FollowLinks', 'on', 'LinkStatus', 'resolved', 'Commented', 'off');
+    % In case sys is a library, remove any dependencies to itself
+    lib = bdroot(ll);
+    idx = ~strcmp(lib, sys);
+    ll = ll(idx);
     if isempty(ll)
         ll = {'N/A'};
     else

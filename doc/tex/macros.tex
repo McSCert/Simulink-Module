@@ -1,0 +1,92 @@
+\usepackage{xspace}
+
+\newcommand{\args}[1] {\textit{#1}}
+\newcommand{\cmd}[1] {\texttt{#1}}     % Use for command window commands, e.g., \cmd{svn up}
+\newcommand{\block}[1] {\textsf{#1}}   % Use for Simulink block names, e.g., \cmd{Subsystem1}
+\newcommand{\signal}[1] {\textsf{#1}}   % Use for Simulink block names, e.g., \cmd{Subsystem1}
+\newcommand{\ring}[1] {\textsf{#1}} 	 % Use for files names and paths
+\newcommand{\keyword}[1] {\texttt{#1}} % Use for keywords of programming languages, e.g., \keyword{while}
+\newcommand{\file}[1] {\texttt{#1}} 	 % Use for files names and paths
+\newcommand{\param}[1] {\textsf{#1}}   % Use for block parameter names, e.g., \param{BlockType}
+
+% Matlab Products
+\newcommand{\matlab}{\textsc{Matlab}\@\xspace}
+\newcommand{\Matlab}{\textsc{Matlab}\@\xspace}
+\newcommand{\Simulink}{Simulink\@\xspace}
+\newcommand{\simulink}{Simulink\@\xspace}
+\newcommand{\SDV}{Simulink Design Verifier\@\xspace}
+\newcommand{\mpath}{\Matlab search path\@\xspace}
+
+% Block Names (not BlockType)
+\newcommand{\ds}{\block{Data Store}\@\xspace}
+\newcommand{\DSM}{\block{Data Store Memory}\@\xspace}
+\newcommand{\DSR}{\block{Data Store Read}\@\xspace}
+\newcommand{\DSW}{\block{Data Store Write}\@\xspace}
+\newcommand{\DSRW}{\block{Data Store Read/Write}\@\xspace}
+\newcommand{\DSMRW}{\block{Data Store Memory/Read/Write}\@\xspace}
+
+\newcommand{\goto}{\block{Goto}\@\xspace}
+\newcommand{\from}{\block{From}\@\xspace}
+
+\newcommand{\inport}{\block{Inport}\@\xspace}
+\newcommand{\outport}{\block{Outport}\@\xspace}
+\newcommand{\constant}{\block{Constant}\@\xspace}
+\newcommand{\ground}{\block{Ground}\@\xspace}
+\newcommand{\subsystem}{\block{Subsystem}\@\xspace}
+
+\newcommand{\logic}{\block{Logical Operator}\@\xspace}
+\newcommand{\relational}{\block{Relational Operator}\@\xspace}
+\newcommand{\ifblk}{\block{If}\@\xspace}
+\newcommand{\switch}{\block{Switch}\@\xspace}
+\newcommand{\merge}{\block{Merge}\@\xspace}
+
+\newcommand{\docblock}{\block{DocBlock}\@\xspace}
+
+\newcommand{\simfunc}{\block{Simulink Function}\@\xspace}
+\newcommand{\simfunccaller}{\block{Function Caller}\@\xspace}
+
+\newcommand{\toworkspace}{\block{To Workspace}\@\xspace}
+\newcommand{\fromworkspace}{\block{From Workspace}\@\xspace}
+
+\newcommand{\tofile}{\block{To File}\@\xspace}
+\newcommand{\fromfile}{\block{From File}\@\xspace}
+
+\newcommand{\fromspreadsheet}{\block{From Spreadsheet}\@\xspace}
+
+\newcommand{\modelref}{\block{Model Reference}\@\xspace}
+\newcommand{\library}{\block{Library}\@\xspace}
+\newcommand{\librarylink}{\block{Library Link}\@\xspace}
+
+% Commonly used parameters
+\newcommand{\AND}{\param{AND}\@\xspace}
+\newcommand{\OR}{\param{OR}\@\xspace}
+\newcommand{\NOT}{\param{NOT}\@\xspace}
+\newcommand{\NOR}{\param{NOR}\@\xspace}
+\newcommand{\NAND}{\param{NAND}\@\xspace}
+\newcommand{\XOR}{\param{XOR}\@\xspace}
+\newcommand{\NXOR}{\param{NXOR}\@\xspace}
+
+% Common Abbreviations
+% Example
+\newcommand{\eg}{\textrm{e.g.,}\@\xspace}
+
+% That Is To Say
+\newcommand{\ie}{\textrm{i.e.,}\@\xspace}
+
+% And So On
+\newcommand{\etc}{\textrm{etc.}\@\xspace}
+
+% And Others
+\newcommand{\etal}{\textrm{et al.}\@\xspace}
+
+% With Respect To
+\newcommand{\wrt}{\textrm{w.r.t.}\@\xspace}
+
+% Vice Versa
+\newcommand{\vrsa}{\textrm{vice versa}\@\xspace}
+
+% Symbols
+
+\usepackage{amssymb}
+\newcommand{\checkbox}{\makebox[0pt][l]{$\square$}\raisebox{.15ex}{\hspace{0.1em}$\checkmark$}}%
+\newcommand{\uncheckbox}{$\square$~}%

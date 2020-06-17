@@ -30,7 +30,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%
 % Tool-Specific Macros
 %%%%%%%%%%%%%%%%%%%%%%%%%
-\input{../../common/macros}
+\input{macros}
 
 \newcommand{\ToolName}{Simulink Module Tool\@\xspace}
 
@@ -475,32 +475,18 @@ Right-clicking anywhere in the model and then selecting \cmd{\menu{7}} from the 
 \end{figure}
 
 %---------------------------------------
-% What are the configuration options for the tool?
-%---------------------------------------
-%\subsection{Configuration Parameters}
-%The configuration file \cmd{config.txt} is included in \cmd{\toolFolder\textbackslash src}. The following configuration parameters are utilized by the tool, and can be modified by the user in order to tailor tool functionality:
-%
-%\begin{itemize}
-%	\item \cmd{gotofrom\_bgcolor} -- The ... 
-%	\item \cmd{heading\_size} -- The ...
-%\end{itemize}
-%
-%Please see the configuration file for more details regarding parameter usage and accepted values. These parameters can be modified with \matlab open, and do not require that \matlab be restarted for the changes to take effect.
-
-%---------------------------------------
 % What else does the tool do?
 %---------------------------------------
 
 \subsection{Errors and Warnings}
-Any errors or warnings during tool use will be visible in the \matlab Command Window. %Typically, errors will be shown when the model is locked or function parameters are incorrect.
-
+Any errors or warnings during tool use will be visible in the \matlab Command Window.
 
 \subsection{Limitations}
 A \Simulink model can depend on or interact with other files and elements via the use of Callbacks\footnote{\url{https://www.mathworks.com/help/simulink/ug/model-callbacks.html}} and S-Functions\footnote{\url{https://www.mathworks.com/help/simulink/sfg/what-is-an-s-function.html}}. Identifying these is not currently supported by the tool.
 
-%\begin{thebibliography}{9}
-%\bibitem{paper} 
-%Monika Jaskolka, Vera Pantelic, Mark Lawford, and Alan Wassyng, ``Supporting Modularity for \Simulink Models", 2019, \textit{(Manuscript in Preparation)}.
-%\end{thebibliography}
+\begin{thebibliography}{9}
+\bibitem{paper} 
+Monika Jaskolka, Vera Pantelic, Mark Lawford, and Alan Wassyng, ``Supporting Modularity in \Simulink Models", \emph{Journal of Software and Systems Modeling} (Submitted May 2020).
+\end{thebibliography}
 
 \end{document}

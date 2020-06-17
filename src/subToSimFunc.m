@@ -91,18 +91,48 @@ function subToSimFunc(subsystem,simulinkFunctionName,visibility)
     outportParameters=getPortParameters(allOutports);
     
     % Replace outports with argument outputs
-    replace_block(subsystem,'SearchDepth',1,'BlockType','Outport','ArgOut','noprompt');
+    replace_block(subsystem,'SearchDepth',1,'BlockType',...
+                  'Outport','ArgOut','noprompt');
     
     % Create array of all the argOuts for the Simulink-function
     allArgOuts=find_system(subsystem,'SearchDepth',1,'BlockType','ArgOut');
     
     % Setting the parameters for all the argument outputs
     for argOut=1:length(allArgOuts)
-        set_param(allArgOuts{argOut},'Port',outportParameters{argOut,1},'OutMin',outportParameters{argOut,2},'OutMax',outportParameters{argOut,3},'OutDataTypeStr',outportParameters{argOut,4},'LockScale',outportParameters{argOut,5},'PortDimensions',outportParameters{argOut,6},'ArgumentName',outportParameters{argOut,7});
+        set_param(allArgOuts{argOut},'Port',outportParameters{argOut,1},...
+                  'OutMin',outportParameters{argOut,2},...
+                  'OutMax',outportParameters{argOut,3},...
+                  'OutDataTypeStr',outportParameters{argOut,4},...
+                  'LockScale',outportParameters{argOut,5},...
+                  'PortDimensions',outportParameters{argOut,6},...
+                  'ArgumentName',outportParameters{argOut,7});
     end
 end
 
 function parameters=getPortParameters(ports)
+% getPortParameters returns the parameters for an inport or outport
+%
+% Inputs:
+%   ports           Cell array of inports or outports
+%
+% Outputs:
+%   parameters      Cell array of parameters including:
+%                       1) Port
+%                       2) OutMin
+%                       3) OutMax
+%                       4) OutDataTypeStr
+%                       5) LockScale
+%                       6) PortDimensions
+%                       7) ArgumentName
+%
+% Example:
+%   parameters=getPortParameters({'System/Subsystem/Inport1'})
+%
+%           ans = 
+%                1x7 cell array
+%                    {'1'} {'[]'} {'[]'} {'boolean'} {'off'} {'on'} {'Inport1'}
+
+    %% Get the port parameters
     % Init counter to counter invalid port names
     invalidNameCounter=0;
     % Init array of parameters for the ports
@@ -121,7 +151,7 @@ function parameters=getPortParameters(ports)
         try
             assert(not(strcmp(parameters{port,4},'Inherit: auto')));
         catch
-            disp(['Data type of port',newline,ports{port},newline,...
+            disp(['Invalid data type of port',newline,ports{port},newline,...
                   'was set to Inherit - setting to double...',newline]);
             parameters{port,4}='double';
         end
@@ -133,8 +163,8 @@ function parameters=getPortParameters(ports)
         try
             assert(not(strcmp(parameters{port,6},'-1')))
         catch
-            disp(['Port dimensions of port:',newline,ports{port},newline,...
-                  'was set to Inherit - setting to 1...',newline]);
+            disp(['Invalid port dimensions of port:',newline,ports{port},...
+                   newline,'was set to Inherit - setting to 1...',newline]);
             parameters{port,6}='1';
         end
         % Get the port name by splitting the pathname by the backslash
@@ -147,8 +177,8 @@ function parameters=getPortParameters(ports)
         catch
             invalidNameCounter = invalidNameCounter + 1;
             parameters{port,7}=strcat('arg',num2str(invalidNameCounter));
-            disp(['Invalid port variable name',newline,splitPortPath{end},...
-            newline,'setting to ',parameters{port,7},newline])
+            disp(['Invalid port variable name:',newline,splitPortPath{end},...
+                   newline,'setting to ',parameters{port,7},newline])
         end
     end
 end

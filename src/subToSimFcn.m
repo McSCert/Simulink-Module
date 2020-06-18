@@ -1,4 +1,4 @@
-function subToSimFcn(subsystem,simulinkFcnName,visibility)
+function subToSimFcn(subsystem, simulinkFcnName, visibility)
 % subToSimFunc              Converts a subsystem to a Simulink Function
 %
 % Inputs:

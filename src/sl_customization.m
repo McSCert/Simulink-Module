@@ -16,7 +16,44 @@ function schemaFcns = getSLModuleTool(callbackInfo)
     elseif any(selectedFcns) && ~isempty(gcbs)
         schemaFcns{end+1} = @ChangeFcnScopeSchema;
         schemaFcns{end+1} = @FcnCreatorLocalSchema;
+    elseif isSubsystem(gcbs)
+        schemaFcns{end+1} = @ConvToSimFcnSchema;
     end
+end
+
+%% Define action: Convert Subsystem to Simulink-function
+function schema = ConvToSimFcnSchema(callbackInfo)
+    schema = sl_container_schema;
+    schema.label = 'Convert Subsystem';
+    schema.ChildrenFcns = {@toScopedSimFcn,@toGlobalSimFcn};
+end
+
+function schema=toScopedSimFcn(callbackInfo)
+    schema = sl_action_schema;
+    schema.label = 'to Scoped Simulink Function';
+    schema.userdata = 'toScopedSimFcn';
+    schema.callback = @toScopedSimFcnCallback;
+end
+
+function toScopedSimFcnCallback(callbackInfo)
+    simulinkFunctionName = ...
+        input('Enter a name for the Simulink-function: ','s');
+    subsystem = gcbs;
+    subToSimFcn(subsystem{1},simulinkFunctionName,'scoped');
+end
+
+function schema=toGlobalSimFcn(callbackInfo)
+    schema = sl_action_schema;
+    schema.label = 'to Global Simulink Function';
+    schema.userdata = 'toGlobalSimFcn';
+    schema.callback = @toGlobalSimFcnCallback;
+end
+
+function toGlobalSimFcnCallback(callbackInfo)
+    simulinkFunctionName = ...
+        input('Enter a name for the Simulink-function: ','s');
+    subsystem = gcbs;
+    subToSimFcn(subsystem{1},simulinkFunctionName,'global');
 end
 
 %% Define action: Create Function Caller for Local Function

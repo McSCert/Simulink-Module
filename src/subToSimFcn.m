@@ -1,10 +1,10 @@
-function subToSimFunc(subsystem,simulinkFunctionName,visibility)
-% subToSimFunc converts a subsystem to a Simulink-function
+function subToSimFcn(subsystem,simulinkFunctionName,visibility)
+% subToSimFunc              Converts a subsystem to a Simulink-function
 %
 % Inputs:
-%   subsystem           Path of a subsystem to be converted
-%   simulinkFunctionName     Name of the Simulink-function to be created
-%   visibility          Set function Visibility parameter to'scoped' or 'global'
+%   subsystem               Path of a subsystem to be converted
+%   simulinkFunctionName    Name of the Simulink-function to be created
+%   visibility              Set function visibility to'scoped' or 'global'
 %
 % Outputs:
 %   N/A
@@ -14,8 +14,6 @@ function subToSimFunc(subsystem,simulinkFunctionName,visibility)
 %
 %           Converts 'f_Sensor_Trip_1' subsystem to a
 %           scoped Simulink-function 'f_SensorTrip_i'
-%
-% Author: Stephen Scott
 
     %% Input Validation
     
@@ -72,15 +70,7 @@ function subToSimFunc(subsystem,simulinkFunctionName,visibility)
     allArgIns=find_system(subsystem,'SearchDepth',1,'BlockType','ArgIn');
     
     % Setting the parameters for all the argument inputs
-    for argIn=1:length(allArgIns)
-        set_param(allArgIns{argIn},'Port',inportParameters{argIn,1},...
-                  'OutMin',inportParameters{argIn,2},...
-                  'OutMax',inportParameters{argIn,3},...
-                  'OutDataTypeStr',inportParameters{argIn,4},...
-                  'LockScale',inportParameters{argIn,5},....
-                  'PortDimensions',inportParameters{argIn,6},...
-                  'ArgumentName',inportParameters{argIn,7});
-    end
+    setArgumentParameters(allArgIns,inportParameters);
     
     %% Convert Outports to ArgOuts
     
@@ -98,32 +88,24 @@ function subToSimFunc(subsystem,simulinkFunctionName,visibility)
     allArgOuts=find_system(subsystem,'SearchDepth',1,'BlockType','ArgOut');
     
     % Setting the parameters for all the argument outputs
-    for argOut=1:length(allArgOuts)
-        set_param(allArgOuts{argOut},'Port',outportParameters{argOut,1},...
-                  'OutMin',outportParameters{argOut,2},...
-                  'OutMax',outportParameters{argOut,3},...
-                  'OutDataTypeStr',outportParameters{argOut,4},...
-                  'LockScale',outportParameters{argOut,5},...
-                  'PortDimensions',outportParameters{argOut,6},...
-                  'ArgumentName',outportParameters{argOut,7});
-    end
+    setArgumentParameters(allArgOuts,outportParameters);
 end
 
 function parameters=getPortParameters(ports)
-% getPortParameters returns the parameters for an inport or outport
+% getPortParameters     Returns the parameters for an inport or outport
 %
 % Inputs:
-%   ports           Cell array of inports or outports
+%   ports               Cell array of inports or outports
 %
 % Outputs:
-%   parameters      Cell array of parameters including:
-%                       1) Port
-%                       2) OutMin
-%                       3) OutMax
-%                       4) OutDataTypeStr
-%                       5) LockScale
-%                       6) PortDimensions
-%                       7) ArgumentName
+%   parameters          Cell array of parameters including:
+%                           1) Port
+%                           2) OutMin
+%                           3) OutMax
+%                           4) OutDataTypeStr
+%                           5) LockScale
+%                           6) PortDimensions
+%                           7) ArgumentName
 %
 % Example:
 %   parameters=getPortParameters({'System/Subsystem/Inport1'})
@@ -180,5 +162,33 @@ function parameters=getPortParameters(ports)
             disp(['Invalid port variable name:',newline,splitPortPath{end},...
                    newline,'setting to ',parameters{port,7},newline])
         end
+    end
+end
+
+function setArgumentParameters(arguments,parameters)
+% setArgumentParameters     Sets argIn or ArgOut parameters
+%
+% Inputs:
+%   arguments               Cell array of argIns or argOuts
+%   parameters              Cell array of parameters for each argument
+%
+% Outputs:
+%   N/A
+%
+% Example:
+%   setArgumentParameters({'System/Subsystem/argIn1'},...
+%                         {'1','[]','[]','boolean','off','on','Inport1'})
+
+    %% Set the argument parameters
+    % Loop through each argument
+    for arg=1:length(arguments)
+        % Set the parameters for each argument
+        set_param(arguments{arg},'Port',parameters{arg,1},...
+                  'OutMin',parameters{arg,2},...
+                  'OutMax',parameters{arg,3},...
+                  'OutDataTypeStr',parameters{arg,4},...
+                  'LockScale',parameters{arg,5},...
+                  'PortDimensions',parameters{arg,6},...
+                  'ArgumentName',parameters{arg,7});
     end
 end

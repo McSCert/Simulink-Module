@@ -1,4 +1,4 @@
-function b = isSubsystem(block)
+function b = isSubsystem(blocks)
 % ISSUBSYSTEM Determine if the block is a subsystem.
 %
 %   Inputs:
@@ -7,8 +7,15 @@ function b = isSubsystem(block)
 %   Outputs:
 %       b       Whether the block is a subsystem(1) or not(0).
     
-    % Strip block from cell array
-    block = block{1};
-    % Check if block is a subsystem
-    b = strcmpi(get_param(block,'BlockType'),'SubSystem');
+    % Convert the input to handles
+    blocks = inputToNumeric(blocks);
+    
+    b = zeros(1, length(blocks));
+    % Check each block to see if its a subsystem
+    for block = 1:length(blocks)
+        try
+            b(block) = strcmpi(get_param(blocks(block),'BlockType'),'SubSystem');
+        catch % Unexpected error
+        end
+    end
 end

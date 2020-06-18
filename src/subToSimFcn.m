@@ -1,9 +1,9 @@
-function subToSimFcn(subsystem,simulinkFunctionName,visibility)
-% subToSimFunc              Converts a subsystem to a Simulink-function
+function subToSimFcn(subsystem,simulinkFcnName,visibility)
+% subToSimFunc              Converts a subsystem to a Simulink Function
 %
 % Inputs:
 %   subsystem               Path of a subsystem to be converted
-%   simulinkFunctionName    Name of the Simulink-function to be created
+%   simulinkFcnName         Name of the Simulink Function to be created
 %   visibility              Set function visibility to'scoped' or 'global'
 %
 % Outputs:
@@ -27,71 +27,74 @@ function subToSimFcn(subsystem,simulinkFunctionName,visibility)
     
     % Check that the function name is valid
     try
-        assert(isvarname(simulinkFunctionName));
+        assert(isvarname(simulinkFcnName));
     catch
         error('Invalid function name. Use a valid MATLAB variable name.');
     end
     
     % Check that the function visibility is valid
     try
-        assert(strcmp(visibility,'scoped')||strcmp(visibility,'global'));
+        assert(strcmp(visibility, 'scoped') || strcmp(visibility, 'global'));
     catch
         error('Invalid function visibility. Use scoped/global visibility.');
     end
     
-    %% Convert Subsystem to Simulink-function
+    %% Add Trigger to Subsystem
     
     % Disable subsystem link
-    set_param(subsystem,'LinkStatus','inactive');
+    set_param(subsystem, 'LinkStatus', 'inactive');
 
     % Adding the trigger block to the subsystem and calibrating its parameters
-    TriggerPath=append(subsystem,'/',simulinkFunctionName);
-    add_block('simulink/Ports & Subsystems/Trigger',TriggerPath);
-    set_param(TriggerPath,'TriggerType','function-call','IsSimulinkFunction',...
-              'on','FunctionName',simulinkFunctionName,...
-              'FunctionVisibility',visibility);
+    TriggerPath = append(subsystem, '/', simulinkFcnName);
+    add_block('simulink/Ports & Subsystems/Trigger', TriggerPath);
+    set_param(TriggerPath, 'TriggerType', 'function-call', ...
+              'IsSimulinkFunction', 'on', 'FunctionName', simulinkFcnName, ...
+              'FunctionVisibility', visibility);
     
     % Set subsystem to atomic execution
-    set_param(subsystem,'TreatAsAtomicUnit','on');
+    set_param(subsystem, 'TreatAsAtomicUnit', 'on');
     
     %% Convert Inports to ArgIns
     
     % Create array of all the inports in the subsystem
-    allInports=find_system(subsystem,'SearchDepth',1,'BlockType','Inport');
+    allInports = find_system(subsystem, 'SearchDepth', 1, ...
+                             'BlockType', 'Inport');
     
     % Getting the parameters for all inports in the subsystem
-    inportParameters=getPortParameters(allInports);
+    inportParameters = getPortParameters(allInports);
     
     % Replace inports with argument inputs
-    replace_block(subsystem,'SearchDepth',1,'BlockType',...
-                  'Inport','ArgIn','noprompt');
+    replace_block(subsystem, 'SearchDepth', 1, ...
+                  'BlockType', 'Inport', 'ArgIn', 'noprompt');
     
-    % Create array of all the argIns in the Simulink-function
-    allArgIns=find_system(subsystem,'SearchDepth',1,'BlockType','ArgIn');
+    % Create array of all the argIns in the Simulink Function
+    allArgIns = find_system(subsystem, 'SearchDepth', 1, 'BlockType', 'ArgIn');
     
     % Setting the parameters for all the argument inputs
-    setArgumentParameters(allArgIns,inportParameters);
+    setArgumentParameters(allArgIns, inportParameters);
     
     %% Convert Outports to ArgOuts
     
     % Create array of all the outports in the subsystem
-    allOutports=find_system(subsystem,'SearchDepth',1,'BlockType','Outport');
+    allOutports = find_system(subsystem, 'SearchDepth', 1, ...
+                              'BlockType', 'Outport');
     
     % Getting the parameters for all outports in the subsystem
-    outportParameters=getPortParameters(allOutports);
+    outportParameters = getPortParameters(allOutports);
     
     % Replace outports with argument outputs
-    replace_block(subsystem,'SearchDepth',1,'BlockType',...
-                  'Outport','ArgOut','noprompt');
+    replace_block(subsystem, 'SearchDepth', 1, ...
+                  'BlockType', 'Outport', 'ArgOut', 'noprompt');
     
-    % Create array of all the argOuts for the Simulink-function
-    allArgOuts=find_system(subsystem,'SearchDepth',1,'BlockType','ArgOut');
+    % Create array of all the argOuts for the Simulink Function
+    allArgOuts = find_system(subsystem, 'SearchDepth', 1, ...
+                             'BlockType', 'ArgOut');
     
     % Setting the parameters for all the argument outputs
-    setArgumentParameters(allArgOuts,outportParameters);
+    setArgumentParameters(allArgOuts, outportParameters);
 end
 
-function parameters=getPortParameters(ports)
+function parameters = getPortParameters(ports)
 % getPortParameters     Returns the parameters for an inport or outport
 %
 % Inputs:
@@ -116,56 +119,56 @@ function parameters=getPortParameters(ports)
 
     %% Get the port parameters
     % Init counter to counter invalid port names
-    invalidNameCounter=0;
+    invalidNameCounter = 0;
     % Init array of parameters for the ports
-    parameters=cell(length(ports),7);
+    parameters = cell(length(ports), 7);
     % Loop through each port
-    for port=1:length(ports)
+    for port = 1:length(ports)
         % Get the port number
-        parameters{port,1}=get_param(ports{port},'Port');
+        parameters{port, 1} = get_param(ports{port}, 'Port');
         % Get the port minimum output
-        parameters{port,2}=get_param(ports{port},'OutMin');
+        parameters{port, 2} = get_param(ports{port}, 'OutMin');
         % Get the port maximum output
-        parameters{port,3}=get_param(ports{port},'OutMax');
+        parameters{port, 3} = get_param(ports{port}, 'OutMax');
         % Get the port data type
-        parameters{port,4}=get_param(ports{port},'OutDataTypeStr');
+        parameters{port, 4} = get_param(ports{port}, 'OutDataTypeStr');
         % If data type is set to inherit, set to double by default
         try
-            assert(not(strcmp(parameters{port,4},'Inherit: auto')));
+            assert(not(strcmp(parameters{port, 4}, 'Inherit: auto')));
         catch
-            disp(['Invalid data type of port',newline,ports{port},newline,...
-                  'was set to Inherit - setting to double...',newline]);
-            parameters{port,4}='double';
+            disp(['Invalid data type of port', newline, ports{port}, newline,...
+                  'was set to Inherit - setting to double...', newline]);
+            parameters{port, 4} = 'double';
         end
         % Get the port lock scale
-        parameters{port,5}=get_param(ports{port},'LockScale');
+        parameters{port, 5} = get_param(ports{port}, 'LockScale');
         % Get the port dimension
-        parameters{port,6}=get_param(ports{port},'PortDimensions');
+        parameters{port, 6} = get_param(ports{port}, 'PortDimensions');
         % If port dimension is set to inherit, set to 1 by default
         try
-            assert(not(strcmp(parameters{port,6},'-1')))
+            assert(not(strcmp(parameters{port, 6}, '-1')))
         catch
-            disp(['Invalid port dimensions of port:',newline,ports{port},...
-                   newline,'was set to Inherit - setting to 1...',newline]);
-            parameters{port,6}='1';
+            disp(['Invalid port dimensions of port:', newline, ports{port},...
+                   newline, 'was set to Inherit - setting to 1...', newline]);
+            parameters{port, 6} = '1';
         end
         % Get the port name by splitting the pathname by the backslash
-        splitPortPath=split(ports{port},'/');
+        splitPortPath = split(ports{port}, '/');
         % Set port name equal to the last string in the split pathname
-        parameters{port,7}=splitPortPath{end};
+        parameters{port, 7} = splitPortPath{end};
         % If port name is invalid variable name, set to invalid name counter
         try
-            assert(isvarname(parameters{port,7}));
+            assert(isvarname(parameters{port, 7}));
         catch
             invalidNameCounter = invalidNameCounter + 1;
-            parameters{port,7}=strcat('arg',num2str(invalidNameCounter));
-            disp(['Invalid port variable name:',newline,splitPortPath{end},...
-                   newline,'setting to ',parameters{port,7},newline])
+            parameters{port, 7} = strcat('arg', num2str(invalidNameCounter));
+            disp(['Invalid port variable name:', newline, splitPortPath{end},...
+                   newline, 'setting to ', parameters{port, 7}, newline])
         end
     end
 end
 
-function setArgumentParameters(arguments,parameters)
+function setArgumentParameters(arguments, parameters)
 % setArgumentParameters     Sets argIn or ArgOut parameters
 %
 % Inputs:
@@ -181,14 +184,14 @@ function setArgumentParameters(arguments,parameters)
 
     %% Set the argument parameters
     % Loop through each argument
-    for arg=1:length(arguments)
+    for arg = 1:length(arguments)
         % Set the parameters for each argument
-        set_param(arguments{arg},'Port',parameters{arg,1},...
-                  'OutMin',parameters{arg,2},...
-                  'OutMax',parameters{arg,3},...
-                  'OutDataTypeStr',parameters{arg,4},...
-                  'LockScale',parameters{arg,5},...
-                  'PortDimensions',parameters{arg,6},...
-                  'ArgumentName',parameters{arg,7});
+        set_param(arguments{arg}, 'Port', parameters{arg, 1}, ...
+                  'OutMin', parameters{arg, 2}, ...
+                  'OutMax', parameters{arg, 3}, ...
+                  'OutDataTypeStr', parameters{arg, 4}, ...
+                  'LockScale', parameters{arg, 5}, ...
+                  'PortDimensions', parameters{arg, 6}, ...
+                  'ArgumentName', parameters{arg, 7});
     end
 end

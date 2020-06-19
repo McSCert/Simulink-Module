@@ -17,19 +17,21 @@ function goodName = isGoodSimFcnName(subsystem, simulinkFcnName)
     % Get callable Simulink-functions at the current scope
     [~, prototype] = getCallableFunctions(subsystem);
     
-    result = zeros(1, length(prototype));
+    % Get the prototype names
+    prototypeNames = getPrototypeName(prototype);
     
-    splitEquals = split(prototype, '= ');
-    % Loop through each fcn name and compare to the input name
-    for fcn = 1:length(prototype)
-        if length(prototype) == 1
-            splitHierarchy = split(splitEquals{end}, '.');
-        else
-            splitHierarchy = split(splitEquals{fcn,end}, '.');
-        end
-        tmp = split(splitHierarchy{end}, '(');
-        result(fcn) = ~strcmp(simulinkFcnName, tmp{1});
+    % Make sure the prototype name is a cell
+    if ~iscell(prototypeNames)
+        prototypeNames = {prototypeNames};
     end
-    % Return true if none of the fcn names are the same as the input name
+    
+    result = zeros(1, length(prototypeNames));
+    
+    % Loop through each prototype name
+    for name = 1:length(prototypeNames)
+        % Compare to the input name
+        result(name) = ~strcmp(simulinkFcnName, prototypeNames{name});
+    end
+    % Return true if none of the prototype names are the same as the input name
     goodName = all(result);
 end

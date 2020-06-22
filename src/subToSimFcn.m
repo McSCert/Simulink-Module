@@ -10,7 +10,7 @@ function subToSimFcn(subsystem, simulinkFcnName, visibility)
 %   N/A
 %
 % Example:
-%   subToSimFunc('Demo_Example/f_Sensor_Trip_1','f_Sensor_Trip_i', 'scoped')
+%   subToSimFunc('Demo_Example/f_Sensor_Trip_1', 'f_Sensor_Trip_i', 'scoped')
 %
 %           Converts 'f_Sensor_Trip_1' subsystem to a
 %           scoped Simulink-function 'f_SensorTrip_i'
@@ -118,8 +118,6 @@ function parameters = getPortParameters(ports)
 %                    {'1'} {'[]'} {'[]'} {'boolean'} {'off'} {'on'} {'Inport1'}
 
     %% Get the port parameters
-    % Init counter to counter invalid port names
-    invalidNameCounter = 0;
     % Init array of parameters for the ports
     parameters = cell(length(ports), 7);
     % Loop through each port
@@ -155,16 +153,7 @@ function parameters = getPortParameters(ports)
         % Get the port name by splitting the pathname by the backslash
         splitPortPath = split(ports{port}, '/');
         % Set port name equal to the last string in the split pathname
-        parameters{port, 7} = splitPortPath{end};
-        % If port name is invalid variable name, set to invalid name counter
-        try
-            assert(isvarname(parameters{port, 7}));
-        catch
-            invalidNameCounter = invalidNameCounter + 1;
-            parameters{port, 7} = strcat('arg', num2str(invalidNameCounter));
-            disp(['Invalid port variable name:', newline, splitPortPath{end},...
-                   newline, 'setting to ', parameters{port, 7}, newline])
-        end
+        parameters{port, 7} = genvarname(splitPortPath{end});
     end
 end
 

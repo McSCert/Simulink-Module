@@ -1,20 +1,21 @@
 function goodName = isGoodSimFcnName(subsystem, simulinkFcnName)
-% isGoodSimFcnName          Checks to see if a Simulink-fcn name clashes with
-%                           any other Simulink-fcns in scope at the current
-%                           subsystem level
+% isGoodSimFcnName          Checks to see if a Simulink Function name is the
+%                           same as any other Simulink Functions in scope at
+%                           the current subsystem level
 % Inputs:
-%   subsystem               Path of a subsystem where the fcn will be added
-%   simulinkFcnName         Name of the Simulink-function to be created
+%   subsystem               Path of a subsystem where a Simulink Function
+%                           will be added
+%   simulinkFcnName         Name of the Simulink Function to be added
 %
 % Outputs:
 %   goodName                Name can be used(1) or not(0)
 %
 % Example:
-%   isGoodSimFcnName('SubSystem_Name','SimFcnName')
+%   isGoodSimFcnName('SubSystem_Name', 'SimFcnName')
 %
 %           ans = 1
 
-    % Get callable Simulink-functions at the current scope
+    % Get callable Simulink Functions at the current scope
     [~, prototype] = getCallableFunctions(subsystem);
     
     % Get the prototype names

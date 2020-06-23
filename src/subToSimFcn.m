@@ -13,7 +13,7 @@ function subToSimFcn(subsystem, simulinkFcnName, visibility)
 %   subToSimFunc('Demo_Example/f_Sensor_Trip_1', 'f_Sensor_Trip_i', 'scoped')
 %
 %           Converts 'f_Sensor_Trip_1' subsystem to a
-%           scoped Simulink-function 'f_SensorTrip_i'
+%           scoped Simulink Function 'f_SensorTrip_i'
 
     %% Input Validation
     
@@ -41,13 +41,13 @@ function subToSimFcn(subsystem, simulinkFcnName, visibility)
     
     %% Add Trigger to Subsystem
     
-    % Disable subsystem link
-    set_param(subsystem, 'LinkStatus', 'inactive');
+    % Break library link
+    set_param(subsystem, 'LinkStatus', 'none');
 
     % Adding the trigger block to the subsystem and calibrating its parameters
-    TriggerPath = append(subsystem, '/', simulinkFcnName);
-    add_block('simulink/Ports & Subsystems/Trigger', TriggerPath);
-    set_param(TriggerPath, 'TriggerType', 'function-call', ...
+    triggerPath = append(subsystem, '/', simulinkFcnName);
+    add_block('simulink/Ports & Subsystems/Trigger', triggerPath);
+    set_param(triggerPath, 'TriggerType', 'function-call', ...
               'IsSimulinkFunction', 'on', 'FunctionName', simulinkFcnName, ...
               'FunctionVisibility', visibility);
     
@@ -111,7 +111,7 @@ function parameters = getPortParameters(ports)
 %                           7) ArgumentName
 %
 % Example:
-%   parameters=getPortParameters({'System/Subsystem/Inport1'})
+%   parameters = getPortParameters({'System/Subsystem/Inport1'})
 %
 %           ans = 
 %                1x7 cell array
@@ -122,6 +122,10 @@ function parameters = getPortParameters(ports)
     parameters = cell(length(ports), 7);
     % Loop through each port
     for port = 1:length(ports)
+        % Get the port name by splitting the pathname by the backslash
+        splitPortPath = split(ports{port}, '/');
+        % The port name is the last index of splitPortPath
+        portName = splitPortPath{end};
         % Get the port number
         parameters{port, 1} = get_param(ports{port}, 'Port');
         % Get the port minimum output
@@ -134,8 +138,9 @@ function parameters = getPortParameters(ports)
         try
             assert(not(strcmp(parameters{port, 4}, 'Inherit: auto')));
         catch
-            disp(['Invalid data type of port', newline, ports{port}, newline,...
-                  'was set to Inherit - setting to double...', newline]);
+            disp([portName, ...
+                  ' data type was set to ''Inherit: auto''', ...
+                  ' - setting to ''double''...']);
             parameters{port, 4} = 'double';
         end
         % Get the port lock scale
@@ -146,14 +151,13 @@ function parameters = getPortParameters(ports)
         try
             assert(not(strcmp(parameters{port, 6}, '-1')))
         catch
-            disp(['Invalid port dimensions of port:', newline, ports{port},...
-                   newline, 'was set to Inherit - setting to 1...', newline]);
+            disp([portName, ...
+                  ' dimension was set to ''-1''', ...
+                  ' - setting to ''1''...', newline]);
             parameters{port, 6} = '1';
         end
-        % Get the port name by splitting the pathname by the backslash
-        splitPortPath = split(ports{port}, '/');
-        % Set port name equal to the last string in the split pathname
-        parameters{port, 7} = genvarname(splitPortPath{end});
+        % Remove spaces from port name to create a valid variable name
+        parameters{port, 7} = genvarname(portName);
     end
 end
 
@@ -168,8 +172,8 @@ function setArgumentParameters(arguments, parameters)
 %   N/A
 %
 % Example:
-%   setArgumentParameters({'System/Subsystem/argIn1'},...
-%                         {'1','[]','[]','boolean','off','on','Inport1'})
+%   setArgumentParameters({'System/Subsystem/argIn1'}, ...
+%                         {'1', '[]', '[]', 'boolean', 'off', 'on', 'Inport1'})
 
     %% Set the argument parameters
     % Loop through each argument

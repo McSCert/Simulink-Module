@@ -153,7 +153,7 @@ function parameters = getPortParameters(ports)
         catch
             disp([portName, ...
                   ' dimension was set to ''-1''', ...
-                  ' - setting to ''1''...', newline]);
+                  ' - setting to ''1''...']);
             parameters{port, 6} = '1';
         end
         % Remove spaces from port name to create a valid variable name

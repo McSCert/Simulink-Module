@@ -25,7 +25,7 @@ function simulinkFcnName = reqSimFcnName()
     while 1
         inputName = inputdlg(prompt, dlgtitle, dims, definput);
         % Checks to see if the name shadows other names in scope
-        if isGoodSimFcnName(gcs,inputName{1})
+        if isGoodSimFcnName(gcs, inputName{1})
             break
         else
             waitfor(msgbox([inputName{1}, ...

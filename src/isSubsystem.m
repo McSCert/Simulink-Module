@@ -14,7 +14,8 @@ function b = isSubsystem(blocks)
     % Check each block to see if its a subsystem
     for block = 1:length(blocks)
         try
-            b(block) = strcmpi(get_param(blocks(block),'BlockType'),'SubSystem');
+            blockType = get_param(blocks(block), 'BlockType');
+            b(block) = strcmpi(blockType, 'SubSystem');
         catch % Unexpected error
         end
     end

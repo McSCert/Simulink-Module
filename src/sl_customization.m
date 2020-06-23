@@ -21,14 +21,14 @@ function schemaFcns = getSLModuleTool(callbackInfo)
     end
 end
 
-%% Define action: Convert Subsystem to Simulink-function
+%% Define action: Convert Subsystem to Simulink Function
 function schema = ConvToSimFcnSchema(callbackInfo)
     schema = sl_container_schema;
     schema.label = 'Convert Subsystem';
     schema.ChildrenFcns = {@toScopedSimFcn, @toGlobalSimFcn};
 end
 
-function schema=toScopedSimFcn(callbackInfo)
+function schema = toScopedSimFcn(callbackInfo)
     schema = sl_action_schema;
     schema.label = 'To Scoped Simulink Function';
     schema.userdata = 'toScopedSimFcn';
@@ -41,7 +41,7 @@ function toScopedSimFcnCallback(callbackInfo)
     subToSimFcn(subsystem{1}, simulinkFcnName, 'scoped');
 end
 
-function schema=toGlobalSimFcn(callbackInfo)
+function schema = toGlobalSimFcn(callbackInfo)
     schema = sl_action_schema;
     schema.label = 'To Global Simulink Function';
     schema.userdata = 'toGlobalSimFcn';

@@ -16,7 +16,9 @@ function schemaFcns = getSLModuleTool(callbackInfo)
     elseif any(selectedFcns) && ~isempty(gcbs)
         schemaFcns{end+1} = @ChangeFcnScopeSchema;
         schemaFcns{end+1} = @FcnCreatorLocalSchema;
-    elseif isSubsystem(gcbs)
+    end
+    
+    if isSubsystem(gcbs) && ~isSimulinkFcn(gcbs)
         schemaFcns{end+1} = @ConvToSimFcnSchema;
     end
 end

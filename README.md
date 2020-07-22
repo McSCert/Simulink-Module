@@ -4,6 +4,7 @@ The Simulink Module Tool performs several functions in order to support modular 
 
 * Scoping Simulink Functions
 * Creating pre-configured Function callers
+* Converting SubSystems into Simulink Functions
 * Visualizing or printing a syntactic interface
 * Listing module dependencies
 * Checking guidelines
@@ -14,3 +15,5 @@ The Simulink Module Tool performs several functions in order to support modular 
 For installation and other information, please see the [User Guide](doc/SimulinkModule_UserGuide.pdf).
 
 This tool is also available for download on the [Matlab Central File Exchange](https://www.mathworks.com/matlabcentral/fileexchange/71952-simulink-module-tool).
+
+[![View Simulink Module Tool on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/71952-simulink-module-tool)

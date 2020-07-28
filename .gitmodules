@@ -1,0 +1,3 @@
+[submodule "src/Utility"]
+	path = src/Utility
+	url = https://github.com/McSCert/Simulink-Utility.git

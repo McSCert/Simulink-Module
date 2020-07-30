@@ -1046,11 +1046,11 @@ classdef Interface
                     'function'};
             end
             
-            if contains2(varargin, 'inport')
+            if any(contains2(varargin, 'inport'))
                 ports = find_system(obj.ModelName, 'SearchDepth', 1, 'BlockType', 'Inport', 'Commented', 'off');
                 obj = add(obj, ports);
             end
-            if contains2(varargin, 'fromfile')
+            if any(contains2(varargin, 'fromfile'))
                 blocks = find_system(obj.ModelName, 'BlockType', 'FromFile', 'Commented', 'off');
                 filename = get_param(blocks, 'FileName');
                 
@@ -1060,7 +1060,7 @@ classdef Interface
                 
                 obj = add(obj, blocks);
             end
-            if contains2(varargin, 'fromspreadsheet')
+            if any(contains2(varargin, 'fromspreadsheet'))
                 blocks = find_system(obj.ModelName, 'BlockType', 'FromSpreadsheet', 'Commented', 'off');
                 filename = get_param(blocks, 'FileName');
                 
@@ -1070,7 +1070,7 @@ classdef Interface
                 
                 obj = add(obj, blocks);
             end
-            if contains2(varargin, 'fromworkspace')
+            if any(contains2(varargin, 'fromworkspace'))
                 blocks = find_system(obj.ModelName, 'BlockType', 'FromWorkspace', 'Commented', 'off');
                 varname = get_param(blocks, 'VariableName');
                 
@@ -1080,7 +1080,7 @@ classdef Interface
                 
                 obj = add(obj, blocks);
             end
-            if contains2(varargin, 'datastoreread')
+            if any(contains2(varargin, 'datastoreread'))
                 % Only add data stores that are stored in the data dictionary or
                 % base workspace because if they are in the model worskpace,
                 % they are not shared outside the model
@@ -1100,11 +1100,11 @@ classdef Interface
                 end
             end        
             
-            if contains2(varargin, 'outport')
+            if any(contains2(varargin, 'outport'))
                 ports = find_system(obj.ModelName, 'SearchDepth', 1, 'BlockType', 'Outport', 'Commented', 'off');
                 obj = add(obj, ports);
             end
-            if contains2(varargin, 'tofile')
+            if any(contains2(varargin, 'tofile'))
                 blocks = find_system(obj.ModelName, 'BlockType', 'ToFile', 'Commented', 'off');
                 filename = get_param(blocks, 'FileName');
                 
@@ -1114,7 +1114,7 @@ classdef Interface
                 
                 obj = add(obj, blocks);
             end
-            if contains2(varargin, 'toworkspace')
+            if any(contains2(varargin, 'toworkspace'))
                 blocks = find_system(obj.ModelName, 'BlockType', 'ToWorkspace', 'Commented', 'off');                
                 varname = get_param(blocks, 'VariableName');
                 
@@ -1124,7 +1124,7 @@ classdef Interface
                 
                 obj = add(obj, blocks);
             end
-            if contains2(varargin, 'datastorewrite')
+            if any(contains2(varargin, 'datastorewrite'))
                 % Only add data stores that are stored in the data dictionary or
                 % base workspace because if they are in the model worskpace,
                 % they are not shared outside the model
@@ -1143,7 +1143,7 @@ classdef Interface
                     end
                 end
             end
-            if contains2(varargin, 'function')
+            if any(contains2(varargin, 'function'))
                 fcns_scoped = find_system(obj.ModelName, 'SearchDepth', 1, 'BlockType', 'SubSystem', 'IsSimulinkFunction', 'on', 'Commented', 'off');
                 fcns_all = find_system(obj.ModelName, 'BlockType', 'SubSystem', 'IsSimulinkFunction', 'on', 'Commented', 'off');
                 scope = getFcnScope(fcns_all);

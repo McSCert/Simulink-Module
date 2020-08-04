@@ -7,6 +7,7 @@ classdef Interface
 
     properties
         ModelName
+        FileName
         
         % INPUTS
         Inport          InterfaceItem  
@@ -51,10 +52,12 @@ classdef Interface
         function obj = Interface(m)
             if nargin == 0
                 obj.ModelName = '';
+                obj.FileName = '';
             elseif nargin == 1
                 obj.ModelName = bdroot(m);
                 obj.RootSystemHandle = get_param(obj.ModelName, 'Handle');
                 obj = autoAdd(obj);
+                obj.FileName = saveInterfaceMat(obj);
             end
         end
         function hdl = getHandle(obj)
@@ -955,6 +958,7 @@ classdef Interface
                 warning('No elements on the interface.');
                 return
             end
+            deleteInterfaceMat(obj);
             
             % Remove headings
             obj.InputHeader = delete(obj.InputHeader);
@@ -1223,6 +1227,52 @@ classdef Interface
                 obj.ExportHeader.Handle, ...
                 obj.FunctionHeader.Handle, ...
                 obj.Function.InterfaceHandle];          
+        end
+        function filename = saveInterfaceMat(obj)
+        % SAVEINTERFACE Save the interface object to a mat file in the same directory
+        %   as the model and create a callback in the model to load the mat file everytime
+        %   the model is opened.
+            sys = obj.ModelName;
+            % Create the mat file
+            % TODO: Check if exists already
+            syspath = get_param(sys, 'FileName');
+            [path, name, ~] = fileparts(syspath);
+            ext = '.mat';
+            filename = fullfile(path, [name '_Interface' ext]);
+            save(filename, 'obj')
+
+            % Ensure model loads mat file
+            % TODO: Check if in callbacks alredy
+            callback = get_param(sys, 'PreLoadFcn');
+            if ~isempty(callback)
+                newcallback = [callback newline '% INTERFACE' newline 'load(''' filename ''');'];
+            else
+                newcallback = ['% INTERFACE' newline 'load(''' filename ''');'];
+            end
+            set_param(sys, 'PreLoadFcn', newcallback);
+        end
+        function deleteInterfaceMat(obj)
+        % DELETEINTERFACE Delete the interface mat and remove the callback in the model.
+            sys = obj.ModelName;
+            % Delete the mat file
+            syspath = get_param(sys, 'FileName');
+            [path, name, ~] = fileparts(syspath);
+            ext = '.mat';
+            filename = fullfile(path, [name '_Interface' ext]);
+            if isfile(filename)
+                delete(filename)
+            end
+
+            % Delete callback
+            callback = get_param(sys, 'PreLoadFcn');
+            callback = regexp(callback, '[\f\n\r]', 'split');
+            idx = find(strcmp(callback, '% INTERFACE'));
+            if idx
+                callback{idx} = '';
+                callback{idx+1} = '';
+            end
+            callback = strjoin(callback, '\n');
+            set_param(sys, 'PreLoadFcn', callback);
         end
     end
 end

@@ -288,10 +288,12 @@ function showInterfaceCallback(callbackInfo)
     eval(['global ' objName ';']);
     
     if interface_exists(sys)
+        eval([objName ' = load_interface(sys);']);
+        
         answer = questdlg('An interface already exists. Do you wish to replace it?', 'Interface Exists');
         if strcmp(answer, 'Yes')
             % Delete old representation
-            eval([objName '.delete;'])
+            eval([objName '.delete();'])
 
             % Create new interface
             eval([objName ' = Interface(sys);']);
@@ -299,7 +301,8 @@ function showInterfaceCallback(callbackInfo)
         end
     else
         eval([objName ' = Interface(sys);']);
-        eval([objName ' = ' objName '.model();']);        
+        eval([objName ' = ' objName '.model();']);
+        eval([objName '.saveInterfaceMat;']);
     end
 end
 
@@ -313,7 +316,11 @@ end
 function printInterfaceCallback(callbackInfo)
     sys = bdroot(gcs);
     objName = [sys '_InterfaceObject'];
-    eval([objName ' = Interface(sys);']);
+    if interface_exists(sys)
+        eval([objName ' = load_interface(sys);']);
+    else
+        eval([objName ' = Interface(sys);']);
+    end
     eval([objName '.print();']);
     
     garbageCollection();
@@ -327,7 +334,8 @@ function schema = DeleteInterface(callbackInfo)
     schema.callback = @deleteInterfaceCallback;
     
     % Hide the delete option when there is nothing to delete
-    if interface_exists(bdroot(gcs))
+    sys = bdroot(gcs);
+    if interface_exists(sys)
         schema.state = 'Enabled';
     else
         schema.state = 'Disabled';
@@ -335,38 +343,44 @@ function schema = DeleteInterface(callbackInfo)
 end
 
 function deleteInterfaceCallback(callbackInfo)
+    
     sys = bdroot(gcs);
     objName = [sys '_InterfaceObject'];
     eval(['global ' objName ';']);
     
-    if interface_exists(sys)
-        eval([objName ' = delete(' objName ');']);
-        eval(['clear global ' objName ';']);
-    else
-        warning('No interface representation is present in the moodel.');
-    end
+    eval([objName ' = load_interface(sys);']);
+        
+    eval([objName ' = delete(' objName ');']);
+    eval(['clear global ' objName ';']);
     
     garbageCollection();
 end
 
+function filename = get_interface_filename(sys)
+    syspath = get_param(sys, 'FileName');
+    [path, name, ~] = fileparts(syspath);
+    ext = '.mat';
+    filename = fullfile(path, [name '_Interface' ext]);
+end
+
 function e = interface_exists(sys)
-    % INTERFACE_EXISTS Determine if there exists an interface object for a model.
-    objName = [sys '_InterfaceObject'];
-    eval(['global ' objName ';']);
-    eval(['objEmpty = isempty(' objName ');']);
     
-    if ~objEmpty
-        % Check that the object refers to the same model instance
-        eval(['objHdl = ' objName '.getHandle;']);
-        sysHdl = get_param(sys, 'Handle');
-        sameHdl = (objHdl == sysHdl);
-        if sameHdl
-            e = true;
-        else
-            e = false;
-        end
+    filename = get_interface_filename(sys);
+    
+    if isfile(filename)
+        e = true;
     else
         e = false;
+    end
+end
+
+function obj = load_interface(sys)
+    
+    filename = get_interface_filename(sys);
+    
+    if interface_exists(sys)
+       obj = load(filename);
+       obj = obj.obj;
     end
 end
 

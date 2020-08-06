@@ -12,6 +12,7 @@ classdef InterfaceHeader
             % DELETE Delete the header from the model.
             %
             % Inputs:
+            obj = obj.update;
             try
                 delete(obj.Handle);
             catch ME
@@ -20,6 +21,18 @@ classdef InterfaceHeader
                 end
             end
             obj.Handle = [];
+        end
+        function obj = update(obj)
+
+            if isempty(obj.Handle)
+                return
+            end
+            
+            sys = bdroot(gcs);
+            path = [sys '/' obj.Label];
+            disp(['Before: ' obj.Handle]);
+            obj.Handle = get_param(path, 'Handle');
+            disp(['After: ' obj.Handle]);
         end
     end
 end

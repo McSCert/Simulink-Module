@@ -287,9 +287,8 @@ function showInterfaceCallback(callbackInfo)
     objName = [sys '_InterfaceObject'];
     eval(['global ' objName ';']);
     
-    if interface_exists(sys)
+    if interface_exists(sys) 
         eval([objName ' = load_interface(sys);']);
-        
         answer = questdlg('An interface already exists. Do you wish to replace it?', 'Interface Exists');
         if strcmp(answer, 'Yes')
             % Delete old representation
@@ -302,8 +301,8 @@ function showInterfaceCallback(callbackInfo)
     else
         eval([objName ' = Interface(sys);']);
         eval([objName ' = ' objName '.model();']);
-        eval([objName '.saveInterfaceMat;']);
     end
+    eval([objName '.saveInterfaceMat;']);
 end
 
 %% Define menu: Print Interface
@@ -343,13 +342,12 @@ function schema = DeleteInterface(callbackInfo)
 end
 
 function deleteInterfaceCallback(callbackInfo)
-    
     sys = bdroot(gcs);
     objName = [sys '_InterfaceObject'];
     eval(['global ' objName ';']);
     
     eval([objName ' = load_interface(sys);']);
-        
+    
     eval([objName ' = delete(' objName ');']);
     eval(['clear global ' objName ';']);
     
@@ -364,20 +362,26 @@ function filename = get_interface_filename(sys)
 end
 
 function e = interface_exists(sys)
+    % INTERFACE_EXISTS Determine if there exists an interface for a model.
+    objName = [sys '_InterfaceObject'];
+    eval(['global ' objName ';']);
+    eval(['objEmpty = isempty(' objName ');']);
     
     filename = get_interface_filename(sys);
     
-    if isfile(filename)
-        e = true;
+    if objEmpty
+        if isfile(filename)
+            e = true;
+        else
+            e = false;
+        end
     else
-        e = false;
+        e = true;
     end
 end
 
 function obj = load_interface(sys)
-    
     filename = get_interface_filename(sys);
-    
     if interface_exists(sys)
        obj = load(filename);
        obj = obj.obj;

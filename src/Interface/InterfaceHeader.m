@@ -30,9 +30,7 @@ classdef InterfaceHeader
             
             sys = bdroot(gcs);
             path = [sys '/' obj.Label];
-            disp(['Before: ' obj.Handle]);
             obj.Handle = get_param(path, 'Handle');
-            disp(['After: ' obj.Handle]);
         end
     end
 end

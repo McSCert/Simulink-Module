@@ -270,6 +270,7 @@ classdef InterfaceItem
         function obj = deleteFromModel(obj)
             % DELETEFROMMODEL Delete the representation of the item in the
             % model.
+            obj = obj.updateHandle;
             if any2(strcmp(obj.BlockType, {'Inport', 'Outport'}))
                 obj = deleteGrndTrm(obj);
                 % Move inport/outport back
@@ -306,21 +307,35 @@ classdef InterfaceItem
             end
             
             try
-                if ~any2(strcmp(obj.BlockType, {'Inport', 'Outport'}))
-                    obj.InterfaceHandle = get_param(obj.InterfacePath, 'Handle');
-                end
+                obj.InterfaceHandle = get_param(obj.InterfacePath, 'Handle');
             catch
                 obj.InterfaceHandle = [];
             end
             
             try
-                obj.GroundHandle = get_param(obj.GroundPath, 'Handle');
+                for i = 1:length(obj.GroundHandle)
+                    if iscell(obj.GroundPath)
+                        g = obj.GroundPath{i};
+                    else
+                        g = obj.GroundPath;
+                    end
+                    g = get_param(g, 'Handle');
+                    obj.GroundHandle(i) = g;
+                end
             catch
                 obj.GroundHandle = [];
             end
             
             try
-                obj.TerminatorHandle = get_param(obj.TerminatorPath, 'Handle');
+                for j = 1:length(obj.TerminatorHandle)
+                    if iscell(obj.TerminatorPath)
+                        t = obj.TerminatorPath{j};
+                    else
+                        t = obj.TerminatorPath;
+                    end
+                    t = get_param(t, 'Handle');
+                    obj.TerminatorHandle(j) = t;
+                end
             catch
                 obj.TerminatorHandle = [];
             end
@@ -382,7 +397,6 @@ classdef InterfaceItem
             for j = 1:length(obj.TerminatorHandle)
                 t = obj.TerminatorHandle(j);
                 if ishandle(t)
-                                        
                     if strcmp(obj.BlockType, 'Inport')
                         goto2Line(bdroot(obj.Fullpath), obj.TerminatorHandle);
                     else
@@ -394,6 +408,7 @@ classdef InterfaceItem
             end
             obj.TerminatorHandle = [];
             obj.TerminatorPath = [];
+            
         end
     end
 end

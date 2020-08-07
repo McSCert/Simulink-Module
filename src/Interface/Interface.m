@@ -59,7 +59,7 @@ classdef Interface
             end
         end
         function path = getFilePath(obj)
-           path = obj.FilePath; 
+            path = obj.FilePath; 
         end
         function hdl = getHandle(obj)
             hdl = obj.RootSystemHandle;
@@ -542,6 +542,7 @@ classdef Interface
                 obj.InportHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.InportHeader.Label], 'FontSize', SMALLFONT).Handle;
                 for a = 1:length(obj.Inport)
                     obj.Inport(a).InterfaceHandle = get_param(obj.Inport(a).Fullpath, 'Handle');
+                    obj.Inport(a).InterfacePath = getfullname(obj.Inport(a).InterfaceHandle);
                     
                     % Convert lines to goto/from connections
                     lines = get_param(obj.Inport(a).Handle, 'LineHandles');
@@ -564,6 +565,7 @@ classdef Interface
                     
                     fromName = char(getDsts(obj.Inport(a).Handle, 'IncludeImplicit', 'off'));
                     obj.Inport(a).TerminatorHandle = get_param(fromName, 'Handle');
+                    obj.Inport(a).TerminatorPath = getfullname(obj.Inport(a).TerminatorHandle);
                 end
             end
             
@@ -703,6 +705,7 @@ classdef Interface
                 obj.OutportHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.OutportHeader.Label], 'FontSize', SMALLFONT).Handle;
                 for h = 1:length(obj.Outport)
                     obj.Outport(h).InterfaceHandle = get_param(obj.Outport(h).Fullpath, 'Handle');
+                    obj.Outport(h).InterfacePath = getfullname(obj.Outport(h).InterfaceHandle);
                     
                     % Convert line(s) to goto/from connection
                     lines = get_param(obj.Outport(h).Handle, 'LineHandles');
@@ -725,6 +728,7 @@ classdef Interface
                     
                     fromName = char(getSrcs(obj.Outport(h).Handle, 'IncludeImplicit', 'off'));
                     obj.Outport(h).GroundHandle = get_param(fromName, 'Handle');
+                    obj.Outport(h).GroundPath = getfullname(obj.Outport(h).GroundHandle);
                 end
             end
             
@@ -959,7 +963,6 @@ classdef Interface
                 warning('No elements on the interface.');
                 return
             end
-            obj = deleteInterfaceMat(obj);
             
             % Remove headings
             obj.InputHeader = delete(obj.InputHeader);
@@ -1022,6 +1025,8 @@ classdef Interface
                 set_param(obj.ModelName, 'Zoomfactor', 'FitSystem');
             catch
             end
+            % Delete the interface .mat
+            obj = deleteInterfaceMat(obj);
         end
         function obj = updateHandles(obj)
 
@@ -1244,7 +1249,7 @@ classdef Interface
         % DELETEINTERFACE Delete the interface mat
             filename = obj.FilePath;
             if isfile(filename)
-                delete(filename)
+                delete(filename);
             end
             obj.FilePath = '';
         end

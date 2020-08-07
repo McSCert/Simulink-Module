@@ -300,7 +300,7 @@ function showInterfaceCallback(callbackInfo)
         end
     else
         eval([objName ' = Interface(sys);']);
-        eval([objName ' = ' objName '.model();']);
+        eval([objName ' = ' objName '.model;']);
     end
     eval([objName '.saveInterfaceMat;']);
 end

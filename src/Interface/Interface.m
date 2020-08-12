@@ -46,6 +46,7 @@ classdef Interface
         
         % Other
         RootSystemHandle
+        FilePath
     end
     methods (Access = public)
         function obj = Interface(m)
@@ -56,6 +57,9 @@ classdef Interface
                 obj.RootSystemHandle = get_param(obj.ModelName, 'Handle');
                 obj = autoAdd(obj);
             end
+        end
+        function path = getFilePath(obj)
+            path = obj.FilePath; 
         end
         function hdl = getHandle(obj)
             hdl = obj.RootSystemHandle;
@@ -538,6 +542,7 @@ classdef Interface
                 obj.InportHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.InportHeader.Label], 'FontSize', SMALLFONT).Handle;
                 for a = 1:length(obj.Inport)
                     obj.Inport(a).InterfaceHandle = get_param(obj.Inport(a).Fullpath, 'Handle');
+                    obj.Inport(a).InterfacePath = getfullname(obj.Inport(a).InterfaceHandle);
                     
                     % Convert lines to goto/from connections
                     lines = get_param(obj.Inport(a).Handle, 'LineHandles');
@@ -560,6 +565,7 @@ classdef Interface
                     
                     fromName = char(getDsts(obj.Inport(a).Handle, 'IncludeImplicit', 'off'));
                     obj.Inport(a).TerminatorHandle = get_param(fromName, 'Handle');
+                    obj.Inport(a).TerminatorPath = getfullname(obj.Inport(a).TerminatorHandle);
                 end
             end
             
@@ -699,6 +705,7 @@ classdef Interface
                 obj.OutportHeader.Handle = Simulink.Annotation([obj.ModelName '/' obj.OutportHeader.Label], 'FontSize', SMALLFONT).Handle;
                 for h = 1:length(obj.Outport)
                     obj.Outport(h).InterfaceHandle = get_param(obj.Outport(h).Fullpath, 'Handle');
+                    obj.Outport(h).InterfacePath = getfullname(obj.Outport(h).InterfaceHandle);
                     
                     % Convert line(s) to goto/from connection
                     lines = get_param(obj.Outport(h).Handle, 'LineHandles');
@@ -721,6 +728,7 @@ classdef Interface
                     
                     fromName = char(getSrcs(obj.Outport(h).Handle, 'IncludeImplicit', 'off'));
                     obj.Outport(h).GroundHandle = get_param(fromName, 'Handle');
+                    obj.Outport(h).GroundPath = getfullname(obj.Outport(h).GroundHandle);
                 end
             end
             
@@ -972,7 +980,7 @@ classdef Interface
             obj.FunctionHeader = delete(obj.FunctionHeader);            
             
             % Remove blocks
-            for a = 1:length(obj.Inport)                    
+            for a = 1:length(obj.Inport)    
                 obj.Inport(a) = deleteFromModel(obj.Inport(a));
             end
             
@@ -1017,6 +1025,8 @@ classdef Interface
                 set_param(obj.ModelName, 'Zoomfactor', 'FitSystem');
             catch
             end
+            % Delete the interface .mat
+            obj = deleteInterfaceMat(obj);
         end
         function obj = updateHandles(obj)
 
@@ -1032,6 +1042,17 @@ classdef Interface
             %       iter    Iterator object.
             
             iter = InterfaceIterator(obj);
+        end
+        function saveInterfaceMat(obj)
+        % SAVEINTERFACE Save the interface object to a mat file
+        % in the same directory as the model
+            sys = obj.ModelName;
+            syspath = get_param(sys, 'FileName');
+            [path, name, ~] = fileparts(syspath);
+            ext = '.mat';
+            filename = fullfile(path, [name '_Interface' ext]);
+            obj.FilePath = filename;
+            save(filename, 'obj')
         end
     end
     methods (Access = private)
@@ -1223,6 +1244,14 @@ classdef Interface
                 obj.ExportHeader.Handle, ...
                 obj.FunctionHeader.Handle, ...
                 obj.Function.InterfaceHandle];          
+        end
+        function obj = deleteInterfaceMat(obj)
+        % DELETEINTERFACE Delete the interface mat
+            filename = obj.FilePath;
+            if isfile(filename)
+                delete(filename);
+            end
+            obj.FilePath = '';
         end
     end
 end

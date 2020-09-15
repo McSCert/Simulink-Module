@@ -70,18 +70,17 @@
 \maketitle
 \vfill
 
-%\begin{figure}
-%	\centering
-%	\includegraphics[]{../../common/McSCert_Logo.pdf} \\
-%	McMaster Centre for Software Certification (McSCert)
-%\end{figure}
+\begin{figure}
+	\centering
+	\includegraphics{../figs/McSCert_Logo.pdf} \\
+	McMaster Centre for Software Certification (McSCert)
+\end{figure}
 
 \newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Table of Contents
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \tableofcontents
 \newpage
 
@@ -148,9 +147,9 @@ This section describes what must be done to setup the \ToolName, as well as how 
 \subsection{Prerequisites and Installation}
 
 \begin{enumerate}
-\item For full use of the tool, please use \matlab/\Simulink R2017b or newer.\footnote{Simulink functions were introduced in R2014b. The \emph{Function Visibility} parameter was introduced in R2017b.}
+	\item For full use of the tool, please use \matlab/\Simulink R2017b or newer.\footnote{Simulink functions were introduced in R2014b. The \emph{Function Visibility} parameter was introduced in R2017b.}
 
-\item To install the tool,
+	\item To install the tool,
 	\begin{enumerate}
 		\item from a \file{.zip} file --- unzip the contents into your desired location. Ensure the unzipped folder and subfolders are present in your \mpath, or add them if they are not present. Run \href{https://www.mathworks.com/help/simulink/ug/registering-customizations.html}{sl\_refresh\_customizations} to refresh the Context Menu. 
 		\item from a \file{.mltbx} file --- simply open \Matlab and double-click on the file. Your \mpath should be automatically configured.
@@ -160,7 +159,8 @@ This section describes what must be done to setup the \ToolName, as well as how 
 		\item \textit{Note:} If running the command ``\cmd{which AutoLayout}'' indicates that the script is not found, then the tool needs to be added to the \mpath.
 		For information on adding files to the \mpath, please see the \href{https://www.mathworks.com/help/matlab/matlab_env/add-remove-or-reorder-folders-on-the-search-path.html}{MathWorks documentation}.
 	\end{itemize}
-\item Ensure your model is open and unlocked.
+	\item Ensure the Simulink-Utility folder is on your \mpath. This is a dependency for the tool to work correctly.
+	\item Ensure your model is open and unlocked.
 \end{enumerate}
 
 %---------------------------------------
@@ -486,7 +486,7 @@ A \Simulink model can depend on or interact with other files and elements via th
 
 \begin{thebibliography}{9}
 \bibitem{paper} 
-Monika Jaskolka, Vera Pantelic, Mark Lawford, and Alan Wassyng, ``Supporting Modularity in \Simulink Models", \emph{Journal of Software and Systems Modeling} (Submitted May 2020).
+Monika Jaskolka, Vera Pantelic, Alan Wassyng, and Mark Lawford, ``Supporting Modularity in \Simulink Models", \emph{arXiv:2007.10120}.
 \end{thebibliography}
 
 \end{document}

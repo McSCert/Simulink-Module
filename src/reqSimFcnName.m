@@ -29,7 +29,7 @@ function simulinkFcnName = reqSimFcnName()
         else
             waitfor(msgbox([inputName{1}, ...
                 ' is already used as a Simulink Function in scope.', ...
-                newline, newline, 'Please enter a new name.'], dlgtitle));
+                char(10), 'Please enter a new name.'], dlgtitle));
         end
     end
     simulinkFcnName = inputName{1};

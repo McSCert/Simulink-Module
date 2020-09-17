@@ -1,23 +1,23 @@
 function subToSimFcn(subsystem, simulinkFcnName, visibility)
-% subToSimFunc              Converts a subsystem to a Simulink Function
+% SUBTOSIMFUNC Convert a Subsystem into a Simulink Function.
 %
-% Inputs:
-%   subsystem               Path of a subsystem to be converted
-%   simulinkFcnName         Name of the Simulink Function to be created
-%   visibility              Set function visibility to'scoped' or 'global'
+%   Inputs:
+%       subsystem         Path of a subsystem to be converted.
+%       simulinkFcnName   Name of the Simulink Function to be created.
+%       visibility        Set function visibility to 'scoped' or 'global'.
 %
-% Outputs:
-%   N/A
+%   Outputs:
+%       N/A
 %
-% Example:
-%   subToSimFunc('Demo_Example/f_Sensor_Trip_1', 'f_Sensor_Trip_i', 'scoped')
+%   Example:
+%       subToSimFunc('Demo_Example/f_Sensor_Trip_1', 'f_Sensor_Trip_i', 'scoped')
 %
 %           Converts 'f_Sensor_Trip_1' subsystem to a
 %           scoped Simulink Function 'f_SensorTrip_i'
 
     %% Input Validation
     
-    % Check that the subsystem is loaded
+    % Check that the subsystem model is loaded
     try
         assert(ischar(subsystem));
         assert(bdIsLoaded(bdroot(subsystem)));
@@ -39,66 +39,80 @@ function subToSimFcn(subsystem, simulinkFcnName, visibility)
         error('Invalid function visibility. Use scoped/global visibility.');
     end
     
-    %% Add Trigger to Subsystem
-    
+    %% Add Trigger to Subsystem  
     % Break library link
     set_param(subsystem, 'LinkStatus', 'none');
 
-    % Adding the trigger block to the subsystem and calibrating its parameters
-    triggerPath = append(subsystem, '/', simulinkFcnName);
+    % Adding the trigger block to the subsystem
+    triggerPath = [subsystem, '/', simulinkFcnName];
     add_block('simulink/Ports & Subsystems/Trigger', triggerPath);
-    set_param(triggerPath, 'TriggerType', 'function-call', ...
-              'IsSimulinkFunction', 'on', 'FunctionName', simulinkFcnName, ...
-              'FunctionVisibility', visibility);
     
-    % Set subsystem to atomic execution
+    % Set trigger block parameters
+    set_param(triggerPath, 'TriggerType', 'function-call');
+    try
+        set_param(triggerPath, 'IsSimulinkFunction', 'on', 'FunctionName', simulinkFcnName);
+    catch ME
+        if strcmp(ME.identifier, 'Simulink:Commands:ParamUnknown')
+            % Version of Simulink is pre-R2014b so doesn't support Simulink Functions
+            v = ver('Simulink');
+            warning(ME.identifier, ['Simulink ' v.Release ' does not support Simulink Functions.']);
+        else
+            rethrow(ME)
+        end
+    end
+    try
+        set_param(triggerPath, 'FunctionVisibility', visibility);   
+    catch ME
+        if strcmp(ME.identifier, 'Simulink:Commands:ParamUnknown')
+            %  Version of Simulink is pre-R2017b so doesn't support scoping
+            v = ver('Simulink');
+            warning(ME.identifier, ['Simulink ' v.Release ' does not support Simulink Function scope.']);
+        else
+            rethrow(ME)
+        end
+    end
+    
+    %% Set subsystem parameters
     set_param(subsystem, 'TreatAsAtomicUnit', 'on');
     
-    %% Convert Inports to ArgIns
-    
+    %% Convert Inports to ArgIns    
     % Create array of all the inports in the subsystem
-    allInports = find_system(subsystem, 'SearchDepth', 1, ...
-                             'BlockType', 'Inport');
+    allInports = find_system(subsystem, 'SearchDepth', 1, 'BlockType', 'Inport');
     
-    % Getting the parameters for all inports in the subsystem
+    % Get the parameters for all inports in the subsystem
     inportParameters = getPortParameters(allInports);
     
     % Replace inports with argument inputs
-    replace_block(subsystem, 'SearchDepth', 1, ...
-                  'BlockType', 'Inport', 'ArgIn', 'noprompt');
+    replace_block(subsystem, 'SearchDepth', 1, 'BlockType', 'Inport', 'ArgIn', 'noprompt');
     
     % Create array of all the argIns in the Simulink Function
     allArgIns = find_system(subsystem, 'SearchDepth', 1, 'BlockType', 'ArgIn');
     
-    % Setting the parameters for all the argument inputs
+    % Set the parameters for all the argument inputs
     setArgumentParameters(allArgIns, inportParameters);
     
-    %% Convert Outports to ArgOuts
-    
+    %% Convert Outports to ArgOuts    
     % Create array of all the outports in the subsystem
-    allOutports = find_system(subsystem, 'SearchDepth', 1, ...
-                              'BlockType', 'Outport');
+    allOutports = find_system(subsystem, 'SearchDepth', 1, 'BlockType', 'Outport');
     
-    % Getting the parameters for all outports in the subsystem
+    % Get the parameters for all outports in the subsystem
     outportParameters = getPortParameters(allOutports);
     
     % Replace outports with argument outputs
-    replace_block(subsystem, 'SearchDepth', 1, ...
-                  'BlockType', 'Outport', 'ArgOut', 'noprompt');
+    replace_block(subsystem, 'SearchDepth', 1, 'BlockType', 'Outport', 'ArgOut', 'noprompt');
     
     % Create array of all the argOuts for the Simulink Function
-    allArgOuts = find_system(subsystem, 'SearchDepth', 1, ...
-                             'BlockType', 'ArgOut');
+    allArgOuts = find_system(subsystem, 'SearchDepth', 1, 'BlockType', 'ArgOut');
     
-    % Setting the parameters for all the argument outputs
+    % Set the parameters for all the argument outputs
     setArgumentParameters(allArgOuts, outportParameters);
 end
 
 function parameters = getPortParameters(ports)
-% getPortParameters     Returns the parameters for an inport or outport
+% getPortParameters     Get the parameters for an inport or outport.
 %
 % Inputs:
-%   ports               Cell array of inports or outports
+%   ports               Cell array of inports or outports.
 %
 % Outputs:
 %   parameters          Cell array of parameters including:
@@ -113,9 +127,9 @@ function parameters = getPortParameters(ports)
 % Example:
 %   parameters = getPortParameters({'System/Subsystem/Inport1'})
 %
-%           ans = 
-%                1x7 cell array
-%                    {'1'} {'[]'} {'[]'} {'boolean'} {'off'} {'on'} {'Inport1'}
+%      ans = 
+%          1x7 cell array
+%            {'1'} {'[]'} {'[]'} {'boolean'} {'off'} {'on'} {'Inport1'}
 
     %% Get the port parameters
     % Init array of parameters for the ports
@@ -162,18 +176,18 @@ function parameters = getPortParameters(ports)
 end
 
 function setArgumentParameters(arguments, parameters)
-% setArgumentParameters     Sets argIn or ArgOut parameters
+% setArgumentParameters     Set argIn or ArgOut parameters.
 %
 % Inputs:
-%   arguments               Cell array of argIns or argOuts
-%   parameters              Cell array of parameters for each argument
+%   arguments               Cell array of argIns or argOuts.
+%   parameters              Cell array of parameters for each argument.
 %
 % Outputs:
 %   N/A
 %
 % Example:
 %   setArgumentParameters({'System/Subsystem/argIn1'}, ...
-%                         {'1', '[]', '[]', 'boolean', 'off', 'on', 'Inport1'})
+%        {'1', '[]', '[]', 'boolean', 'off', 'on', 'Inport1'})
 
     %% Set the argument parameters
     % Loop through each argument

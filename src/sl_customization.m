@@ -8,12 +8,20 @@ function schemaFcns = getSLModuleTool(callbackInfo)
     schemaFcns = {};
     selection = find_system(gcs, 'Type', 'block', 'Selected', 'on');
     selectedFcns = isSimulinkFcn(selection);
+    
+    % Check if the Simulink version supports Simulink Functions
+    v = ver('Simulink');
+    if str2double(v.Version) > 8.3 % Greater than 2014a
+        verOK = true;
+    else
+        verOK = false;
+    end
 
     if isempty(gcbs)
         schemaFcns{end+1} = @FcnCreatorSchema;
         schemaFcns{end+1} = @GuidelineSchema;
         schemaFcns{end+1} = @InterfaceSchema;
-    elseif isSubsystem(gcbs) && ~isSimulinkFcn(gcbs) && ~isempty(gcbs)
+    elseif verOK && isSubsystem(gcbs) && ~isSimulinkFcn(gcbs) && ~isempty(gcbs)
         schemaFcns{end+1} = @ConvToSimFcnSchema;
     elseif any(selectedFcns) && ~isempty(gcbs)
         schemaFcns{end+1} = @ChangeFcnScopeSchema;
@@ -123,9 +131,9 @@ function schema = ChangeFcnScopeSchema(callbackInfo)
     scopes = getFcnScope(fcns);
 
     % Show conversion operations depending on scope
-    anyGlobal = any(contains(scopes, char(Scope.Global)));
-    anyScoped = any(contains(scopes, char(Scope.Scoped)));
-    anyLocal = any(contains(scopes, char(Scope.Local)));
+    anyGlobal = any(contains2(scopes, char(Scope.Global)));
+    anyScoped = any(contains2(scopes, char(Scope.Scoped)));
+    anyLocal = any(contains2(scopes, char(Scope.Local)));
     if anyScoped || anyLocal
         schema.childrenFcns{end+1} = @GlobalFcnSchema;
     end

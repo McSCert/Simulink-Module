@@ -11,12 +11,8 @@ function subToSimFcn(subsystem, simulinkFcnName, visibility)
 %
 %   Example:
 %       subToSimFunc('Demo_Example/f_Sensor_Trip_1', 'f_Sensor_Trip_i', 'scoped')
-%
-%           Converts 'f_Sensor_Trip_1' subsystem to a
-%           scoped Simulink Function 'f_SensorTrip_i'
 
     %% Input Validation
-    
     % Check that the subsystem model is loaded
     try
         assert(ischar(subsystem));

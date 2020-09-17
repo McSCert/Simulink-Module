@@ -1,16 +1,15 @@
 function simulinkFcnName = reqSimFcnName()
-% getSimFcnName             Prompts the user for an input Simulink Function name
-%                           until a name is entered which is not the same as
-%                           another Simulink Function in scope
+% REQSIMFCNNAME Prompt the user to input a Simulink Function name until a
+%   name is entered which is not the same as another Simulink Function in scope.
 %                                                 
-% Inputs:
-%   N/A
+%   Inputs:
+%       N/A
 %
-% Outputs:
-%   simulinkFcnName         Char array which represents a Simulink Function name
+%   Outputs:
+%       simulinkFcnName  Char array representing a Simulink Function name.
 %
-% Example:
-%   simulinkFcnName = getSimFcnName()
+%	Example:
+%       simulinkFcnName = getSimFcnName()
 %
 %           ans = 'Function_Name'
 
@@ -24,7 +23,7 @@ function simulinkFcnName = reqSimFcnName()
     % Loop until the input name is acceptable
     while 1
         inputName = inputdlg(prompt, dlgtitle, dims, definput);
-        % Checks to see if the name shadows other names in scope
+        % Check to see if the name shadows other names in scope
         if isGoodSimFcnName(gcs, inputName{1})
             break
         else

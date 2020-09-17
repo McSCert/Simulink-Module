@@ -43,6 +43,7 @@
 	\ifstrequal{#1}{6}{Print Interface}{}%
 	\ifstrequal{#1}{7}{Print Dependencies}{}%
 	\ifstrequal{#1}{8}{Delete Interface}{}%
+	\ifstrequal{#1}{9}{Convert Subsystem}{}%
 }
 
 \newcommand{\func}[1]{%
@@ -181,18 +182,25 @@ Options available when no blocks are selected are (Figure~\ref{FIG:none_selected
 \end{itemize}
 
 \noindent
-Options available when one or more \simfunc blocks are selected are (Figure~\ref{FIG:simfunc_selected}):
+Options available when one or more \simfunc blocks are selected (Figure~\ref{FIG:simfunc_selected}):
 \begin{itemize}
 	\item \emph{\menu{3}} %-- R2017b+
 	\item \emph{\menu{2}} %-- R2014b+
 \end{itemize}
+
+\noindent
+Options available when a \subsystem block is selected (Figure~\ref{FIG:subsystem_selected}):
+\begin{itemize}
+	\item \emph{\menu{9}} %-- R2014b+
+\end{itemize}
+
 
 \begin{figure}[!htb]
     \centering
     \begin{subfigure}[b]{\textwidth}
     \centering
     	\includegraphics[width=0.65\textwidth]{../figs/ContextMenu1}
-        \caption{Menu options when no functions are selected.}
+        \caption{Menu options when no \simfunc{s} are selected.}
         \label{FIG:none_selected}
     \end{subfigure}
     
@@ -201,9 +209,19 @@ Options available when one or more \simfunc blocks are selected are (Figure~\ref
     \begin{subfigure}[b]{\textwidth}
     \centering
 			\includegraphics[width=\textwidth]{../figs/ContextMenu2}
-        \caption{Menu options when one or more functions are selected.}
+        \caption{Menu options when one or more \simfunc{s} are selected.}
         \label{FIG:simfunc_selected}
     \end{subfigure}
+    
+    		\vspace{1em}%
+		
+    \begin{subfigure}[b]{\textwidth}
+    \centering
+			\includegraphics[width=.85\textwidth]{../figs/ContextMenu3}
+        \caption{Menu options when a \subsystem is selected.}
+        \label{FIG:subsystem_selected}
+    \end{subfigure}
+    
 	\caption{Simulink Context Menu with context-dependant tool options visible.}
 	\label{FIG:contextMenu}
 \end{figure}
@@ -291,7 +309,13 @@ Right-clicking on one or more \simfunc blocks and then selecting \cmd{\menu{2}} 
 	\label{fig:demo1}
 \end{figure}
 
-\newpage
+%-------------------------
+\subsubsection{\menu{9}}
+%-------------------------
+\emph{Note: This option is not available in versions prior to R2014a.}
+
+Right-clicking on a \subsystem and then selecting \cmd{\menu{9}}, and one of the two option from the Context Menu will convert a \subsystem block into a \simfunc. This will prompt the user for a function name, and perform several functions to reconfigure the \subsystem. This includes converting any \inport/\outport blocks to \argin/\argout blocks, adding a \trigger block, and setting various parameters.
+
 %-------------------------
 \subsubsection{\menu{4}}
 %-------------------------
@@ -435,13 +459,6 @@ Simulink Functions:
 \label{FIG:simulinkinterface}
 \end{figure}
 
-\paragraph{Warnings}
-\begin{enumerate}
-	\item This feature is only available for versions R2017b and newer. The Context Menu will have this option disabled for earlier versions. This is because the \emph{function visibility} parameter (\ie scoping) was not introduced for \simfunc{s} until R2017b.
-	
-		\item If a \simfunc is moved and one or more \simfunccaller{s} with the same prototype exist within its previous scope, a warning will appear in the Command Window. It is recommended that the user ensure all \simfunccaller{s} still correctly call the \simfunc. Automatic updating of \simfunccaller blocks is planned for a future version of this tool.
-\end{enumerate}
-
 %-------------------------
 \subsubsection{\menu{8}}
 %-------------------------
@@ -479,7 +496,13 @@ Right-clicking anywhere in the model and then selecting \cmd{\menu{7}} from the 
 %---------------------------------------
 
 \subsection{Errors and Warnings}
-Any errors or warnings during tool use will be visible in the \matlab Command Window.
+Any errors or warnings during tool use will be visible in the \matlab Command Window or as pop-up windows.
+
+\begin{enumerate}
+
+	
+		\item If a \simfunc is moved and one or more \simfunccaller{s} with the same prototype exist within its previous scope, a warning will appear in the Command Window. It is recommended that the user ensure all \simfunccaller{s} still correctly call the \simfunc. Automatic updating of \simfunccaller blocks is planned for a future version of this tool.
+\end{enumerate}
 
 \subsection{Limitations}
 A \Simulink model can depend on or interact with other files and elements via the use of Callbacks\footnote{\url{https://www.mathworks.com/help/simulink/ug/model-callbacks.html}} and S-Functions\footnote{\url{https://www.mathworks.com/help/simulink/sfg/what-is-an-s-function.html}}. Identifying these is not currently supported by the tool.

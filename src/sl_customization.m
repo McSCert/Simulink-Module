@@ -230,6 +230,7 @@ function CheckGuidelines(callbackInfo)
             for i = 1:length(blocks)
                 fprintf('\t%s can be moved to %s\n', replaceNewline(blocks{i}), replaceNewline(locations{i}));
             end
+            fprintf('\n');
         end
     end
     if guidelines(2)
@@ -242,6 +243,7 @@ function CheckGuidelines(callbackInfo)
             for i = 1:length(blocks)
                 fprintf('\t%s\n', replaceNewline(blocks{i}));
             end
+            fprintf('\n');
         end
     end
     if guidelines(3)
@@ -254,7 +256,8 @@ function CheckGuidelines(callbackInfo)
             for i = 1:length(blocks)
                if ~isempty(shadows{i})
                     fprintf('\t%s is shadowed by:\n\t\t%s\n', replaceNewline(blocks{i}), strjoin(replaceNewline(shadows{i}), '\n\t\t'));
-               end         
+               end     
+               fprintf('\n');
             end
         end        
     end
@@ -268,6 +271,7 @@ function CheckGuidelines(callbackInfo)
             for i = 1:length(blocks)
                 fprintf('\t%s\n', replaceNewline(blocks{i}));       
             end
+            fprintf('\n');
         end
     end
     

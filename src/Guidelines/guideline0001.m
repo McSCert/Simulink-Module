@@ -28,12 +28,15 @@ function [blocks, location] = guideline0001(model)
     for i = 1:length(fcns)
         % Find corresponding Function callers
         callers = findCallers(fcns{i});
+        if isempty(callers)
+            continue
+        end
         % Find lowest common parent of callers
         idealLocation = commonParents(callers);
         
         % If subsystem is not placed in this spot, it can be placed lower or higher
         % than its current position 
-        if ~strcmp(idealLocation, currentLocation)
+        if ~strcmp(idealLocation, currentLocation{i})
             blocks{end+1} = fcns{i};
             location{end+1} = idealLocation;
         end

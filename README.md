@@ -11,7 +11,7 @@ The Simulink Module Tool performs several functions in order to support modular 
 * Listing module dependencies
 * Checking guidelines
 
-<img src="imgs/Cover.png" width="650">
+<img src="imgs/Cover.png" width="850">
 
 ## User Guide
 For installation and other information, please see the [User Guide](doc/SimulinkModule_UserGuide.pdf).

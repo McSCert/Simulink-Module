@@ -150,17 +150,20 @@ This section describes what must be done to setup the \ToolName, as well as how 
 \begin{enumerate}
 	\item For full use of the tool, please use \matlab/\Simulink R2017b or newer.\footnote{Simulink functions were introduced in R2014b. The \emph{Function Visibility} parameter was introduced in R2017b.}
 
-	\item To install the tool,
+	\item To install the tool:
 	\begin{enumerate}
-		\item from a \file{.zip} file --- unzip the contents into your desired location. Ensure the unzipped folder and subfolders are present in your \mpath, or add them if they are not present. Run \href{https://www.mathworks.com/help/simulink/ug/registering-customizations.html}{sl\_refresh\_customizations} to refresh the Context Menu. 
-		\item from a \file{.mltbx} file --- simply open \Matlab and double-click on the file. Your \mpath should be automatically configured.
-		\item from the files only --- add the folders and subfolders to your \mpath. Run \href{https://www.mathworks.com/help/simulink/ug/registering-customizations.html}{sl\_refresh\_customizations} to refresh the Context Menu.
+		\item \textbf{Download the \file{.zip} from GitHub}
+		\begin{enumerate} 
+			\item Unzip the contents into your desired location. 
+			\item Add the unzipped folder and subfolders to your \mpath. 
+			\item Download the \href{https://github.com/McSCert/Simulink-Utility}{Simulink-Utility} in the same manner. Add the folder to your \mpath also. This is a dependency for the tool to work correctly.
+		\end{enumerate}
+		\item \textbf{Use the Git command line}
+			\begin{enumerate}
+				\item Use the command, \begin{verbatim}git clone --recursive https://github.com/McSCert/Simulink-Module\end{verbatim} This will download the tool and any necessary submodules.
+			\end{enumerate}
 	\end{enumerate}
-	\begin{itemize}
-		\item \textit{Note:} If running the command ``\cmd{which AutoLayout}'' indicates that the script is not found, then the tool needs to be added to the \mpath.
-		For information on adding files to the \mpath, please see the \href{https://www.mathworks.com/help/matlab/matlab_env/add-remove-or-reorder-folders-on-the-search-path.html}{MathWorks documentation}.
-	\end{itemize}
-	\item Ensure the Simulink-Utility folder is on your \mpath. This is a dependency for the tool to work correctly.
+	\item Run \href{https://www.mathworks.com/help/simulink/ug/registering-customizations.html}{sl\_refresh\_customizations} to refresh the Context Menu. 
 	\item Ensure your model is open and unlocked.
 \end{enumerate}
 

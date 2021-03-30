@@ -150,18 +150,26 @@ This section describes what must be done to setup the \ToolName, as well as how 
 \begin{enumerate}
 	\item For full use of the tool, please use \matlab/\Simulink R2017b or newer.\footnote{Simulink functions were introduced in R2014b. The \emph{Function Visibility} parameter was introduced in R2017b.}
 
-	\item To install the tool:
+	\item To install the tool, use one of the following approaches:
 	\begin{enumerate}
 		\item \textbf{Download the \file{.zip} from GitHub}
 		\begin{enumerate} 
 			\item Unzip the contents into your desired location. 
 			\item Add the unzipped folder and subfolders to your \mpath. 
-			\item Download the \href{https://github.com/McSCert/Simulink-Utility}{Simulink-Utility} in the same manner. Add the folder to your \mpath also. This is a dependency for the tool to work correctly.
+			\item Download the \href{https://github.com/McSCert/Simulink-Utility}{Simulink-Utility} in the same manner. Add the folder and subfolders to your \mpath also. This is a dependency for the tool to work correctly.
 		\end{enumerate}
 		\item \textbf{Use the Git command line}
-			\begin{enumerate}
-				\item Use the command, \begin{verbatim}git clone --recursive https://github.com/McSCert/Simulink-Module\end{verbatim} This will download the tool and any necessary submodules.
-			\end{enumerate}
+		\begin{enumerate}
+			\item Use the following command to download the tool and any necessary submodules. 
+			\begin{verbatim}
+			git clone --recursive https://github.com/McSCert/Simulink-Module
+			\end{verbatim}
+			\item Add the folder and subfolders to your \mpath. 
+		\end{enumerate}
+		\item \textbf{If you already have the files}
+		\begin{enumerate}
+			\item Add the tool folder and subfolders to your \mpath. 
+		\end{enumerate}
 	\end{enumerate}
 	\item Run \href{https://www.mathworks.com/help/simulink/ug/registering-customizations.html}{sl\_refresh\_customizations} to refresh the Context Menu. 
 	\item Ensure your model is open and unlocked.
@@ -196,7 +204,6 @@ Options available when a \subsystem block is selected (Figure~\ref{FIG:subsystem
 \begin{itemize}
 	\item \emph{\menu{9}} %-- R2014b+
 \end{itemize}
-
 
 \begin{figure}[!htb]
     \centering
